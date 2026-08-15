@@ -901,3 +901,386 @@ Ao final do próximo bloco, serei capaz de:
 - criar layouts responsivos;
 - compreender Media Queries;
 - construir interfaces profissionais para o Finance Manager.
+
+# Learning Journal — Frontend
+
+## Bloco 3 — CSS
+
+### Status
+
+Em andamento.
+
+Checkpoint parcial contemplando os conteúdos estudados até **Unidades CSS**.
+
+---
+
+## Objetivo
+
+Compreender CSS como a linguagem responsável pela apresentação e pelo comportamento visual dos elementos HTML, entendendo como o navegador calcula estilos, dimensões, posicionamento e layout.
+
+O objetivo não é apenas conhecer propriedades, mas compreender como elas interagem durante a renderização da página.
+
+---
+
+## 1. CSS e renderização
+
+CSS é responsável pela apresentação dos elementos estruturados pelo HTML.
+
+O navegador processa HTML e CSS aproximadamente pelo seguinte fluxo:
+
+    HTML → DOM
+    CSS → CSSOM
+
+    DOM + CSSOM
+         ↓
+    Render Tree
+         ↓
+    Layout
+         ↓
+    Paint
+         ↓
+    Composite
+
+- **DOM:** representação do HTML como árvore de objetos.
+- **CSSOM:** representação das regras CSS.
+- **Render Tree:** reúne as informações necessárias para renderização.
+- **Layout:** calcula dimensões e posições.
+- **Paint:** desenha os elementos.
+- **Composite:** combina as camadas renderizadas.
+
+---
+
+## 2. Cascata, Especificidade e Herança
+
+### Cascata
+
+Resolve conflitos quando diferentes regras definem a mesma propriedade.
+
+Entre os critérios analisados estão:
+
+    Origem → Importância → Especificidade → Ordem
+
+### Especificidade
+
+Determina o peso dos seletores durante a resolução de conflitos.
+
+Modelo estudado:
+
+    inline | ID | classe/atributo/pseudo-classe | elemento
+
+Classes são geralmente preferíveis a IDs para estilização reutilizável, pois evitam especificidade excessiva.
+
+### Herança
+
+Permite que determinadas propriedades sejam recebidas dos elementos ancestrais.
+
+Propriedades relacionadas a texto frequentemente são herdadas, enquanto propriedades estruturais como `margin`, `padding` e `display` normalmente não são.
+
+---
+
+## 3. Seletores
+
+Seletores determinam quais elementos recebem determinada regra CSS.
+
+Foram estudados:
+
+    p {}
+    .card {}
+    #menu {}
+    * {}
+
+Correspondendo a seletores por elemento, classe, ID e universal.
+
+Para estilização reutilizável, classes geralmente oferecem maior flexibilidade.
+
+---
+
+## 4. Box Model
+
+Todo elemento pode ser compreendido como uma caixa:
+
+    Margin
+    └── Border
+        └── Padding
+            └── Content
+
+- **Content:** conteúdo do elemento.
+- **Padding:** espaço interno.
+- **Border:** limite da caixa.
+- **Margin:** espaço externo.
+
+### Box sizing
+
+Com `content-box`, `width` e `height` representam o Content, sendo Padding e Border adicionados às dimensões.
+
+Com `border-box`, Padding e Border ficam incluídos nas dimensões declaradas.
+
+---
+
+## 5. Margin, Border e Padding
+
+### Margin
+
+Controla o espaço externo entre caixas.
+
+Pode ser definida individualmente ou através de shorthand.
+
+Também foram estudados:
+
+- `margin: auto`;
+- centralização horizontal;
+- margin collapsing.
+
+### Border
+
+Representa o limite visual da caixa e possui principalmente:
+
+    width
+    style
+    color
+
+Pode ser aplicada individualmente aos lados.
+
+`border-radius` controla o arredondamento dos cantos e não exige uma Border visível.
+
+### Padding
+
+Representa o espaço entre Content e Border.
+
+Modelo mental:
+
+    Espaço interno → Padding
+    Espaço externo → Margin ou mecanismo de layout
+
+Padding também aumenta a região visual e interativa do elemento.
+
+---
+
+## 6. Width e Height
+
+Controlam as dimensões das caixas.
+
+Também foram estudados:
+
+    min-width
+    max-width
+    min-height
+    max-height
+
+Dimensões fixas oferecem previsibilidade, mas podem dificultar adaptação.
+
+Dimensões relativas e limites permitem criar componentes mais flexíveis.
+
+Para conteúdo variável, `min-height` tende a ser mais seguro que uma altura fixa quando o componente deve poder crescer.
+
+---
+
+## 7. Display
+
+`display` participa da definição de como uma caixa se comporta no layout.
+
+### Block
+
+- inicia normalmente em uma nova linha;
+- funciona como caixa estrutural;
+- permite controle dimensional.
+
+### Inline
+
+- participa do fluxo de texto;
+- não força uma nova linha;
+- possui limitações para `width` e `height`.
+
+### Inline-block
+
+- participa do fluxo inline;
+- permite maior controle dimensional.
+
+A semântica HTML deve continuar sendo escolhida pelo significado do elemento, e não por sua aparência padrão.
+
+---
+
+## 8. Position
+
+Foram estudados:
+
+    static
+    relative
+    absolute
+    fixed
+    sticky
+
+- **Static:** segue o fluxo normal.
+- **Relative:** permanece no fluxo e permite posicionamento relativo à posição original.
+- **Absolute:** é retirado do fluxo normal para posicionamento.
+- **Fixed:** permanece normalmente relacionado à viewport.
+- **Sticky:** participa do fluxo até atingir um limite durante a rolagem.
+
+Um uso importante é combinar um ancestral `relative` com um descendente `absolute` para criar posicionamento contextual.
+
+`absolute` não deve ser utilizado como mecanismo principal para construir layouts completos.
+
+---
+
+## 9. Overflow
+
+Define o comportamento quando o conteúdo ultrapassa os limites da caixa.
+
+    visible → permite transbordamento
+    hidden  → recorta
+    scroll  → estabelece região rolável
+    auto    → rolagem quando necessária
+
+Também existem:
+
+    overflow-x
+    overflow-y
+
+Uma combinação útil para conteúdo variável é:
+
+    max-height: 300px;
+    overflow-y: auto;
+
+`overflow: hidden` não deve ser utilizado apenas para esconder problemas de layout.
+
+---
+
+## 10. Unidades CSS
+
+Foram estudadas:
+
+| Unidade | Referência |
+|---|---|
+| `px` | CSS pixel |
+| `%` | depende da propriedade e contexto |
+| `em` | contexto tipográfico local |
+| `rem` | tamanho da fonte do elemento raiz |
+| `vw` | largura da viewport |
+| `vh` | altura da viewport |
+
+O principal aprendizado é perguntar:
+
+> Relativo a quê?
+
+A escolha da unidade deve representar a relação desejada, e não seguir regras rígidas como utilizar sempre `%` para largura ou `rem` para qualquer dimensão.
+
+---
+
+## Aplicação no Finance Manager
+
+Os conceitos estudados serão utilizados diretamente em:
+
+- formulários de Login;
+- cards do Dashboard;
+- menu lateral;
+- tabelas de transações;
+- notificações;
+- componentes com conteúdo variável.
+
+Box Model, dimensões, Display e Position formarão a base estrutural desses componentes.
+
+Overflow será importante para regiões com quantidade variável de dados, enquanto unidades relativas ajudarão na construção de interfaces adaptáveis.
+
+---
+
+## Principais aprendizados
+
+CSS não é apenas uma coleção de propriedades visuais.
+
+O navegador utiliza suas regras para determinar:
+
+    Estilos
+    Dimensões
+    Espaçamentos
+    Comportamento das caixas
+    Posicionamento
+    Overflow
+
+Os conceitos estudados possuem relação direta:
+
+    Cascata / Especificidade / Herança
+                    ↓
+                 Seletores
+                    ↓
+                Box Model
+                    ↓
+         Margin / Border / Padding
+                    ↓
+            Width / Height
+                    ↓
+                 Display
+                    ↓
+                Position
+                    ↓
+                Overflow
+                    ↓
+                Unidades
+
+---
+
+## Boas práticas
+
+- Separar estrutura HTML de apresentação CSS.
+- Preferir classes para estilização reutilizável.
+- Evitar especificidade desnecessária.
+- Compreender o Box Model antes de ajustar dimensões.
+- Diferenciar espaçamento interno e externo.
+- Evitar alturas fixas para conteúdo imprevisível.
+- Utilizar `min-*` e `max-*` quando forem necessários limites.
+- Não construir layouts completos com `absolute`.
+- Não utilizar `overflow: hidden` para mascarar problemas.
+- Escolher unidades conforme a relação dimensional desejada.
+
+---
+
+## Progresso
+
+### Conteúdos concluídos
+
+1. CSS
+2. Aplicação do CSS pelo navegador
+3. Cascata
+4. Especificidade
+5. Herança
+6. Seletores
+7. Box Model
+8. Margin
+9. Border
+10. Padding
+11. Width e Height
+12. Display
+13. Position
+14. Overflow
+15. Unidades
+
+### Conteúdos restantes
+
+16. Cores
+17. Tipografia
+18. Background
+19. Flexbox
+20. CSS Grid
+21. Responsividade
+22. Media Queries
+23. Organização de CSS
+24. Boas práticas
+
+**Progresso nominal: 15 de 24 assuntos — 62,5%.**
+
+---
+
+## Próxima etapa
+
+A sequência continuará com:
+
+    Cores
+    → Tipografia
+    → Background
+    → Flexbox
+    → Grid
+    → Responsividade
+    → Media Queries
+    → Organização
+    → Boas práticas
+
+Flexbox e Grid iniciarão o estudo dos principais sistemas modernos de layout, utilizando como base os conceitos de Box Model, dimensões e Display já consolidados.
