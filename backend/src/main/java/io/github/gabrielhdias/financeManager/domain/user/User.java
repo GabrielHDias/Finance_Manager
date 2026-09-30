@@ -17,15 +17,15 @@ public class User {
     private String email;
 
     @Column(name = "password", nullable = false)
-    private String password;
+    private String passwordHash;
 
     protected User() {
     }
 
-    public User(String name, String email, String password) {
+    public User(String name, String email, String passwordHash) {
         this.name = validateName(name);
         this.email = validateEmail(email);
-        this.password = validatePassword(password);
+        this.passwordHash = validatePasswordHash(passwordHash);
     }
 
     public Long getId() {
@@ -40,8 +40,8 @@ public class User {
         return email;
     }
 
-    public String getPassword() {
-        return password;
+    public String getPasswordHash() {
+        return passwordHash;
     }
 
     public void rename(String name) {
@@ -52,8 +52,8 @@ public class User {
         this.email = validateEmail(email);
     }
 
-    public void changePassword(String password) {
-        this.password = validatePassword(password);
+    public void changePasswordHash(String passwordHash) {
+        this.passwordHash = validatePasswordHash(passwordHash);
     }
 
     private String validateName(String name) {
@@ -76,13 +76,13 @@ public class User {
         return email.trim().toLowerCase();
     }
 
-    private String validatePassword(String password) {
-        if (password == null || password.isBlank()) {
+    private String validatePasswordHash(String passwordHash) {
+        if (passwordHash == null || passwordHash.isBlank()) {
             throw new IllegalArgumentException(
-                "A senha não pode estar vazia"
+                "O hash da senha não pode estar vazio"
             );
         }
 
-        return password;
+        return passwordHash;
     }
 }
