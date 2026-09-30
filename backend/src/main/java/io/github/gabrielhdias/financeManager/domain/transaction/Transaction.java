@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity
 @Table(name = "transactions")
@@ -47,12 +48,24 @@ public class Transaction {
         Account account,
         Category category
     ) {
-        this.description = description;
-        this.amount = amount;
-        this.date = date;
-        this.type = type;
-        this.account = account;
-        this.category = category;
+        this.description = validateDescription(description);
+        this.amount = validateAmount(amount);
+        this.date = Objects.requireNonNull(
+            date,
+            "A data da transação não pode ser nula"
+        );
+        this.type = Objects.requireNonNull(
+            type,
+            "O tipo da transação não pode ser nulo"
+        );
+        this.account = Objects.requireNonNull(
+            account,
+            "A conta da transação não pode ser nula"
+        );
+        this.category = Objects.requireNonNull(
+            category,
+            "A categoria da transação não pode ser nula"
+        );
     }
 
     public Long getId() {
@@ -84,26 +97,64 @@ public class Transaction {
     }
 
     public void updateDescription(String description) {
-        this.description = description;
+        this.description = validateDescription(description);
     }
 
     public void updateAmount(BigDecimal amount) {
-        this.amount = amount;
+        this.amount = validateAmount(amount);
     }
 
     public void updateDate(LocalDate date) {
-        this.date = date;
+        this.date = Objects.requireNonNull(
+            date,
+            "A data da transação não pode ser nula"
+        );
     }
 
     public void updateType(TransactionType type) {
-        this.type = type;
+        this.type = Objects.requireNonNull(
+            type,
+            "O tipo da transação não pode ser nulo"
+        );
     }
 
     public void updateAccount(Account account) {
-        this.account = account;
+        this.account = Objects.requireNonNull(
+            account,
+            "A conta da transação não pode ser nula"
+        );
     }
 
     public void updateCategory(Category category) {
-        this.category = category;
+        this.category = Objects.requireNonNull(
+            category,
+            "A categoria da transação não pode ser nula"
+        );
+    }
+
+    private String validateDescription(String description) {
+        if (description == null || description.isBlank()) {
+            throw new IllegalArgumentException(
+                "A descrição da transação não pode estar vazia"
+            );
+        }
+
+        return description.trim();
+    }
+
+    private BigDecimal validateAmount(BigDecimal amount) {
+        if (amount == null) {
+            throw new IllegalArgumentException(
+                "O valor da transação não pode ser nulo"
+            );
+        }
+
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException(
+                "O valor da transação deve ser maior que zero"
+            );
+        }
+
+        return amount;
     }
 }

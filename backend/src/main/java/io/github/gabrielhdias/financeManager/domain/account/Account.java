@@ -3,6 +3,8 @@ package io.github.gabrielhdias.financeManager.domain.account;
 import io.github.gabrielhdias.financeManager.domain.user.User;
 import jakarta.persistence.*;
 
+import java.util.Objects;
+
 @Entity
 @Table(name = "accounts")
 public class Account {
@@ -22,8 +24,11 @@ public class Account {
     }
 
     public Account(String name, User user) {
-        this.name = name;
-        this.user = user;
+        this.name = validateName(name);
+        this.user = Objects.requireNonNull(
+            user,
+            "O usuário da conta não pode ser nulo"
+        );
     }
 
     public Long getId() {
@@ -39,6 +44,16 @@ public class Account {
     }
 
     public void rename(String name) {
-        this.name = name;
+        this.name = validateName(name);
+    }
+
+    private String validateName(String name) {
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException(
+                "O nome da conta não pode estar vazio"
+            );
+        }
+
+        return name.trim();
     }
 }
