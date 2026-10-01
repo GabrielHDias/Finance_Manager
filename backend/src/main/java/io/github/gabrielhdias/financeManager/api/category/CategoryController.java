@@ -4,11 +4,10 @@ import io.github.gabrielhdias.financeManager.api.category.dto.CategoryRequest;
 import io.github.gabrielhdias.financeManager.api.category.dto.CategoryResponse;
 import io.github.gabrielhdias.financeManager.domain.category.Category;
 import io.github.gabrielhdias.financeManager.domain.category.CategoryService;
+import io.github.gabrielhdias.financeManager.security.AuthenticatedUser;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,17 +24,21 @@ import java.util.List;
 public class CategoryController {
 
     private final CategoryService categoryService;
+    private final AuthenticatedUser authenticatedUser;
 
-    public CategoryController(CategoryService categoryService) {
+    public CategoryController(
+        CategoryService categoryService,
+        AuthenticatedUser authenticatedUser
+    ) {
         this.categoryService = categoryService;
+        this.authenticatedUser = authenticatedUser;
     }
 
     @PostMapping
     public ResponseEntity<CategoryResponse> create(
-        @AuthenticationPrincipal Jwt jwt,
         @Valid @RequestBody CategoryRequest request
     ) {
-        Long userId = getUserId(jwt);
+        Long userId = authenticatedUser.getId();
 
         Category category = categoryService.create(
             userId,
@@ -48,10 +51,8 @@ public class CategoryController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CategoryResponse>> list(
-        @AuthenticationPrincipal Jwt jwt
-    ) {
-        Long userId = getUserId(jwt);
+    public ResponseEntity<List<CategoryResponse>> list() {
+        Long userId = authenticatedUser.getId();
 
         List<CategoryResponse> response = categoryService
             .listByUser(userId)
@@ -64,10 +65,9 @@ public class CategoryController {
 
     @GetMapping("/{id}")
     public ResponseEntity<CategoryResponse> findById(
-        @AuthenticationPrincipal Jwt jwt,
         @PathVariable Long id
     ) {
-        Long userId = getUserId(jwt);
+        Long userId = authenticatedUser.getId();
 
         Category category = categoryService.findById(
             userId,
@@ -81,11 +81,10 @@ public class CategoryController {
 
     @PutMapping("/{id}")
     public ResponseEntity<CategoryResponse> rename(
-        @AuthenticationPrincipal Jwt jwt,
         @PathVariable Long id,
         @Valid @RequestBody CategoryRequest request
     ) {
-        Long userId = getUserId(jwt);
+        Long userId = authenticatedUser.getId();
 
         Category category = categoryService.rename(
             userId,
@@ -100,10 +99,9 @@ public class CategoryController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
-        @AuthenticationPrincipal Jwt jwt,
         @PathVariable Long id
     ) {
-        Long userId = getUserId(jwt);
+        Long userId = authenticatedUser.getId();
 
         categoryService.delete(
             userId,
@@ -111,9 +109,5 @@ public class CategoryController {
         );
 
         return ResponseEntity.noContent().build();
-    }
-
-    private Long getUserId(Jwt jwt) {
-        return Long.valueOf(jwt.getSubject());
     }
 }

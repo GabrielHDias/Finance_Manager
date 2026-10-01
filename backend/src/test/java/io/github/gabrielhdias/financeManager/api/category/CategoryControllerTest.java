@@ -4,6 +4,7 @@ import io.github.gabrielhdias.financeManager.api.category.dto.CategoryRequest;
 import io.github.gabrielhdias.financeManager.api.category.dto.CategoryResponse;
 import io.github.gabrielhdias.financeManager.domain.category.Category;
 import io.github.gabrielhdias.financeManager.domain.category.CategoryService;
+import io.github.gabrielhdias.financeManager.security.AuthenticatedUser;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -11,7 +12,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.util.List;
 
@@ -25,7 +25,7 @@ class CategoryControllerTest {
     private CategoryService categoryService;
 
     @Mock
-    private Jwt jwt;
+    private AuthenticatedUser authenticatedUser;
 
     @InjectMocks
     private CategoryController categoryController;
@@ -39,8 +39,8 @@ class CategoryControllerTest {
 
         Category category = mock(Category.class);
 
-        when(jwt.getSubject())
-            .thenReturn(userId.toString());
+        when(authenticatedUser.getId())
+            .thenReturn(userId);
 
         when(category.getId())
             .thenReturn(10L);
@@ -54,10 +54,7 @@ class CategoryControllerTest {
         )).thenReturn(category);
 
         ResponseEntity<CategoryResponse> response =
-            categoryController.create(
-                jwt,
-                request
-            );
+            categoryController.create(request);
 
         assertEquals(
             HttpStatus.CREATED,
@@ -89,8 +86,8 @@ class CategoryControllerTest {
         Category firstCategory = mock(Category.class);
         Category secondCategory = mock(Category.class);
 
-        when(jwt.getSubject())
-            .thenReturn(userId.toString());
+        when(authenticatedUser.getId())
+            .thenReturn(userId);
 
         when(firstCategory.getId())
             .thenReturn(10L);
@@ -111,7 +108,7 @@ class CategoryControllerTest {
             ));
 
         ResponseEntity<List<CategoryResponse>> response =
-            categoryController.list(jwt);
+            categoryController.list();
 
         assertEquals(
             HttpStatus.OK,
@@ -146,8 +143,8 @@ class CategoryControllerTest {
 
         Category category = mock(Category.class);
 
-        when(jwt.getSubject())
-            .thenReturn(userId.toString());
+        when(authenticatedUser.getId())
+            .thenReturn(userId);
 
         when(category.getId())
             .thenReturn(categoryId);
@@ -161,10 +158,7 @@ class CategoryControllerTest {
         )).thenReturn(category);
 
         ResponseEntity<CategoryResponse> response =
-            categoryController.findById(
-                jwt,
-                categoryId
-            );
+            categoryController.findById(categoryId);
 
         assertEquals(
             HttpStatus.OK,
@@ -199,8 +193,8 @@ class CategoryControllerTest {
 
         Category category = mock(Category.class);
 
-        when(jwt.getSubject())
-            .thenReturn(userId.toString());
+        when(authenticatedUser.getId())
+            .thenReturn(userId);
 
         when(category.getId())
             .thenReturn(categoryId);
@@ -216,7 +210,6 @@ class CategoryControllerTest {
 
         ResponseEntity<CategoryResponse> response =
             categoryController.rename(
-                jwt,
                 categoryId,
                 request
             );
@@ -250,14 +243,11 @@ class CategoryControllerTest {
         Long userId = 1L;
         Long categoryId = 10L;
 
-        when(jwt.getSubject())
-            .thenReturn(userId.toString());
+        when(authenticatedUser.getId())
+            .thenReturn(userId);
 
         ResponseEntity<Void> response =
-            categoryController.delete(
-                jwt,
-                categoryId
-            );
+            categoryController.delete(categoryId);
 
         assertEquals(
             HttpStatus.NO_CONTENT,

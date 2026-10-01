@@ -4,11 +4,10 @@ import io.github.gabrielhdias.financeManager.api.transaction.dto.TransactionRequ
 import io.github.gabrielhdias.financeManager.api.transaction.dto.TransactionResponse;
 import io.github.gabrielhdias.financeManager.domain.transaction.Transaction;
 import io.github.gabrielhdias.financeManager.domain.transaction.TransactionService;
+import io.github.gabrielhdias.financeManager.security.AuthenticatedUser;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,19 +24,21 @@ import java.util.List;
 public class TransactionController {
 
     private final TransactionService transactionService;
+    private final AuthenticatedUser authenticatedUser;
 
     public TransactionController(
-        TransactionService transactionService
+        TransactionService transactionService,
+        AuthenticatedUser authenticatedUser
     ) {
         this.transactionService = transactionService;
+        this.authenticatedUser = authenticatedUser;
     }
 
     @PostMapping
     public ResponseEntity<TransactionResponse> create(
-        @AuthenticationPrincipal Jwt jwt,
         @Valid @RequestBody TransactionRequest request
     ) {
-        Long userId = getUserId(jwt);
+        Long userId = authenticatedUser.getId();
 
         Transaction transaction = transactionService.create(
             userId,
@@ -55,10 +56,8 @@ public class TransactionController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TransactionResponse>> list(
-        @AuthenticationPrincipal Jwt jwt
-    ) {
-        Long userId = getUserId(jwt);
+    public ResponseEntity<List<TransactionResponse>> list() {
+        Long userId = authenticatedUser.getId();
 
         List<TransactionResponse> response = transactionService
             .listByUser(userId)
@@ -71,10 +70,9 @@ public class TransactionController {
 
     @GetMapping("/{id}")
     public ResponseEntity<TransactionResponse> findById(
-        @AuthenticationPrincipal Jwt jwt,
         @PathVariable Long id
     ) {
-        Long userId = getUserId(jwt);
+        Long userId = authenticatedUser.getId();
 
         Transaction transaction = transactionService.findById(
             userId,
@@ -88,11 +86,10 @@ public class TransactionController {
 
     @PutMapping("/{id}")
     public ResponseEntity<TransactionResponse> update(
-        @AuthenticationPrincipal Jwt jwt,
         @PathVariable Long id,
         @Valid @RequestBody TransactionRequest request
     ) {
-        Long userId = getUserId(jwt);
+        Long userId = authenticatedUser.getId();
 
         Transaction transaction = transactionService.update(
             userId,
@@ -112,10 +109,9 @@ public class TransactionController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
-        @AuthenticationPrincipal Jwt jwt,
         @PathVariable Long id
     ) {
-        Long userId = getUserId(jwt);
+        Long userId = authenticatedUser.getId();
 
         transactionService.delete(
             userId,
@@ -123,9 +119,5 @@ public class TransactionController {
         );
 
         return ResponseEntity.noContent().build();
-    }
-
-    private Long getUserId(Jwt jwt) {
-        return Long.valueOf(jwt.getSubject());
     }
 }

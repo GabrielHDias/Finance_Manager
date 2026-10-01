@@ -3,6 +3,7 @@ package io.github.gabrielhdias.financeManager.api.account;
 import io.github.gabrielhdias.financeManager.config.security.SecurityConfig;
 import io.github.gabrielhdias.financeManager.domain.account.Account;
 import io.github.gabrielhdias.financeManager.domain.account.AccountService;
+import io.github.gabrielhdias.financeManager.security.AuthenticatedUser;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -32,6 +33,9 @@ class AccountControllerMvcTest {
     private AccountService accountService;
 
     @MockitoBean
+    private AuthenticatedUser authenticatedUser;
+
+    @MockitoBean
     private JwtDecoder jwtDecoder;
 
     @Test
@@ -47,6 +51,9 @@ class AccountControllerMvcTest {
         Long userId = 1L;
 
         Account account = mock(Account.class);
+
+        when(authenticatedUser.getId())
+            .thenReturn(userId);
 
         when(account.getId())
             .thenReturn(10L);
@@ -83,6 +90,9 @@ class AccountControllerMvcTest {
 
     @Test
     void shouldReturnBadRequestWhenAccountNameIsBlank() throws Exception {
+        when(authenticatedUser.getId())
+            .thenReturn(1L);
+
         mockMvc.perform(
                 post("/accounts")
                     .with(jwt().jwt(jwt ->

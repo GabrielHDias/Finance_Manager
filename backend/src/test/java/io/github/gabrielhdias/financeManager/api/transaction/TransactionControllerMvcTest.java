@@ -6,6 +6,7 @@ import io.github.gabrielhdias.financeManager.domain.category.Category;
 import io.github.gabrielhdias.financeManager.domain.transaction.Transaction;
 import io.github.gabrielhdias.financeManager.domain.transaction.TransactionService;
 import io.github.gabrielhdias.financeManager.domain.transaction.TransactionType;
+import io.github.gabrielhdias.financeManager.security.AuthenticatedUser;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -38,6 +39,9 @@ class TransactionControllerMvcTest {
     private TransactionService transactionService;
 
     @MockitoBean
+    private AuthenticatedUser authenticatedUser;
+
+    @MockitoBean
     private JwtDecoder jwtDecoder;
 
     @Test
@@ -57,6 +61,9 @@ class TransactionControllerMvcTest {
         Account account = mock(Account.class);
         Category category = mock(Category.class);
         Transaction transaction = mock(Transaction.class);
+
+        when(authenticatedUser.getId())
+            .thenReturn(userId);
 
         when(account.getId())
             .thenReturn(accountId);
@@ -145,6 +152,9 @@ class TransactionControllerMvcTest {
 
     @Test
     void shouldReturnBadRequestWhenTransactionDataIsInvalid() throws Exception {
+        when(authenticatedUser.getId())
+            .thenReturn(1L);
+
         mockMvc.perform(
                 post("/transactions")
                     .with(jwt().jwt(jwt ->

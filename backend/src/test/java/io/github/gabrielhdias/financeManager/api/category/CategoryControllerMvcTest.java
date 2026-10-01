@@ -3,6 +3,7 @@ package io.github.gabrielhdias.financeManager.api.category;
 import io.github.gabrielhdias.financeManager.config.security.SecurityConfig;
 import io.github.gabrielhdias.financeManager.domain.category.Category;
 import io.github.gabrielhdias.financeManager.domain.category.CategoryService;
+import io.github.gabrielhdias.financeManager.security.AuthenticatedUser;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -32,6 +33,9 @@ class CategoryControllerMvcTest {
     private CategoryService categoryService;
 
     @MockitoBean
+    private AuthenticatedUser authenticatedUser;
+
+    @MockitoBean
     private JwtDecoder jwtDecoder;
 
     @Test
@@ -47,6 +51,9 @@ class CategoryControllerMvcTest {
         Long userId = 1L;
 
         Category category = mock(Category.class);
+
+        when(authenticatedUser.getId())
+            .thenReturn(userId);
 
         when(category.getId())
             .thenReturn(10L);
@@ -84,6 +91,9 @@ class CategoryControllerMvcTest {
 
     @Test
     void shouldReturnBadRequestWhenCategoryNameIsBlank() throws Exception {
+        when(authenticatedUser.getId())
+            .thenReturn(1L);
+
         mockMvc.perform(
                 post("/categories")
                     .with(jwt().jwt(jwt ->

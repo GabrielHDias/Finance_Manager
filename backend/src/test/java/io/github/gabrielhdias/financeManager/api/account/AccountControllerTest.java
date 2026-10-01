@@ -4,6 +4,7 @@ import io.github.gabrielhdias.financeManager.api.account.dto.AccountRequest;
 import io.github.gabrielhdias.financeManager.api.account.dto.AccountResponse;
 import io.github.gabrielhdias.financeManager.domain.account.Account;
 import io.github.gabrielhdias.financeManager.domain.account.AccountService;
+import io.github.gabrielhdias.financeManager.security.AuthenticatedUser;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -11,7 +12,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.util.List;
 
@@ -25,7 +25,7 @@ class AccountControllerTest {
     private AccountService accountService;
 
     @Mock
-    private Jwt jwt;
+    private AuthenticatedUser authenticatedUser;
 
     @InjectMocks
     private AccountController accountController;
@@ -39,8 +39,8 @@ class AccountControllerTest {
 
         Account account = mock(Account.class);
 
-        when(jwt.getSubject())
-            .thenReturn(userId.toString());
+        when(authenticatedUser.getId())
+            .thenReturn(userId);
 
         when(account.getId())
             .thenReturn(10L);
@@ -54,10 +54,7 @@ class AccountControllerTest {
         )).thenReturn(account);
 
         ResponseEntity<AccountResponse> response =
-            accountController.create(
-                jwt,
-                request
-            );
+            accountController.create(request);
 
         assertEquals(
             HttpStatus.CREATED,
@@ -76,6 +73,9 @@ class AccountControllerTest {
             response.getBody().name()
         );
 
+        verify(authenticatedUser)
+            .getId();
+
         verify(accountService).create(
             userId,
             "Nubank"
@@ -89,8 +89,8 @@ class AccountControllerTest {
         Account firstAccount = mock(Account.class);
         Account secondAccount = mock(Account.class);
 
-        when(jwt.getSubject())
-            .thenReturn(userId.toString());
+        when(authenticatedUser.getId())
+            .thenReturn(userId);
 
         when(firstAccount.getId())
             .thenReturn(10L);
@@ -111,7 +111,7 @@ class AccountControllerTest {
             ));
 
         ResponseEntity<List<AccountResponse>> response =
-            accountController.list(jwt);
+            accountController.list();
 
         assertEquals(
             HttpStatus.OK,
@@ -119,11 +119,7 @@ class AccountControllerTest {
         );
 
         assertNotNull(response.getBody());
-
-        assertEquals(
-            2,
-            response.getBody().size()
-        );
+        assertEquals(2, response.getBody().size());
 
         assertEquals(
             "Nubank",
@@ -134,6 +130,9 @@ class AccountControllerTest {
             "Carteira",
             response.getBody().get(1).name()
         );
+
+        verify(authenticatedUser)
+            .getId();
 
         verify(accountService)
             .listByUser(userId);
@@ -146,8 +145,8 @@ class AccountControllerTest {
 
         Account account = mock(Account.class);
 
-        when(jwt.getSubject())
-            .thenReturn(userId.toString());
+        when(authenticatedUser.getId())
+            .thenReturn(userId);
 
         when(account.getId())
             .thenReturn(accountId);
@@ -161,10 +160,7 @@ class AccountControllerTest {
         )).thenReturn(account);
 
         ResponseEntity<AccountResponse> response =
-            accountController.findById(
-                jwt,
-                accountId
-            );
+            accountController.findById(accountId);
 
         assertEquals(
             HttpStatus.OK,
@@ -199,8 +195,8 @@ class AccountControllerTest {
 
         Account account = mock(Account.class);
 
-        when(jwt.getSubject())
-            .thenReturn(userId.toString());
+        when(authenticatedUser.getId())
+            .thenReturn(userId);
 
         when(account.getId())
             .thenReturn(accountId);
@@ -216,7 +212,6 @@ class AccountControllerTest {
 
         ResponseEntity<AccountResponse> response =
             accountController.rename(
-                jwt,
                 accountId,
                 request
             );
@@ -250,14 +245,11 @@ class AccountControllerTest {
         Long userId = 1L;
         Long accountId = 10L;
 
-        when(jwt.getSubject())
-            .thenReturn(userId.toString());
+        when(authenticatedUser.getId())
+            .thenReturn(userId);
 
         ResponseEntity<Void> response =
-            accountController.delete(
-                jwt,
-                accountId
-            );
+            accountController.delete(accountId);
 
         assertEquals(
             HttpStatus.NO_CONTENT,

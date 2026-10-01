@@ -7,6 +7,7 @@ import io.github.gabrielhdias.financeManager.domain.category.Category;
 import io.github.gabrielhdias.financeManager.domain.transaction.Transaction;
 import io.github.gabrielhdias.financeManager.domain.transaction.TransactionService;
 import io.github.gabrielhdias.financeManager.domain.transaction.TransactionType;
+import io.github.gabrielhdias.financeManager.security.AuthenticatedUser;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,7 +15,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -30,7 +30,7 @@ class TransactionControllerTest {
     private TransactionService transactionService;
 
     @Mock
-    private Jwt jwt;
+    private AuthenticatedUser authenticatedUser;
 
     @InjectMocks
     private TransactionController transactionController;
@@ -62,8 +62,8 @@ class TransactionControllerTest {
             "Alimentação"
         );
 
-        when(jwt.getSubject())
-            .thenReturn(userId.toString());
+        when(authenticatedUser.getId())
+            .thenReturn(userId);
 
         when(transactionService.create(
             userId,
@@ -76,10 +76,7 @@ class TransactionControllerTest {
         )).thenReturn(transaction);
 
         ResponseEntity<TransactionResponse> response =
-            transactionController.create(
-                jwt,
-                request
-            );
+            transactionController.create(request);
 
         assertEquals(
             HttpStatus.CREATED,
@@ -167,8 +164,8 @@ class TransactionControllerTest {
             "Salário"
         );
 
-        when(jwt.getSubject())
-            .thenReturn(userId.toString());
+        when(authenticatedUser.getId())
+            .thenReturn(userId);
 
         when(transactionService.listByUser(userId))
             .thenReturn(List.of(
@@ -177,7 +174,7 @@ class TransactionControllerTest {
             ));
 
         ResponseEntity<List<TransactionResponse>> response =
-            transactionController.list(jwt);
+            transactionController.list();
 
         assertEquals(
             HttpStatus.OK,
@@ -222,8 +219,8 @@ class TransactionControllerTest {
             "Alimentação"
         );
 
-        when(jwt.getSubject())
-            .thenReturn(userId.toString());
+        when(authenticatedUser.getId())
+            .thenReturn(userId);
 
         when(transactionService.findById(
             userId,
@@ -231,10 +228,7 @@ class TransactionControllerTest {
         )).thenReturn(transaction);
 
         ResponseEntity<TransactionResponse> response =
-            transactionController.findById(
-                jwt,
-                transactionId
-            );
+            transactionController.findById(transactionId);
 
         assertEquals(
             HttpStatus.OK,
@@ -285,8 +279,8 @@ class TransactionControllerTest {
             "Transporte"
         );
 
-        when(jwt.getSubject())
-            .thenReturn(userId.toString());
+        when(authenticatedUser.getId())
+            .thenReturn(userId);
 
         when(transactionService.update(
             userId,
@@ -301,7 +295,6 @@ class TransactionControllerTest {
 
         ResponseEntity<TransactionResponse> response =
             transactionController.update(
-                jwt,
                 transactionId,
                 request
             );
@@ -350,14 +343,11 @@ class TransactionControllerTest {
         Long userId = 1L;
         Long transactionId = 100L;
 
-        when(jwt.getSubject())
-            .thenReturn(userId.toString());
+        when(authenticatedUser.getId())
+            .thenReturn(userId);
 
         ResponseEntity<Void> response =
-            transactionController.delete(
-                jwt,
-                transactionId
-            );
+            transactionController.delete(transactionId);
 
         assertEquals(
             HttpStatus.NO_CONTENT,
