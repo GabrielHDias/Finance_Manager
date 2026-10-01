@@ -4,8 +4,10 @@ import io.github.gabrielhdias.financeManager.api.transaction.dto.TransactionRequ
 import io.github.gabrielhdias.financeManager.api.transaction.dto.TransactionResponse;
 import io.github.gabrielhdias.financeManager.domain.transaction.Transaction;
 import io.github.gabrielhdias.financeManager.domain.transaction.TransactionService;
+import io.github.gabrielhdias.financeManager.domain.transaction.TransactionType;
 import io.github.gabrielhdias.financeManager.security.AuthenticatedUser;
 import jakarta.validation.Valid;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,8 +17,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -56,14 +60,39 @@ public class TransactionController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TransactionResponse>> list() {
+    public ResponseEntity<List<TransactionResponse>> list(
+        @RequestParam(required = false)
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+        LocalDate startDate,
+
+        @RequestParam(required = false)
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+        LocalDate endDate,
+
+        @RequestParam(required = false)
+        TransactionType type,
+
+        @RequestParam(required = false)
+        Long accountId,
+
+        @RequestParam(required = false)
+        Long categoryId
+    ) {
         Long userId = authenticatedUser.getId();
 
-        List<TransactionResponse> response = transactionService
-            .listByUser(userId)
-            .stream()
-            .map(TransactionMapper::toResponse)
-            .toList();
+        List<TransactionResponse> response =
+            transactionService
+                .filterByUser(
+                    userId,
+                    startDate,
+                    endDate,
+                    type,
+                    accountId,
+                    categoryId
+                )
+                .stream()
+                .map(TransactionMapper::toResponse)
+                .toList();
 
         return ResponseEntity.ok(response);
     }

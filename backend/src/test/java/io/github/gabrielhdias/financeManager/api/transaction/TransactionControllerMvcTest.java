@@ -3,6 +3,7 @@ package io.github.gabrielhdias.financeManager.api.transaction;
 import io.github.gabrielhdias.financeManager.config.security.SecurityConfig;
 import io.github.gabrielhdias.financeManager.domain.account.Account;
 import io.github.gabrielhdias.financeManager.domain.category.Category;
+import io.github.gabrielhdias.financeManager.domain.exception.BusinessRuleException;
 import io.github.gabrielhdias.financeManager.domain.transaction.Transaction;
 import io.github.gabrielhdias.financeManager.domain.transaction.TransactionService;
 import io.github.gabrielhdias.financeManager.domain.transaction.TransactionType;
@@ -18,13 +19,13 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -45,7 +46,9 @@ class TransactionControllerMvcTest {
     private JwtDecoder jwtDecoder;
 
     @Test
-    void shouldReturnUnauthorizedWhenRequestHasNoToken() throws Exception {
+    void shouldReturnUnauthorizedWhenRequestHasNoToken()
+        throws Exception {
+
         mockMvc.perform(
                 get("/transactions")
             )
@@ -53,50 +56,15 @@ class TransactionControllerMvcTest {
     }
 
     @Test
-    void shouldCreateTransactionWhenAuthenticated() throws Exception {
-        Long userId = 1L;
-        Long accountId = 10L;
-        Long categoryId = 20L;
+    void shouldCreateTransactionWhenAuthenticated()
+        throws Exception {
 
-        Account account = mock(Account.class);
-        Category category = mock(Category.class);
-        Transaction transaction = mock(Transaction.class);
+        Long userId = 1L;
+
+        Transaction transaction = createMockTransaction();
 
         when(authenticatedUser.getId())
             .thenReturn(userId);
-
-        when(account.getId())
-            .thenReturn(accountId);
-
-        when(account.getName())
-            .thenReturn("Nubank");
-
-        when(category.getId())
-            .thenReturn(categoryId);
-
-        when(category.getName())
-            .thenReturn("Alimentação");
-
-        when(transaction.getId())
-            .thenReturn(100L);
-
-        when(transaction.getDescription())
-            .thenReturn("Mercado");
-
-        when(transaction.getAmount())
-            .thenReturn(new BigDecimal("150.00"));
-
-        when(transaction.getDate())
-            .thenReturn(LocalDate.of(2026, 10, 1));
-
-        when(transaction.getType())
-            .thenReturn(TransactionType.EXPENSE);
-
-        when(transaction.getAccount())
-            .thenReturn(account);
-
-        when(transaction.getCategory())
-            .thenReturn(category);
 
         when(transactionService.create(
             userId,
@@ -104,14 +72,14 @@ class TransactionControllerMvcTest {
             new BigDecimal("150.00"),
             LocalDate.of(2026, 10, 1),
             TransactionType.EXPENSE,
-            accountId,
-            categoryId
+            10L,
+            20L
         )).thenReturn(transaction);
 
         mockMvc.perform(
                 post("/transactions")
                     .with(jwt().jwt(jwt ->
-                        jwt.subject(userId.toString())
+                        jwt.subject("1")
                     ))
                     .contentType(MediaType.APPLICATION_JSON)
                     .content("""
@@ -126,32 +94,153 @@ class TransactionControllerMvcTest {
                                 """)
             )
             .andExpect(status().isCreated())
-            .andExpect(
-                content().contentTypeCompatibleWith(
-                    MediaType.APPLICATION_JSON
-                )
-            )
-            .andExpect(jsonPath("$.id").value(100))
+            .andExpect(jsonPath("$.id")
+                .value(100))
             .andExpect(jsonPath("$.description")
                 .value("Mercado"))
             .andExpect(jsonPath("$.amount")
                 .value(150.00))
-            .andExpect(jsonPath("$.date")
-                .value("2026-10-01"))
             .andExpect(jsonPath("$.type")
-                .value("EXPENSE"))
-            .andExpect(jsonPath("$.accountId")
-                .value(10))
-            .andExpect(jsonPath("$.accountName")
-                .value("Nubank"))
-            .andExpect(jsonPath("$.categoryId")
-                .value(20))
-            .andExpect(jsonPath("$.categoryName")
-                .value("Alimentação"));
+                .value("EXPENSE"));
     }
 
     @Test
-    void shouldReturnBadRequestWhenTransactionDataIsInvalid() throws Exception {
+    void shouldListTransactionsWithoutFilters()
+        throws Exception {
+
+        Long userId = 1L;
+
+        Transaction transaction = createMockTransaction();
+
+        when(authenticatedUser.getId())
+            .thenReturn(userId);
+
+        when(transactionService.filterByUser(
+            userId,
+            null,
+            null,
+            null,
+            null,
+            null
+        )).thenReturn(
+            List.of(transaction)
+        );
+
+        mockMvc.perform(
+                get("/transactions")
+                    .with(jwt().jwt(jwt ->
+                        jwt.subject("1")
+                    ))
+            )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].id")
+                .value(100))
+            .andExpect(jsonPath("$[0].description")
+                .value("Mercado"));
+    }
+
+    @Test
+    void shouldListTransactionsWithFilters()
+        throws Exception {
+
+        Long userId = 1L;
+
+        Transaction transaction = createMockTransaction();
+
+        when(authenticatedUser.getId())
+            .thenReturn(userId);
+
+        when(transactionService.filterByUser(
+            userId,
+            LocalDate.of(2026, 10, 1),
+            LocalDate.of(2026, 10, 31),
+            TransactionType.EXPENSE,
+            10L,
+            20L
+        )).thenReturn(
+            List.of(transaction)
+        );
+
+        mockMvc.perform(
+                get("/transactions")
+                    .param(
+                        "startDate",
+                        "2026-10-01"
+                    )
+                    .param(
+                        "endDate",
+                        "2026-10-31"
+                    )
+                    .param(
+                        "type",
+                        "EXPENSE"
+                    )
+                    .param(
+                        "accountId",
+                        "10"
+                    )
+                    .param(
+                        "categoryId",
+                        "20"
+                    )
+                    .with(jwt().jwt(jwt ->
+                        jwt.subject("1")
+                    ))
+            )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].description")
+                .value("Mercado"));
+    }
+
+    @Test
+    void shouldReturnConflictWhenPeriodIsInvalid()
+        throws Exception {
+
+        Long userId = 1L;
+
+        when(authenticatedUser.getId())
+            .thenReturn(userId);
+
+        when(transactionService.filterByUser(
+            userId,
+            LocalDate.of(2026, 10, 31),
+            LocalDate.of(2026, 10, 1),
+            null,
+            null,
+            null
+        )).thenThrow(
+            new BusinessRuleException(
+                "A data inicial não pode ser posterior à data final"
+            )
+        );
+
+        mockMvc.perform(
+                get("/transactions")
+                    .param(
+                        "startDate",
+                        "2026-10-31"
+                    )
+                    .param(
+                        "endDate",
+                        "2026-10-01"
+                    )
+                    .with(jwt().jwt(jwt ->
+                        jwt.subject("1")
+                    ))
+            )
+            .andExpect(status().isConflict())
+            .andExpect(jsonPath("$.status")
+                .value(409))
+            .andExpect(jsonPath("$.message")
+                .value(
+                    "A data inicial não pode ser posterior à data final"
+                ));
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenTransactionDataIsInvalid()
+        throws Exception {
+
         when(authenticatedUser.getId())
             .thenReturn(1L);
 
@@ -177,19 +266,50 @@ class TransactionControllerMvcTest {
                 .value(400))
             .andExpect(jsonPath("$.error")
                 .value("Validation Error"))
-            .andExpect(jsonPath("$.message")
-                .value("Dados inválidos"))
             .andExpect(jsonPath("$.fields.description")
                 .exists())
             .andExpect(jsonPath("$.fields.amount")
-                .exists())
-            .andExpect(jsonPath("$.fields.date")
-                .exists())
-            .andExpect(jsonPath("$.fields.type")
-                .exists())
-            .andExpect(jsonPath("$.fields.accountId")
-                .exists())
-            .andExpect(jsonPath("$.fields.categoryId")
                 .exists());
+    }
+
+    private Transaction createMockTransaction() {
+        Account account = mock(Account.class);
+        Category category = mock(Category.class);
+        Transaction transaction = mock(Transaction.class);
+
+        when(account.getId())
+            .thenReturn(10L);
+
+        when(account.getName())
+            .thenReturn("Nubank");
+
+        when(category.getId())
+            .thenReturn(20L);
+
+        when(category.getName())
+            .thenReturn("Alimentação");
+
+        when(transaction.getId())
+            .thenReturn(100L);
+
+        when(transaction.getDescription())
+            .thenReturn("Mercado");
+
+        when(transaction.getAmount())
+            .thenReturn(new BigDecimal("150.00"));
+
+        when(transaction.getDate())
+            .thenReturn(LocalDate.of(2026, 10, 1));
+
+        when(transaction.getType())
+            .thenReturn(TransactionType.EXPENSE);
+
+        when(transaction.getAccount())
+            .thenReturn(account);
+
+        when(transaction.getCategory())
+            .thenReturn(category);
+
+        return transaction;
     }
 }

@@ -4,6 +4,7 @@ import io.github.gabrielhdias.financeManager.domain.account.Account;
 import io.github.gabrielhdias.financeManager.domain.account.AccountRepository;
 import io.github.gabrielhdias.financeManager.domain.category.Category;
 import io.github.gabrielhdias.financeManager.domain.category.CategoryRepository;
+import io.github.gabrielhdias.financeManager.domain.exception.BusinessRuleException;
 import io.github.gabrielhdias.financeManager.domain.exception.ResourceNotFoundException;
 import io.github.gabrielhdias.financeManager.domain.user.User;
 import org.junit.jupiter.api.Test;
@@ -63,7 +64,7 @@ class TransactionServiceTest {
             userId,
             "Mercado",
             new BigDecimal("150.00"),
-            LocalDate.of(2026, 9, 30),
+            LocalDate.of(2026, 10, 1),
             TransactionType.EXPENSE,
             accountId,
             categoryId
@@ -97,7 +98,7 @@ class TransactionServiceTest {
                 userId,
                 "Mercado",
                 new BigDecimal("150.00"),
-                LocalDate.of(2026, 9, 30),
+                LocalDate.of(2026, 10, 1),
                 TransactionType.EXPENSE,
                 accountId,
                 categoryId
@@ -141,7 +142,7 @@ class TransactionServiceTest {
                 userId,
                 "Mercado",
                 new BigDecimal("150.00"),
-                LocalDate.of(2026, 9, 30),
+                LocalDate.of(2026, 10, 1),
                 TransactionType.EXPENSE,
                 accountId,
                 categoryId
@@ -161,27 +162,12 @@ class TransactionServiceTest {
     void shouldListTransactionsByUser() {
         Long userId = 1L;
 
-        User user = createUser();
-        Account account = new Account("Nubank", user);
-        Category category = new Category("Alimentação", user);
+        Transaction first = createTransaction();
+        Transaction second = createTransaction();
 
         List<Transaction> transactions = List.of(
-            new Transaction(
-                "Mercado",
-                new BigDecimal("150.00"),
-                LocalDate.of(2026, 9, 30),
-                TransactionType.EXPENSE,
-                account,
-                category
-            ),
-            new Transaction(
-                "Salário",
-                new BigDecimal("3000.00"),
-                LocalDate.of(2026, 9, 30),
-                TransactionType.INCOME,
-                account,
-                category
-            )
+            first,
+            second
         );
 
         when(transactionRepository.findAllByAccountUserId(userId))
@@ -195,6 +181,131 @@ class TransactionServiceTest {
 
         verify(transactionRepository)
             .findAllByAccountUserId(userId);
+    }
+
+    @Test
+    void shouldFilterTransactionsByUser() {
+        Long userId = 1L;
+
+        LocalDate startDate =
+            LocalDate.of(2026, 10, 1);
+
+        LocalDate endDate =
+            LocalDate.of(2026, 10, 31);
+
+        Long accountId = 10L;
+        Long categoryId = 20L;
+
+        List<Transaction> transactions =
+            List.of(createTransaction());
+
+        when(transactionRepository.findAllByFilters(
+            userId,
+            startDate,
+            endDate,
+            TransactionType.EXPENSE,
+            accountId,
+            categoryId
+        )).thenReturn(transactions);
+
+        List<Transaction> result =
+            transactionService.filterByUser(
+                userId,
+                startDate,
+                endDate,
+                TransactionType.EXPENSE,
+                accountId,
+                categoryId
+            );
+
+        assertEquals(transactions, result);
+
+        verify(transactionRepository)
+            .findAllByFilters(
+                userId,
+                startDate,
+                endDate,
+                TransactionType.EXPENSE,
+                accountId,
+                categoryId
+            );
+    }
+
+    @Test
+    void shouldFilterTransactionsWhenAllOptionalFiltersAreNull() {
+        Long userId = 1L;
+
+        List<Transaction> transactions =
+            List.of(createTransaction());
+
+        when(transactionRepository.findAllByFilters(
+            userId,
+            null,
+            null,
+            null,
+            null,
+            null
+        )).thenReturn(transactions);
+
+        List<Transaction> result =
+            transactionService.filterByUser(
+                userId,
+                null,
+                null,
+                null,
+                null,
+                null
+            );
+
+        assertEquals(transactions, result);
+
+        verify(transactionRepository)
+            .findAllByFilters(
+                userId,
+                null,
+                null,
+                null,
+                null,
+                null
+            );
+    }
+
+    @Test
+    void shouldNotFilterTransactionsWhenStartDateIsAfterEndDate() {
+        Long userId = 1L;
+
+        LocalDate startDate =
+            LocalDate.of(2026, 10, 31);
+
+        LocalDate endDate =
+            LocalDate.of(2026, 10, 1);
+
+        BusinessRuleException exception = assertThrows(
+            BusinessRuleException.class,
+            () -> transactionService.filterByUser(
+                userId,
+                startDate,
+                endDate,
+                null,
+                null,
+                null
+            )
+        );
+
+        assertEquals(
+            "A data inicial não pode ser posterior à data final",
+            exception.getMessage()
+        );
+
+        verify(transactionRepository, never())
+            .findAllByFilters(
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any()
+            );
     }
 
     @Test
@@ -250,20 +361,26 @@ class TransactionServiceTest {
 
         User user = createUser();
 
-        Account oldAccount = new Account("Nubank", user);
-        Category oldCategory = new Category("Alimentação", user);
+        Account oldAccount =
+            new Account("Nubank", user);
+
+        Category oldCategory =
+            new Category("Alimentação", user);
 
         Transaction transaction = new Transaction(
             "Mercado",
             new BigDecimal("150.00"),
-            LocalDate.of(2026, 9, 30),
+            LocalDate.of(2026, 10, 1),
             TransactionType.EXPENSE,
             oldAccount,
             oldCategory
         );
 
-        Account newAccount = new Account("Carteira", user);
-        Category newCategory = new Category("Transporte", user);
+        Account newAccount =
+            new Account("Carteira", user);
+
+        Category newCategory =
+            new Category("Transporte", user);
 
         when(transactionRepository.findByIdAndAccountUserId(
             transactionId,
@@ -285,18 +402,33 @@ class TransactionServiceTest {
             transactionId,
             "Uber",
             new BigDecimal("35.90"),
-            LocalDate.of(2026, 10, 1),
+            LocalDate.of(2026, 10, 2),
             TransactionType.EXPENSE,
             accountId,
             categoryId
         );
 
         assertEquals("Uber", result.getDescription());
-        assertEquals(new BigDecimal("35.90"), result.getAmount());
-        assertEquals(LocalDate.of(2026, 10, 1), result.getDate());
-        assertEquals(TransactionType.EXPENSE, result.getType());
-        assertEquals(newAccount, result.getAccount());
-        assertEquals(newCategory, result.getCategory());
+        assertEquals(
+            new BigDecimal("35.90"),
+            result.getAmount()
+        );
+        assertEquals(
+            LocalDate.of(2026, 10, 2),
+            result.getDate()
+        );
+        assertEquals(
+            TransactionType.EXPENSE,
+            result.getType()
+        );
+        assertEquals(
+            newAccount,
+            result.getAccount()
+        );
+        assertEquals(
+            newCategory,
+            result.getCategory()
+        );
 
         verify(transactionRepository, never())
             .save(any(Transaction.class));
@@ -307,9 +439,9 @@ class TransactionServiceTest {
         Long userId = 1L;
         Long transactionId = 100L;
         Long accountId = 10L;
-        Long categoryId = 20L;
 
-        Transaction transaction = createTransaction();
+        Transaction transaction =
+            createTransaction();
 
         when(transactionRepository.findByIdAndAccountUserId(
             transactionId,
@@ -328,10 +460,10 @@ class TransactionServiceTest {
                 transactionId,
                 "Uber",
                 new BigDecimal("35.90"),
-                LocalDate.of(2026, 10, 1),
+                LocalDate.of(2026, 10, 2),
                 TransactionType.EXPENSE,
                 accountId,
-                categoryId
+                20L
             )
         );
 
@@ -352,8 +484,11 @@ class TransactionServiceTest {
         Long categoryId = 20L;
 
         User user = createUser();
-        Transaction transaction = createTransaction();
-        Account account = new Account("Carteira", user);
+        Transaction transaction =
+            createTransaction();
+
+        Account account =
+            new Account("Carteira", user);
 
         when(transactionRepository.findByIdAndAccountUserId(
             transactionId,
@@ -377,7 +512,7 @@ class TransactionServiceTest {
                 transactionId,
                 "Uber",
                 new BigDecimal("35.90"),
-                LocalDate.of(2026, 10, 1),
+                LocalDate.of(2026, 10, 2),
                 TransactionType.EXPENSE,
                 accountId,
                 categoryId
@@ -395,7 +530,8 @@ class TransactionServiceTest {
         Long userId = 1L;
         Long transactionId = 100L;
 
-        Transaction transaction = createTransaction();
+        Transaction transaction =
+            createTransaction();
 
         when(transactionRepository.findByIdAndAccountUserId(
             transactionId,
@@ -462,7 +598,7 @@ class TransactionServiceTest {
         return new Transaction(
             "Mercado",
             new BigDecimal("150.00"),
-            LocalDate.of(2026, 9, 30),
+            LocalDate.of(2026, 10, 1),
             TransactionType.EXPENSE,
             account,
             category

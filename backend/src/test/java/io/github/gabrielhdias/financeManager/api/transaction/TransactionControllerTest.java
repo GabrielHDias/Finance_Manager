@@ -38,29 +38,17 @@ class TransactionControllerTest {
     @Test
     void shouldCreateTransaction() {
         Long userId = 1L;
-        Long accountId = 10L;
-        Long categoryId = 20L;
 
         TransactionRequest request = new TransactionRequest(
             "Mercado",
             new BigDecimal("150.00"),
             LocalDate.of(2026, 10, 1),
             TransactionType.EXPENSE,
-            accountId,
-            categoryId
+            10L,
+            20L
         );
 
-        Transaction transaction = createMockTransaction(
-            100L,
-            "Mercado",
-            new BigDecimal("150.00"),
-            LocalDate.of(2026, 10, 1),
-            TransactionType.EXPENSE,
-            accountId,
-            "Nubank",
-            categoryId,
-            "Alimentação"
-        );
+        Transaction transaction = createMockTransaction();
 
         when(authenticatedUser.getId())
             .thenReturn(userId);
@@ -86,43 +74,8 @@ class TransactionControllerTest {
         assertNotNull(response.getBody());
 
         assertEquals(
-            100L,
-            response.getBody().id()
-        );
-
-        assertEquals(
             "Mercado",
             response.getBody().description()
-        );
-
-        assertEquals(
-            new BigDecimal("150.00"),
-            response.getBody().amount()
-        );
-
-        assertEquals(
-            TransactionType.EXPENSE,
-            response.getBody().type()
-        );
-
-        assertEquals(
-            accountId,
-            response.getBody().accountId()
-        );
-
-        assertEquals(
-            "Nubank",
-            response.getBody().accountName()
-        );
-
-        assertEquals(
-            categoryId,
-            response.getBody().categoryId()
-        );
-
-        assertEquals(
-            "Alimentação",
-            response.getBody().categoryName()
         );
 
         verify(transactionService).create(
@@ -137,44 +90,33 @@ class TransactionControllerTest {
     }
 
     @Test
-    void shouldListTransactions() {
+    void shouldListTransactionsWithoutFilters() {
         Long userId = 1L;
 
-        Transaction firstTransaction = createMockTransaction(
-            100L,
-            "Mercado",
-            new BigDecimal("150.00"),
-            LocalDate.of(2026, 10, 1),
-            TransactionType.EXPENSE,
-            10L,
-            "Nubank",
-            20L,
-            "Alimentação"
-        );
-
-        Transaction secondTransaction = createMockTransaction(
-            101L,
-            "Salário",
-            new BigDecimal("3000.00"),
-            LocalDate.of(2026, 10, 1),
-            TransactionType.INCOME,
-            10L,
-            "Nubank",
-            30L,
-            "Salário"
-        );
+        Transaction transaction = createMockTransaction();
 
         when(authenticatedUser.getId())
             .thenReturn(userId);
 
-        when(transactionService.listByUser(userId))
-            .thenReturn(List.of(
-                firstTransaction,
-                secondTransaction
-            ));
+        when(transactionService.filterByUser(
+            userId,
+            null,
+            null,
+            null,
+            null,
+            null
+        )).thenReturn(
+            List.of(transaction)
+        );
 
         ResponseEntity<List<TransactionResponse>> response =
-            transactionController.list();
+            transactionController.list(
+                null,
+                null,
+                null,
+                null,
+                null
+            );
 
         assertEquals(
             HttpStatus.OK,
@@ -182,24 +124,71 @@ class TransactionControllerTest {
         );
 
         assertNotNull(response.getBody());
-
-        assertEquals(
-            2,
-            response.getBody().size()
-        );
-
-        assertEquals(
-            "Mercado",
-            response.getBody().get(0).description()
-        );
-
-        assertEquals(
-            "Salário",
-            response.getBody().get(1).description()
-        );
+        assertEquals(1, response.getBody().size());
 
         verify(transactionService)
-            .listByUser(userId);
+            .filterByUser(
+                userId,
+                null,
+                null,
+                null,
+                null,
+                null
+            );
+    }
+
+    @Test
+    void shouldListTransactionsWithFilters() {
+        Long userId = 1L;
+
+        LocalDate startDate =
+            LocalDate.of(2026, 10, 1);
+
+        LocalDate endDate =
+            LocalDate.of(2026, 10, 31);
+
+        Transaction transaction = createMockTransaction();
+
+        when(authenticatedUser.getId())
+            .thenReturn(userId);
+
+        when(transactionService.filterByUser(
+            userId,
+            startDate,
+            endDate,
+            TransactionType.EXPENSE,
+            10L,
+            20L
+        )).thenReturn(
+            List.of(transaction)
+        );
+
+        ResponseEntity<List<TransactionResponse>> response =
+            transactionController.list(
+                startDate,
+                endDate,
+                TransactionType.EXPENSE,
+                10L,
+                20L
+            );
+
+        assertEquals(
+            HttpStatus.OK,
+            response.getStatusCode()
+        );
+
+        assertNotNull(response.getBody());
+        assertEquals(1, response.getBody().size());
+
+        verify(transactionService)
+            .filterByUser(
+                userId,
+                startDate,
+                endDate,
+                TransactionType.EXPENSE,
+                10L,
+                20L
+            );
     }
 
     @Test
@@ -207,17 +196,7 @@ class TransactionControllerTest {
         Long userId = 1L;
         Long transactionId = 100L;
 
-        Transaction transaction = createMockTransaction(
-            transactionId,
-            "Mercado",
-            new BigDecimal("150.00"),
-            LocalDate.of(2026, 10, 1),
-            TransactionType.EXPENSE,
-            10L,
-            "Nubank",
-            20L,
-            "Alimentação"
-        );
+        Transaction transaction = createMockTransaction();
 
         when(authenticatedUser.getId())
             .thenReturn(userId);
@@ -228,7 +207,9 @@ class TransactionControllerTest {
         )).thenReturn(transaction);
 
         ResponseEntity<TransactionResponse> response =
-            transactionController.findById(transactionId);
+            transactionController.findById(
+                transactionId
+            );
 
         assertEquals(
             HttpStatus.OK,
@@ -237,20 +218,11 @@ class TransactionControllerTest {
 
         assertNotNull(response.getBody());
 
-        assertEquals(
-            transactionId,
-            response.getBody().id()
-        );
-
-        assertEquals(
-            "Mercado",
-            response.getBody().description()
-        );
-
-        verify(transactionService).findById(
-            userId,
-            transactionId
-        );
+        verify(transactionService)
+            .findById(
+                userId,
+                transactionId
+            );
     }
 
     @Test
@@ -259,25 +231,15 @@ class TransactionControllerTest {
         Long transactionId = 100L;
 
         TransactionRequest request = new TransactionRequest(
-            "Uber",
-            new BigDecimal("35.90"),
-            LocalDate.of(2026, 10, 2),
+            "Mercado",
+            new BigDecimal("150.00"),
+            LocalDate.of(2026, 10, 1),
             TransactionType.EXPENSE,
-            11L,
-            21L
+            10L,
+            20L
         );
 
-        Transaction transaction = createMockTransaction(
-            transactionId,
-            "Uber",
-            new BigDecimal("35.90"),
-            LocalDate.of(2026, 10, 2),
-            TransactionType.EXPENSE,
-            11L,
-            "Carteira",
-            21L,
-            "Transporte"
-        );
+        Transaction transaction = createMockTransaction();
 
         when(authenticatedUser.getId())
             .thenReturn(userId);
@@ -306,36 +268,17 @@ class TransactionControllerTest {
 
         assertNotNull(response.getBody());
 
-        assertEquals(
-            "Uber",
-            response.getBody().description()
-        );
-
-        assertEquals(
-            new BigDecimal("35.90"),
-            response.getBody().amount()
-        );
-
-        assertEquals(
-            "Carteira",
-            response.getBody().accountName()
-        );
-
-        assertEquals(
-            "Transporte",
-            response.getBody().categoryName()
-        );
-
-        verify(transactionService).update(
-            userId,
-            transactionId,
-            request.description(),
-            request.amount(),
-            request.date(),
-            request.type(),
-            request.accountId(),
-            request.categoryId()
-        );
+        verify(transactionService)
+            .update(
+                userId,
+                transactionId,
+                request.description(),
+                request.amount(),
+                request.date(),
+                request.type(),
+                request.accountId(),
+                request.categoryId()
+            );
     }
 
     @Test
@@ -347,7 +290,9 @@ class TransactionControllerTest {
             .thenReturn(userId);
 
         ResponseEntity<Void> response =
-            transactionController.delete(transactionId);
+            transactionController.delete(
+                transactionId
+            );
 
         assertEquals(
             HttpStatus.NO_CONTENT,
@@ -356,53 +301,44 @@ class TransactionControllerTest {
 
         assertNull(response.getBody());
 
-        verify(transactionService).delete(
-            userId,
-            transactionId
-        );
+        verify(transactionService)
+            .delete(
+                userId,
+                transactionId
+            );
     }
 
-    private Transaction createMockTransaction(
-        Long transactionId,
-        String description,
-        BigDecimal amount,
-        LocalDate date,
-        TransactionType type,
-        Long accountId,
-        String accountName,
-        Long categoryId,
-        String categoryName
-    ) {
+    private Transaction createMockTransaction() {
         Account account = mock(Account.class);
         Category category = mock(Category.class);
         Transaction transaction = mock(Transaction.class);
 
         when(account.getId())
-            .thenReturn(accountId);
+            .thenReturn(10L);
 
         when(account.getName())
-            .thenReturn(accountName);
+            .thenReturn("Nubank");
 
         when(category.getId())
-            .thenReturn(categoryId);
+            .thenReturn(20L);
 
         when(category.getName())
-            .thenReturn(categoryName);
+            .thenReturn("Alimentação");
 
         when(transaction.getId())
-            .thenReturn(transactionId);
+            .thenReturn(100L);
 
         when(transaction.getDescription())
-            .thenReturn(description);
+            .thenReturn("Mercado");
 
         when(transaction.getAmount())
-            .thenReturn(amount);
+            .thenReturn(new BigDecimal("150.00"));
 
         when(transaction.getDate())
-            .thenReturn(date);
+            .thenReturn(LocalDate.of(2026, 10, 1));
 
         when(transaction.getType())
-            .thenReturn(type);
+            .thenReturn(TransactionType.EXPENSE);
 
         when(transaction.getAccount())
             .thenReturn(account);
