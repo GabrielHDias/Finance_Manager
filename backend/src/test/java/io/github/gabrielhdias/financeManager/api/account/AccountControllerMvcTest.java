@@ -13,6 +13,8 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
@@ -84,8 +86,43 @@ class AccountControllerMvcTest {
                     MediaType.APPLICATION_JSON
                 )
             )
-            .andExpect(jsonPath("$.id").value(10))
-            .andExpect(jsonPath("$.name").value("Nubank"));
+            .andExpect(jsonPath("$.id")
+                .value(10))
+            .andExpect(jsonPath("$.name")
+                .value("Nubank"));
+    }
+
+    @Test
+    void shouldReturnAccountBalanceWhenAuthenticated() throws Exception {
+        Long userId = 1L;
+        Long accountId = 10L;
+
+        when(authenticatedUser.getId())
+            .thenReturn(userId);
+
+        when(accountService.calculateBalance(
+            userId,
+            accountId
+        )).thenReturn(
+            new BigDecimal("850.00")
+        );
+
+        mockMvc.perform(
+                get("/accounts/{id}/balance", accountId)
+                    .with(jwt().jwt(jwt ->
+                        jwt.subject(userId.toString())
+                    ))
+            )
+            .andExpect(status().isOk())
+            .andExpect(
+                content().contentTypeCompatibleWith(
+                    MediaType.APPLICATION_JSON
+                )
+            )
+            .andExpect(jsonPath("$.accountId")
+                .value(10))
+            .andExpect(jsonPath("$.balance")
+                .value(850.00));
     }
 
     @Test
@@ -106,11 +143,13 @@ class AccountControllerMvcTest {
                                 """)
             )
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.status").value(400))
+            .andExpect(jsonPath("$.status")
+                .value(400))
             .andExpect(jsonPath("$.error")
                 .value("Validation Error"))
             .andExpect(jsonPath("$.message")
                 .value("Dados inválidos"))
-            .andExpect(jsonPath("$.fields.name").exists());
+            .andExpect(jsonPath("$.fields.name")
+                .exists());
     }
 }

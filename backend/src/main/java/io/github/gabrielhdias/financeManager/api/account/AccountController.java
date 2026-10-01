@@ -1,5 +1,6 @@
 package io.github.gabrielhdias.financeManager.api.account;
 
+import io.github.gabrielhdias.financeManager.api.account.dto.AccountBalanceResponse;
 import io.github.gabrielhdias.financeManager.api.account.dto.AccountRequest;
 import io.github.gabrielhdias.financeManager.api.account.dto.AccountResponse;
 import io.github.gabrielhdias.financeManager.domain.account.Account;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -77,6 +79,26 @@ public class AccountController {
         return ResponseEntity.ok(
             AccountMapper.toResponse(account)
         );
+    }
+
+    @GetMapping("/{id}/balance")
+    public ResponseEntity<AccountBalanceResponse> getBalance(
+        @PathVariable Long id
+    ) {
+        Long userId = authenticatedUser.getId();
+
+        BigDecimal balance = accountService.calculateBalance(
+            userId,
+            id
+        );
+
+        AccountBalanceResponse response =
+            new AccountBalanceResponse(
+                id,
+                balance
+            );
+
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{id}")

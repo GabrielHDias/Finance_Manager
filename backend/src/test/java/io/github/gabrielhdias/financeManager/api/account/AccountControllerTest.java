@@ -1,5 +1,6 @@
 package io.github.gabrielhdias.financeManager.api.account;
 
+import io.github.gabrielhdias.financeManager.api.account.dto.AccountBalanceResponse;
 import io.github.gabrielhdias.financeManager.api.account.dto.AccountRequest;
 import io.github.gabrielhdias.financeManager.api.account.dto.AccountResponse;
 import io.github.gabrielhdias.financeManager.domain.account.Account;
@@ -13,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -73,9 +75,6 @@ class AccountControllerTest {
             response.getBody().name()
         );
 
-        verify(authenticatedUser)
-            .getId();
-
         verify(accountService).create(
             userId,
             "Nubank"
@@ -119,7 +118,11 @@ class AccountControllerTest {
         );
 
         assertNotNull(response.getBody());
-        assertEquals(2, response.getBody().size());
+
+        assertEquals(
+            2,
+            response.getBody().size()
+        );
 
         assertEquals(
             "Nubank",
@@ -130,9 +133,6 @@ class AccountControllerTest {
             "Carteira",
             response.getBody().get(1).name()
         );
-
-        verify(authenticatedUser)
-            .getId();
 
         verify(accountService)
             .listByUser(userId);
@@ -183,6 +183,48 @@ class AccountControllerTest {
             userId,
             accountId
         );
+    }
+
+    @Test
+    void shouldReturnAccountBalance() {
+        Long userId = 1L;
+        Long accountId = 10L;
+
+        when(authenticatedUser.getId())
+            .thenReturn(userId);
+
+        when(accountService.calculateBalance(
+            userId,
+            accountId
+        )).thenReturn(
+            new BigDecimal("850.00")
+        );
+
+        ResponseEntity<AccountBalanceResponse> response =
+            accountController.getBalance(accountId);
+
+        assertEquals(
+            HttpStatus.OK,
+            response.getStatusCode()
+        );
+
+        assertNotNull(response.getBody());
+
+        assertEquals(
+            accountId,
+            response.getBody().accountId()
+        );
+
+        assertEquals(
+            new BigDecimal("850.00"),
+            response.getBody().balance()
+        );
+
+        verify(accountService)
+            .calculateBalance(
+                userId,
+                accountId
+            );
     }
 
     @Test
