@@ -4,6 +4,7 @@ import io.github.gabrielhdias.financeManager.domain.account.Account;
 import io.github.gabrielhdias.financeManager.domain.account.AccountRepository;
 import io.github.gabrielhdias.financeManager.domain.category.Category;
 import io.github.gabrielhdias.financeManager.domain.category.CategoryRepository;
+import io.github.gabrielhdias.financeManager.domain.exception.ResourceNotFoundException;
 import io.github.gabrielhdias.financeManager.domain.user.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -90,8 +91,8 @@ class TransactionServiceTest {
             userId
         )).thenReturn(Optional.empty());
 
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+            ResourceNotFoundException.class,
             () -> transactionService.create(
                 userId,
                 "Mercado",
@@ -134,8 +135,8 @@ class TransactionServiceTest {
             userId
         )).thenReturn(Optional.empty());
 
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+            ResourceNotFoundException.class,
             () -> transactionService.create(
                 userId,
                 "Mercado",
@@ -226,8 +227,8 @@ class TransactionServiceTest {
             userId
         )).thenReturn(Optional.empty());
 
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+            ResourceNotFoundException.class,
             () -> transactionService.findById(
                 userId,
                 transactionId
@@ -320,8 +321,8 @@ class TransactionServiceTest {
             userId
         )).thenReturn(Optional.empty());
 
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+            ResourceNotFoundException.class,
             () -> transactionService.update(
                 userId,
                 transactionId,
@@ -369,8 +370,8 @@ class TransactionServiceTest {
             userId
         )).thenReturn(Optional.empty());
 
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+            ResourceNotFoundException.class,
             () -> transactionService.update(
                 userId,
                 transactionId,
@@ -420,8 +421,8 @@ class TransactionServiceTest {
             userId
         )).thenReturn(Optional.empty());
 
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+            ResourceNotFoundException.class,
             () -> transactionService.delete(
                 userId,
                 transactionId
@@ -441,7 +442,7 @@ class TransactionServiceTest {
         return new User(
             "Gabriel",
             "gabriel@email.com",
-            "password"
+            "$2a$10$encodedPassword"
         );
     }
 

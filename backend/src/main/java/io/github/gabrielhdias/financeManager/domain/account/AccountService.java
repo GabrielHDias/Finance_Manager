@@ -3,6 +3,9 @@ package io.github.gabrielhdias.financeManager.domain.account;
 import io.github.gabrielhdias.financeManager.domain.transaction.TransactionRepository;
 import io.github.gabrielhdias.financeManager.domain.user.User;
 import io.github.gabrielhdias.financeManager.domain.user.UserRepository;
+import io.github.gabrielhdias.financeManager.domain.exception.BusinessRuleException;
+import io.github.gabrielhdias.financeManager.domain.exception.DuplicateResourceException;
+import io.github.gabrielhdias.financeManager.domain.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +33,7 @@ public class AccountService {
         User user = findUserById(userId);
 
         if (accountRepository.existsByUserIdAndName(userId, name.trim())) {
-            throw new IllegalArgumentException(
+            throw new DuplicateResourceException(
                 "Já existe uma conta com esse nome para o usuário"
             );
         }
@@ -58,7 +61,7 @@ public class AccountService {
 
         if (!account.getName().equals(normalizedName)
             && accountRepository.existsByUserIdAndName(userId, normalizedName)) {
-            throw new IllegalArgumentException(
+            throw new DuplicateResourceException(
                 "Já existe uma conta com esse nome para o usuário"
             );
         }
@@ -73,7 +76,7 @@ public class AccountService {
         Account account = findAccountByIdAndUserId(accountId, userId);
 
         if (transactionRepository.existsByAccountId(accountId)) {
-            throw new IllegalStateException(
+            throw new BusinessRuleException(
                 "Não é possível excluir uma conta que possui transações"
             );
         }
@@ -83,14 +86,20 @@ public class AccountService {
 
     private User findUserById(Long userId) {
         return userRepository.findById(userId)
-            .orElseThrow(() -> new IllegalArgumentException(
+            .orElseThrow(() -> new ResourceNotFoundException(
                 "Usuário não encontrado"
             ));
     }
 
-    private Account findAccountByIdAndUserId(Long accountId, Long userId) {
-        return accountRepository.findByIdAndUserId(accountId, userId)
-            .orElseThrow(() -> new IllegalArgumentException(
+    private Account findAccountByIdAndUserId(
+        Long accountId,
+        Long userId
+    ) {
+        return accountRepository.findByIdAndUserId(
+                accountId,
+                userId
+            )
+            .orElseThrow(() -> new ResourceNotFoundException(
                 "Conta não encontrada"
             ));
     }

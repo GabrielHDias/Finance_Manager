@@ -3,6 +3,9 @@ package io.github.gabrielhdias.financeManager.domain.account;
 import io.github.gabrielhdias.financeManager.domain.transaction.TransactionRepository;
 import io.github.gabrielhdias.financeManager.domain.user.User;
 import io.github.gabrielhdias.financeManager.domain.user.UserRepository;
+import io.github.gabrielhdias.financeManager.domain.exception.BusinessRuleException;
+import io.github.gabrielhdias.financeManager.domain.exception.DuplicateResourceException;
+import io.github.gabrielhdias.financeManager.domain.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -81,8 +84,8 @@ class AccountServiceTest {
             "Nubank"
         )).thenReturn(true);
 
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        DuplicateResourceException exception = assertThrows(
+            DuplicateResourceException.class,
             () -> accountService.create(userId, "Nubank")
         );
 
@@ -233,8 +236,8 @@ class AccountServiceTest {
         when(transactionRepository.existsByAccountId(accountId))
             .thenReturn(true);
 
-        IllegalStateException exception = assertThrows(
-            IllegalStateException.class,
+        BusinessRuleException exception = assertThrows(
+            BusinessRuleException.class,
             () -> accountService.delete(userId, accountId)
         );
 
@@ -253,8 +256,8 @@ class AccountServiceTest {
         when(userRepository.findById(userId))
             .thenReturn(Optional.empty());
 
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+            ResourceNotFoundException.class,
             () -> accountService.create(userId, "Nubank")
         );
 
@@ -276,8 +279,8 @@ class AccountServiceTest {
             userId
         )).thenReturn(Optional.empty());
 
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+            ResourceNotFoundException.class,
             () -> accountService.findById(userId, accountId)
         );
 
@@ -312,8 +315,8 @@ class AccountServiceTest {
             "Carteira"
         )).thenReturn(true);
 
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        DuplicateResourceException exception = assertThrows(
+            DuplicateResourceException.class,
             () -> accountService.rename(
                 userId,
                 accountId,

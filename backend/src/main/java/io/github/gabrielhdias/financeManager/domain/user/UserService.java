@@ -1,5 +1,7 @@
 package io.github.gabrielhdias.financeManager.domain.user;
 
+import io.github.gabrielhdias.financeManager.domain.exception.DuplicateResourceException;
+import io.github.gabrielhdias.financeManager.domain.exception.ResourceNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +31,7 @@ public class UserService {
         String normalizedEmail = normalizeEmail(email);
 
         if (userRepository.existsByEmail(normalizedEmail)) {
-            throw new IllegalArgumentException(
+            throw new DuplicateResourceException(
                 "Já existe um usuário com esse email"
             );
         }
@@ -57,7 +59,7 @@ public class UserService {
         String normalizedEmail = normalizeEmail(email);
 
         return userRepository.findByEmail(normalizedEmail)
-            .orElseThrow(() -> new IllegalArgumentException(
+            .orElseThrow(() -> new ResourceNotFoundException(
                 "Usuário não encontrado"
             ));
     }

@@ -1,5 +1,8 @@
 package io.github.gabrielhdias.financeManager.domain.category;
 
+import io.github.gabrielhdias.financeManager.domain.exception.BusinessRuleException;
+import io.github.gabrielhdias.financeManager.domain.exception.DuplicateResourceException;
+import io.github.gabrielhdias.financeManager.domain.exception.ResourceNotFoundException;
 import io.github.gabrielhdias.financeManager.domain.transaction.TransactionRepository;
 import io.github.gabrielhdias.financeManager.domain.user.User;
 import io.github.gabrielhdias.financeManager.domain.user.UserRepository;
@@ -38,7 +41,7 @@ class CategoryServiceTest {
         User user = new User(
             "Gabriel",
             "gabriel@email.com",
-            "password"
+            "$2a$10$encodedPassword"
         );
 
         when(userRepository.findById(userId))
@@ -72,7 +75,7 @@ class CategoryServiceTest {
         User user = new User(
             "Gabriel",
             "gabriel@email.com",
-            "password"
+            "$2a$10$encodedPassword"
         );
 
         when(userRepository.findById(userId))
@@ -83,8 +86,8 @@ class CategoryServiceTest {
             "Alimentação"
         )).thenReturn(true);
 
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        DuplicateResourceException exception = assertThrows(
+            DuplicateResourceException.class,
             () -> categoryService.create(
                 userId,
                 "Alimentação"
@@ -107,8 +110,8 @@ class CategoryServiceTest {
         when(userRepository.findById(userId))
             .thenReturn(Optional.empty());
 
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+            ResourceNotFoundException.class,
             () -> categoryService.create(
                 userId,
                 "Alimentação"
@@ -131,7 +134,7 @@ class CategoryServiceTest {
         User user = new User(
             "Gabriel",
             "gabriel@email.com",
-            "password"
+            "$2a$10$encodedPassword"
         );
 
         List<Category> categories = List.of(
@@ -160,7 +163,7 @@ class CategoryServiceTest {
         User user = new User(
             "Gabriel",
             "gabriel@email.com",
-            "password"
+            "$2a$10$encodedPassword"
         );
 
         Category category =
@@ -192,8 +195,8 @@ class CategoryServiceTest {
             userId
         )).thenReturn(Optional.empty());
 
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+            ResourceNotFoundException.class,
             () -> categoryService.findById(
                 userId,
                 categoryId
@@ -214,7 +217,7 @@ class CategoryServiceTest {
         User user = new User(
             "Gabriel",
             "gabriel@email.com",
-            "password"
+            "$2a$10$encodedPassword"
         );
 
         Category category =
@@ -250,7 +253,7 @@ class CategoryServiceTest {
         User user = new User(
             "Gabriel",
             "gabriel@email.com",
-            "password"
+            "$2a$10$encodedPassword"
         );
 
         Category category =
@@ -266,8 +269,8 @@ class CategoryServiceTest {
             "Transporte"
         )).thenReturn(true);
 
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        DuplicateResourceException exception = assertThrows(
+            DuplicateResourceException.class,
             () -> categoryService.rename(
                 userId,
                 categoryId,
@@ -294,7 +297,7 @@ class CategoryServiceTest {
         User user = new User(
             "Gabriel",
             "gabriel@email.com",
-            "password"
+            "$2a$10$encodedPassword"
         );
 
         Category category =
@@ -325,7 +328,7 @@ class CategoryServiceTest {
         User user = new User(
             "Gabriel",
             "gabriel@email.com",
-            "password"
+            "$2a$10$encodedPassword"
         );
 
         Category category =
@@ -339,8 +342,8 @@ class CategoryServiceTest {
         when(transactionRepository.existsByCategoryId(categoryId))
             .thenReturn(true);
 
-        IllegalStateException exception = assertThrows(
-            IllegalStateException.class,
+        BusinessRuleException exception = assertThrows(
+            BusinessRuleException.class,
             () -> categoryService.delete(
                 userId,
                 categoryId

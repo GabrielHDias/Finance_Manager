@@ -1,5 +1,7 @@
 package io.github.gabrielhdias.financeManager.domain.user;
 
+import io.github.gabrielhdias.financeManager.domain.exception.DuplicateResourceException;
+import io.github.gabrielhdias.financeManager.domain.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -104,8 +106,8 @@ class UserServiceTest {
         when(userRepository.existsByEmail(email))
             .thenReturn(true);
 
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        DuplicateResourceException exception = assertThrows(
+            DuplicateResourceException.class,
             () -> userService.register(
                 "Gabriel",
                 email,
@@ -204,8 +206,8 @@ class UserServiceTest {
         when(userRepository.findByEmail(email))
             .thenReturn(Optional.empty());
 
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+            ResourceNotFoundException.class,
             () -> userService.findByEmail(email)
         );
 

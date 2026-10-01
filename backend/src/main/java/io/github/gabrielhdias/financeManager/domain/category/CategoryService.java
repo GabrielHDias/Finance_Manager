@@ -3,6 +3,9 @@ package io.github.gabrielhdias.financeManager.domain.category;
 import io.github.gabrielhdias.financeManager.domain.transaction.TransactionRepository;
 import io.github.gabrielhdias.financeManager.domain.user.User;
 import io.github.gabrielhdias.financeManager.domain.user.UserRepository;
+import io.github.gabrielhdias.financeManager.domain.exception.BusinessRuleException;
+import io.github.gabrielhdias.financeManager.domain.exception.DuplicateResourceException;
+import io.github.gabrielhdias.financeManager.domain.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +35,7 @@ public class CategoryService {
         String normalizedName = name.trim();
 
         if (categoryRepository.existsByUserIdAndName(userId, normalizedName)) {
-            throw new IllegalArgumentException(
+            throw new DuplicateResourceException(
                 "Já existe uma categoria com esse nome para o usuário"
             );
         }
@@ -66,7 +69,7 @@ public class CategoryService {
             userId,
             normalizedName
         )) {
-            throw new IllegalArgumentException(
+            throw new DuplicateResourceException(
                 "Já existe uma categoria com esse nome para o usuário"
             );
         }
@@ -84,7 +87,7 @@ public class CategoryService {
         );
 
         if (transactionRepository.existsByCategoryId(categoryId)) {
-            throw new IllegalStateException(
+            throw new BusinessRuleException(
                 "Não é possível excluir uma categoria que possui transações"
             );
         }
@@ -94,7 +97,7 @@ public class CategoryService {
 
     private User findUserById(Long userId) {
         return userRepository.findById(userId)
-            .orElseThrow(() -> new IllegalArgumentException(
+            .orElseThrow(() -> new ResourceNotFoundException(
                 "Usuário não encontrado"
             ));
     }
@@ -107,7 +110,7 @@ public class CategoryService {
                 categoryId,
                 userId
             )
-            .orElseThrow(() -> new IllegalArgumentException(
+            .orElseThrow(() -> new ResourceNotFoundException(
                 "Categoria não encontrada"
             ));
     }

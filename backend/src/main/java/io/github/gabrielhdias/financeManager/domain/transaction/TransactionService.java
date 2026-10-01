@@ -4,6 +4,7 @@ import io.github.gabrielhdias.financeManager.domain.account.Account;
 import io.github.gabrielhdias.financeManager.domain.account.AccountRepository;
 import io.github.gabrielhdias.financeManager.domain.category.Category;
 import io.github.gabrielhdias.financeManager.domain.category.CategoryRepository;
+import io.github.gabrielhdias.financeManager.domain.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -133,7 +134,7 @@ public class TransactionService {
                 transactionId,
                 userId
             )
-            .orElseThrow(() -> new IllegalArgumentException(
+            .orElseThrow(() -> new ResourceNotFoundException(
                 "Transação não encontrada"
             ));
     }
@@ -146,7 +147,7 @@ public class TransactionService {
                 accountId,
                 userId
             )
-            .orElseThrow(() -> new IllegalArgumentException(
+            .orElseThrow(() -> new ResourceNotFoundException(
                 "Conta não encontrada"
             ));
     }
@@ -159,7 +160,7 @@ public class TransactionService {
                 categoryId,
                 userId
             )
-            .orElseThrow(() -> new IllegalArgumentException(
+            .orElseThrow(() -> new ResourceNotFoundException(
                 "Categoria não encontrada"
             ));
     }
