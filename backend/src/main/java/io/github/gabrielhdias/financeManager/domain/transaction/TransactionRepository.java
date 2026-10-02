@@ -44,6 +44,21 @@ public interface TransactionRepository
     );
 
     @Query("""
+            SELECT COALESCE(SUM(t.amount), 0)
+            FROM Transaction t
+            WHERE t.account.user.id = :userId
+              AND t.type = :type
+              AND t.date >= COALESCE(:startDate, t.date)
+              AND t.date <= COALESCE(:endDate, t.date)
+            """)
+    BigDecimal sumAmountByUserAndTypeAndPeriod(
+        @Param("userId") Long userId,
+        @Param("type") TransactionType type,
+        @Param("startDate") LocalDate startDate,
+        @Param("endDate") LocalDate endDate
+    );
+
+    @Query("""
             SELECT COALESCE(
                 SUM(
                     CASE

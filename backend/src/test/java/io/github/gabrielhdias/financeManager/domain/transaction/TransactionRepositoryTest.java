@@ -355,6 +355,147 @@ class TransactionRepositoryTest {
         );
     }
 
+    @Test
+    void shouldSumIncomeByUserAndPeriod() {
+        TestData data = createTestData(
+            "summary-income@email.com"
+        );
+
+        persistTransaction(
+            "Salário",
+            "5000.00",
+            LocalDate.of(2026, 10, 5),
+            TransactionType.INCOME,
+            data.account(),
+            data.category()
+        );
+
+        persistTransaction(
+            "Freelance",
+            "1000.00",
+            LocalDate.of(2026, 10, 20),
+            TransactionType.INCOME,
+            data.account(),
+            data.category()
+        );
+
+        persistTransaction(
+            "Receita fora do período",
+            "2000.00",
+            LocalDate.of(2026, 9, 1),
+            TransactionType.INCOME,
+            data.account(),
+            data.category()
+        );
+
+        persistTransaction(
+            "Despesa",
+            "500.00",
+            LocalDate.of(2026, 10, 10),
+            TransactionType.EXPENSE,
+            data.account(),
+            data.category()
+        );
+
+        entityManager.flush();
+
+        BigDecimal result =
+            transactionRepository
+                .sumAmountByUserAndTypeAndPeriod(
+                    data.user().getId(),
+                    TransactionType.INCOME,
+                    LocalDate.of(2026, 10, 1),
+                    LocalDate.of(2026, 10, 31)
+                );
+
+        assertEquals(
+            new BigDecimal("6000.00"),
+            result
+        );
+    }
+
+    @Test
+    void shouldSumExpensesByUserWithoutPeriod() {
+        TestData data = createTestData(
+            "summary-expense@email.com"
+        );
+
+        persistTransaction(
+            "Mercado",
+            "150.00",
+            LocalDate.of(2026, 9, 1),
+            TransactionType.EXPENSE,
+            data.account(),
+            data.category()
+        );
+
+        persistTransaction(
+            "Uber",
+            "35.90",
+            LocalDate.of(2026, 10, 1),
+            TransactionType.EXPENSE,
+            data.account(),
+            data.category()
+        );
+
+        persistTransaction(
+            "Salário",
+            "5000.00",
+            LocalDate.of(2026, 10, 1),
+            TransactionType.INCOME,
+            data.account(),
+            data.category()
+        );
+
+        entityManager.flush();
+
+        BigDecimal result =
+            transactionRepository
+                .sumAmountByUserAndTypeAndPeriod(
+                    data.user().getId(),
+                    TransactionType.EXPENSE,
+                    null,
+                    null
+                );
+
+        assertEquals(
+            new BigDecimal("185.90"),
+            result
+        );
+    }
+
+    @Test
+    void shouldReturnZeroWhenUserHasNoTransactionsOfRequestedType() {
+        TestData data = createTestData(
+            "summary-zero@email.com"
+        );
+
+        persistTransaction(
+            "Mercado",
+            "150.00",
+            LocalDate.of(2026, 10, 1),
+            TransactionType.EXPENSE,
+            data.account(),
+            data.category()
+        );
+
+        entityManager.flush();
+
+        BigDecimal result =
+            transactionRepository
+                .sumAmountByUserAndTypeAndPeriod(
+                    data.user().getId(),
+                    TransactionType.INCOME,
+                    null,
+                    null
+                );
+
+        assertEquals(
+            0,
+            result.compareTo(BigDecimal.ZERO)
+        );
+    }
+
     private TestData createTestData(String email) {
         User user = createUser(email);
 
