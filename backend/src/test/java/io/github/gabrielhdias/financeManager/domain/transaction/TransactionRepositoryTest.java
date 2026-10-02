@@ -4,11 +4,11 @@ import io.github.gabrielhdias.financeManager.domain.account.Account;
 import io.github.gabrielhdias.financeManager.domain.category.Category;
 import io.github.gabrielhdias.financeManager.domain.dashboard.CategoryExpenseSummary;
 import io.github.gabrielhdias.financeManager.domain.user.User;
+import io.github.gabrielhdias.financeManager.integration.AbstractPostgreSqlIntegrationTest;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
-import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -17,10 +17,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
-@AutoConfigureTestDatabase(
-    replace = AutoConfigureTestDatabase.Replace.NONE
-)
-class TransactionRepositoryTest {
+class TransactionRepositoryTest
+    extends AbstractPostgreSqlIntegrationTest {
 
     @Autowired
     private TransactionRepository transactionRepository;
