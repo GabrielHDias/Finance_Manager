@@ -6,6 +6,9 @@ import io.github.gabrielhdias.financeManager.api.account.dto.AccountResponse;
 import io.github.gabrielhdias.financeManager.domain.account.Account;
 import io.github.gabrielhdias.financeManager.domain.account.AccountService;
 import io.github.gabrielhdias.financeManager.security.AuthenticatedUser;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +26,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/accounts")
+@Tag(
+    name = "Accounts",
+    description = "Gerenciamento das contas financeiras do usuário"
+)
+@SecurityRequirement(name = "bearerAuth")
 public class AccountController {
 
     private final AccountService accountService;
@@ -37,6 +45,10 @@ public class AccountController {
     }
 
     @PostMapping
+    @Operation(
+        summary = "Criar conta",
+        description = "Cria uma nova conta para o usuário autenticado"
+    )
     public ResponseEntity<AccountResponse> create(
         @Valid @RequestBody AccountRequest request
     ) {
@@ -53,6 +65,10 @@ public class AccountController {
     }
 
     @GetMapping
+    @Operation(
+        summary = "Listar contas",
+        description = "Retorna todas as contas pertencentes ao usuário autenticado"
+    )
     public ResponseEntity<List<AccountResponse>> list() {
         Long userId = authenticatedUser.getId();
 
@@ -66,6 +82,10 @@ public class AccountController {
     }
 
     @GetMapping("/{id}")
+    @Operation(
+        summary = "Buscar conta",
+        description = "Retorna uma conta pertencente ao usuário autenticado"
+    )
     public ResponseEntity<AccountResponse> findById(
         @PathVariable Long id
     ) {
@@ -82,6 +102,10 @@ public class AccountController {
     }
 
     @GetMapping("/{id}/balance")
+    @Operation(
+        summary = "Consultar saldo da conta",
+        description = "Calcula o saldo da conta a partir das transações registradas"
+    )
     public ResponseEntity<AccountBalanceResponse> getBalance(
         @PathVariable Long id
     ) {
@@ -102,6 +126,10 @@ public class AccountController {
     }
 
     @PutMapping("/{id}")
+    @Operation(
+        summary = "Renomear conta",
+        description = "Altera o nome de uma conta pertencente ao usuário autenticado"
+    )
     public ResponseEntity<AccountResponse> rename(
         @PathVariable Long id,
         @Valid @RequestBody AccountRequest request
@@ -120,6 +148,10 @@ public class AccountController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(
+        summary = "Excluir conta",
+        description = "Exclui uma conta sem transações associadas"
+    )
     public ResponseEntity<Void> delete(
         @PathVariable Long id
     ) {

@@ -5,6 +5,8 @@ import io.github.gabrielhdias.financeManager.api.category.dto.CategoryResponse;
 import io.github.gabrielhdias.financeManager.domain.category.Category;
 import io.github.gabrielhdias.financeManager.domain.category.CategoryService;
 import io.github.gabrielhdias.financeManager.security.AuthenticatedUser;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/categories")
+@Tag(
+    name = "Categories",
+    description = "Gerenciamento das categorias financeiras do usuário"
+)
+@SecurityRequirement(name = "bearerAuth")
 public class CategoryController {
 
     private final CategoryService categoryService;

@@ -26,22 +26,36 @@ public class SecurityConfig {
                 )
             )
 
-            .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers(
-                    HttpMethod.POST,
-                    "/users"
-                ).permitAll()
+            .authorizeHttpRequests(authorize ->
+                authorize
 
-                .requestMatchers(
-                    HttpMethod.POST,
-                    "/auth/login"
-                ).permitAll()
+                    .requestMatchers(
+                        HttpMethod.POST,
+                        "/users"
+                    )
+                    .permitAll()
 
-                .anyRequest().authenticated()
+                    .requestMatchers(
+                        HttpMethod.POST,
+                        "/auth/login"
+                    )
+                    .permitAll()
+
+                    .requestMatchers(
+                        "/v3/api-docs/**",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html"
+                    )
+                    .permitAll()
+
+                    .anyRequest()
+                    .authenticated()
             )
 
             .oauth2ResourceServer(oauth2 ->
-                oauth2.jwt(Customizer.withDefaults())
+                oauth2.jwt(
+                    Customizer.withDefaults()
+                )
             );
 
         return http.build();

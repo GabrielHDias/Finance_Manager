@@ -6,6 +6,8 @@ import io.github.gabrielhdias.financeManager.domain.dashboard.CategoryExpenseSum
 import io.github.gabrielhdias.financeManager.domain.dashboard.DashboardService;
 import io.github.gabrielhdias.financeManager.domain.dashboard.FinancialSummary;
 import io.github.gabrielhdias.financeManager.security.AuthenticatedUser;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +20,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/dashboard")
+@Tag(
+    name = "Dashboard",
+    description = "Consultas e indicadores financeiros do usuário"
+)
+@SecurityRequirement(name = "bearerAuth")
 public class DashboardController {
 
     private final DashboardService dashboardService;

@@ -6,6 +6,8 @@ import io.github.gabrielhdias.financeManager.domain.transaction.Transaction;
 import io.github.gabrielhdias.financeManager.domain.transaction.TransactionService;
 import io.github.gabrielhdias.financeManager.domain.transaction.TransactionType;
 import io.github.gabrielhdias.financeManager.security.AuthenticatedUser;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -25,6 +27,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/transactions")
+@Tag(
+    name = "Transactions",
+    description = "Gerenciamento das transações financeiras do usuário"
+)
+@SecurityRequirement(name = "bearerAuth")
 public class TransactionController {
 
     private final TransactionService transactionService;
