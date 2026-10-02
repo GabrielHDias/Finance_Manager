@@ -1,6 +1,8 @@
 package io.github.gabrielhdias.financeManager.api.dashboard;
 
+import io.github.gabrielhdias.financeManager.api.dashboard.dto.CategoryExpenseResponse;
 import io.github.gabrielhdias.financeManager.api.dashboard.dto.DashboardSummaryResponse;
+import io.github.gabrielhdias.financeManager.domain.dashboard.CategoryExpenseSummary;
 import io.github.gabrielhdias.financeManager.domain.dashboard.FinancialSummary;
 
 public final class DashboardMapper {
@@ -15,6 +17,16 @@ public final class DashboardMapper {
             summary.totalIncome(),
             summary.totalExpense(),
             summary.balance()
+        );
+    }
+
+    public static CategoryExpenseResponse toResponse(
+        CategoryExpenseSummary summary
+    ) {
+        return new CategoryExpenseResponse(
+            summary.categoryId(),
+            summary.categoryName(),
+            summary.amount()
         );
     }
 }

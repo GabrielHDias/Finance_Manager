@@ -2,6 +2,7 @@ package io.github.gabrielhdias.financeManager.domain.transaction;
 
 import io.github.gabrielhdias.financeManager.domain.account.Account;
 import io.github.gabrielhdias.financeManager.domain.category.Category;
+import io.github.gabrielhdias.financeManager.domain.dashboard.CategoryExpenseSummary;
 import io.github.gabrielhdias.financeManager.domain.user.User;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
@@ -493,6 +494,235 @@ class TransactionRepositoryTest {
         assertEquals(
             0,
             result.compareTo(BigDecimal.ZERO)
+        );
+    }
+
+    @Test
+    void shouldGroupExpensesByCategoryAndOrderByHighestAmount() {
+        User user = createUser(
+            "expense-category@email.com"
+        );
+
+        Account account =
+            new Account("Nubank", user);
+
+        Category food =
+            new Category("Alimentação", user);
+
+        Category transport =
+            new Category("Transporte", user);
+
+        entityManager.persist(account);
+        entityManager.persist(food);
+        entityManager.persist(transport);
+
+        persistTransaction(
+            "Mercado",
+            "500.00",
+            LocalDate.of(2026, 10, 1),
+            TransactionType.EXPENSE,
+            account,
+            food
+        );
+
+        persistTransaction(
+            "Restaurante",
+            "350.00",
+            LocalDate.of(2026, 10, 5),
+            TransactionType.EXPENSE,
+            account,
+            food
+        );
+
+        persistTransaction(
+            "Uber",
+            "320.50",
+            LocalDate.of(2026, 10, 10),
+            TransactionType.EXPENSE,
+            account,
+            transport
+        );
+
+        entityManager.flush();
+
+        List<CategoryExpenseSummary> result =
+            transactionRepository.sumExpensesByCategory(
+                user.getId(),
+                TransactionType.EXPENSE,
+                null,
+                null
+            );
+
+        assertEquals(2, result.size());
+
+        assertEquals(
+            "Alimentação",
+            result.get(0).categoryName()
+        );
+
+        assertEquals(
+            new BigDecimal("850.00"),
+            result.get(0).amount()
+        );
+
+        assertEquals(
+            "Transporte",
+            result.get(1).categoryName()
+        );
+
+        assertEquals(
+            new BigDecimal("320.50"),
+            result.get(1).amount()
+        );
+    }
+
+    @Test
+    void shouldIgnoreIncomeWhenGroupingExpensesByCategory() {
+        TestData data = createTestData(
+            "expense-only@email.com"
+        );
+
+        persistTransaction(
+            "Mercado",
+            "200.00",
+            LocalDate.of(2026, 10, 1),
+            TransactionType.EXPENSE,
+            data.account(),
+            data.category()
+        );
+
+        persistTransaction(
+            "Salário",
+            "5000.00",
+            LocalDate.of(2026, 10, 1),
+            TransactionType.INCOME,
+            data.account(),
+            data.category()
+        );
+
+        entityManager.flush();
+
+        List<CategoryExpenseSummary> result =
+            transactionRepository.sumExpensesByCategory(
+                data.user().getId(),
+                TransactionType.EXPENSE,
+                null,
+                null
+            );
+
+        assertEquals(1, result.size());
+
+        assertEquals(
+            new BigDecimal("200.00"),
+            result.get(0).amount()
+        );
+    }
+
+    @Test
+    void shouldGroupExpensesByCategoryWithinPeriod() {
+        TestData data = createTestData(
+            "expense-period@email.com"
+        );
+
+        persistTransaction(
+            "Antes",
+            "100.00",
+            LocalDate.of(2026, 9, 30),
+            TransactionType.EXPENSE,
+            data.account(),
+            data.category()
+        );
+
+        persistTransaction(
+            "Dentro 1",
+            "200.00",
+            LocalDate.of(2026, 10, 10),
+            TransactionType.EXPENSE,
+            data.account(),
+            data.category()
+        );
+
+        persistTransaction(
+            "Dentro 2",
+            "50.00",
+            LocalDate.of(2026, 10, 20),
+            TransactionType.EXPENSE,
+            data.account(),
+            data.category()
+        );
+
+        persistTransaction(
+            "Depois",
+            "300.00",
+            LocalDate.of(2026, 11, 1),
+            TransactionType.EXPENSE,
+            data.account(),
+            data.category()
+        );
+
+        entityManager.flush();
+
+        List<CategoryExpenseSummary> result =
+            transactionRepository.sumExpensesByCategory(
+                data.user().getId(),
+                TransactionType.EXPENSE,
+                LocalDate.of(2026, 10, 1),
+                LocalDate.of(2026, 10, 31)
+            );
+
+        assertEquals(1, result.size());
+
+        assertEquals(
+            new BigDecimal("250.00"),
+            result.get(0).amount()
+        );
+    }
+
+    @Test
+    void shouldOnlyGroupExpensesFromRequestedUser() {
+        TestData firstUser =
+            createTestData(
+                "expense-user-one@email.com"
+            );
+
+        TestData secondUser =
+            createTestData(
+                "expense-user-two@email.com"
+            );
+
+        persistTransaction(
+            "Usuário 1",
+            "100.00",
+            LocalDate.of(2026, 10, 1),
+            TransactionType.EXPENSE,
+            firstUser.account(),
+            firstUser.category()
+        );
+
+        persistTransaction(
+            "Usuário 2",
+            "900.00",
+            LocalDate.of(2026, 10, 1),
+            TransactionType.EXPENSE,
+            secondUser.account(),
+            secondUser.category()
+        );
+
+        entityManager.flush();
+
+        List<CategoryExpenseSummary> result =
+            transactionRepository.sumExpensesByCategory(
+                firstUser.user().getId(),
+                TransactionType.EXPENSE,
+                null,
+                null
+            );
+
+        assertEquals(1, result.size());
+
+        assertEquals(
+            new BigDecimal("100.00"),
+            result.get(0).amount()
         );
     }
 

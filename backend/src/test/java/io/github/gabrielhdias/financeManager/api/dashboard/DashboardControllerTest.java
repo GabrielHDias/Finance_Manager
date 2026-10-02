@@ -1,6 +1,8 @@
 package io.github.gabrielhdias.financeManager.api.dashboard;
 
+import io.github.gabrielhdias.financeManager.api.dashboard.dto.CategoryExpenseResponse;
 import io.github.gabrielhdias.financeManager.api.dashboard.dto.DashboardSummaryResponse;
+import io.github.gabrielhdias.financeManager.domain.dashboard.CategoryExpenseSummary;
 import io.github.gabrielhdias.financeManager.domain.dashboard.DashboardService;
 import io.github.gabrielhdias.financeManager.domain.dashboard.FinancialSummary;
 import io.github.gabrielhdias.financeManager.security.AuthenticatedUser;
@@ -14,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -91,6 +94,80 @@ class DashboardControllerTest {
 
         verify(dashboardService)
             .getSummary(
+                userId,
+                startDate,
+                endDate
+            );
+    }
+
+    @Test
+    void shouldReturnExpensesByCategory() {
+        Long userId = 1L;
+
+        LocalDate startDate =
+            LocalDate.of(2026, 10, 1);
+
+        LocalDate endDate =
+            LocalDate.of(2026, 10, 31);
+
+        List<CategoryExpenseSummary> summaries =
+            List.of(
+                new CategoryExpenseSummary(
+                    10L,
+                    "Alimentação",
+                    new BigDecimal("850.00")
+                ),
+                new CategoryExpenseSummary(
+                    20L,
+                    "Transporte",
+                    new BigDecimal("320.50")
+                )
+            );
+
+        when(authenticatedUser.getId())
+            .thenReturn(userId);
+
+        when(dashboardService.getExpensesByCategory(
+            userId,
+            startDate,
+            endDate
+        )).thenReturn(summaries);
+
+        ResponseEntity<List<CategoryExpenseResponse>> response =
+            dashboardController.getExpensesByCategory(
+                startDate,
+                endDate
+            );
+
+        assertEquals(
+            HttpStatus.OK,
+            response.getStatusCode()
+        );
+
+        assertNotNull(response.getBody());
+
+        assertEquals(
+            2,
+            response.getBody().size()
+        );
+
+        assertEquals(
+            10L,
+            response.getBody().get(0).categoryId()
+        );
+
+        assertEquals(
+            "Alimentação",
+            response.getBody().get(0).categoryName()
+        );
+
+        assertEquals(
+            new BigDecimal("850.00"),
+            response.getBody().get(0).amount()
+        );
+
+        verify(dashboardService)
+            .getExpensesByCategory(
                 userId,
                 startDate,
                 endDate

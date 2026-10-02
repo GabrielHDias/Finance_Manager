@@ -1,5 +1,6 @@
 package io.github.gabrielhdias.financeManager.domain.transaction;
 
+import io.github.gabrielhdias.financeManager.domain.dashboard.CategoryExpenseSummary;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -54,6 +55,27 @@ public interface TransactionRepository
     BigDecimal sumAmountByUserAndTypeAndPeriod(
         @Param("userId") Long userId,
         @Param("type") TransactionType type,
+        @Param("startDate") LocalDate startDate,
+        @Param("endDate") LocalDate endDate
+    );
+
+    @Query("""
+            SELECT new io.github.gabrielhdias.financeManager.domain.dashboard.CategoryExpenseSummary(
+                t.category.id,
+                t.category.name,
+                SUM(t.amount)
+            )
+            FROM Transaction t
+            WHERE t.account.user.id = :userId
+              AND t.type = :expenseType
+              AND t.date >= COALESCE(:startDate, t.date)
+              AND t.date <= COALESCE(:endDate, t.date)
+            GROUP BY t.category.id, t.category.name
+            ORDER BY SUM(t.amount) DESC
+            """)
+    List<CategoryExpenseSummary> sumExpensesByCategory(
+        @Param("userId") Long userId,
+        @Param("expenseType") TransactionType expenseType,
         @Param("startDate") LocalDate startDate,
         @Param("endDate") LocalDate endDate
     );

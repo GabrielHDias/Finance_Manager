@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 public class DashboardService {
@@ -56,6 +57,25 @@ public class DashboardService {
             totalIncome,
             totalExpense,
             balance
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public List<CategoryExpenseSummary> getExpensesByCategory(
+        Long userId,
+        LocalDate startDate,
+        LocalDate endDate
+    ) {
+        validatePeriod(
+            startDate,
+            endDate
+        );
+
+        return transactionRepository.sumExpensesByCategory(
+            userId,
+            TransactionType.EXPENSE,
+            startDate,
+            endDate
         );
     }
 
