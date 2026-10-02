@@ -13,11 +13,29 @@ import java.util.Optional;
 public interface TransactionRepository
     extends JpaRepository<Transaction, Long> {
 
-    List<Transaction> findAllByAccountUserId(Long userId);
+    @Query("""
+            SELECT t
+            FROM Transaction t
+            JOIN FETCH t.account
+            JOIN FETCH t.category
+            WHERE t.account.user.id = :userId
+            ORDER BY t.date DESC, t.id DESC
+            """)
+    List<Transaction> findAllByAccountUserId(
+        @Param("userId") Long userId
+    );
 
+    @Query("""
+            SELECT t
+            FROM Transaction t
+            JOIN FETCH t.account
+            JOIN FETCH t.category
+            WHERE t.id = :id
+              AND t.account.user.id = :userId
+            """)
     Optional<Transaction> findByIdAndAccountUserId(
-        Long id,
-        Long userId
+        @Param("id") Long id,
+        @Param("userId") Long userId
     );
 
     boolean existsByAccountId(Long accountId);
@@ -27,6 +45,8 @@ public interface TransactionRepository
     @Query("""
             SELECT t
             FROM Transaction t
+            JOIN FETCH t.account
+            JOIN FETCH t.category
             WHERE t.account.user.id = :userId
               AND t.date >= COALESCE(:startDate, t.date)
               AND t.date <= COALESCE(:endDate, t.date)
