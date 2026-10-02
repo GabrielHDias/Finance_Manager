@@ -1,6 +1,7 @@
 package io.github.gabrielhdias.financeManager.api.category;
 
 import io.github.gabrielhdias.financeManager.config.security.SecurityConfig;
+import io.github.gabrielhdias.financeManager.config.security.SecurityTestConfig;
 import io.github.gabrielhdias.financeManager.domain.category.Category;
 import io.github.gabrielhdias.financeManager.domain.category.CategoryService;
 import io.github.gabrielhdias.financeManager.security.AuthenticatedUser;
@@ -23,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(CategoryController.class)
-@Import(SecurityConfig.class)
+@Import(SecurityTestConfig.class)
 class CategoryControllerMvcTest {
 
     @Autowired

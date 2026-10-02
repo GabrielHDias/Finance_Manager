@@ -2,8 +2,8 @@ package io.github.gabrielhdias.financeManager.api.error;
 
 import io.github.gabrielhdias.financeManager.domain.exception.BusinessRuleException;
 import io.github.gabrielhdias.financeManager.domain.exception.DuplicateResourceException;
-import io.github.gabrielhdias.financeManager.domain.exception.ResourceNotFoundException;
 import io.github.gabrielhdias.financeManager.domain.exception.InvalidCredentialsException;
+import io.github.gabrielhdias.financeManager.domain.exception.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,18 +33,13 @@ public class GlobalExceptionHandler {
             );
         }
 
-        ApiErrorResponse response = new ApiErrorResponse(
-            LocalDateTime.now(),
-            HttpStatus.BAD_REQUEST.value(),
+        return buildResponse(
+            HttpStatus.BAD_REQUEST,
             "Validation Error",
             "Dados inválidos",
-            request.getRequestURI(),
+            request,
             fields
         );
-
-        return ResponseEntity
-            .status(HttpStatus.BAD_REQUEST)
-            .body(response);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -52,18 +47,13 @@ public class GlobalExceptionHandler {
         IllegalArgumentException exception,
         HttpServletRequest request
     ) {
-        ApiErrorResponse response = new ApiErrorResponse(
-            LocalDateTime.now(),
-            HttpStatus.BAD_REQUEST.value(),
+        return buildResponse(
+            HttpStatus.BAD_REQUEST,
             "Bad Request",
             exception.getMessage(),
-            request.getRequestURI(),
-            null
+            request,
+            Map.of()
         );
-
-        return ResponseEntity
-            .status(HttpStatus.BAD_REQUEST)
-            .body(response);
     }
 
     @ExceptionHandler(IllegalStateException.class)
@@ -71,36 +61,27 @@ public class GlobalExceptionHandler {
         IllegalStateException exception,
         HttpServletRequest request
     ) {
-        ApiErrorResponse response = new ApiErrorResponse(
-            LocalDateTime.now(),
-            HttpStatus.CONFLICT.value(),
+        return buildResponse(
+            HttpStatus.CONFLICT,
             "Conflict",
             exception.getMessage(),
-            request.getRequestURI(),
-            null
+            request,
+            Map.of()
         );
-
-        return ResponseEntity
-            .status(HttpStatus.CONFLICT)
-            .body(response);
     }
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiErrorResponse> handleResourceNotFoundException(
         ResourceNotFoundException exception,
         HttpServletRequest request
     ) {
-        ApiErrorResponse response = new ApiErrorResponse(
-            LocalDateTime.now(),
-            HttpStatus.NOT_FOUND.value(),
+        return buildResponse(
+            HttpStatus.NOT_FOUND,
             "Not Found",
             exception.getMessage(),
-            request.getRequestURI(),
-            null
+            request,
+            Map.of()
         );
-
-        return ResponseEntity
-            .status(HttpStatus.NOT_FOUND)
-            .body(response);
     }
 
     @ExceptionHandler(DuplicateResourceException.class)
@@ -108,18 +89,13 @@ public class GlobalExceptionHandler {
         DuplicateResourceException exception,
         HttpServletRequest request
     ) {
-        ApiErrorResponse response = new ApiErrorResponse(
-            LocalDateTime.now(),
-            HttpStatus.CONFLICT.value(),
+        return buildResponse(
+            HttpStatus.CONFLICT,
             "Conflict",
             exception.getMessage(),
-            request.getRequestURI(),
-            null
+            request,
+            Map.of()
         );
-
-        return ResponseEntity
-            .status(HttpStatus.CONFLICT)
-            .body(response);
     }
 
     @ExceptionHandler(BusinessRuleException.class)
@@ -127,18 +103,13 @@ public class GlobalExceptionHandler {
         BusinessRuleException exception,
         HttpServletRequest request
     ) {
-        ApiErrorResponse response = new ApiErrorResponse(
-            LocalDateTime.now(),
-            HttpStatus.CONFLICT.value(),
+        return buildResponse(
+            HttpStatus.CONFLICT,
             "Conflict",
             exception.getMessage(),
-            request.getRequestURI(),
-            null
+            request,
+            Map.of()
         );
-
-        return ResponseEntity
-            .status(HttpStatus.CONFLICT)
-            .body(response);
     }
 
     @ExceptionHandler(InvalidCredentialsException.class)
@@ -146,17 +117,33 @@ public class GlobalExceptionHandler {
         InvalidCredentialsException exception,
         HttpServletRequest request
     ) {
-        ApiErrorResponse response = new ApiErrorResponse(
-            LocalDateTime.now(),
-            HttpStatus.UNAUTHORIZED.value(),
+        return buildResponse(
+            HttpStatus.UNAUTHORIZED,
             "Unauthorized",
             exception.getMessage(),
+            request,
+            Map.of()
+        );
+    }
+
+    private ResponseEntity<ApiErrorResponse> buildResponse(
+        HttpStatus status,
+        String error,
+        String message,
+        HttpServletRequest request,
+        Map<String, String> fields
+    ) {
+        ApiErrorResponse response = new ApiErrorResponse(
+            LocalDateTime.now(),
+            status.value(),
+            error,
+            message,
             request.getRequestURI(),
-            null
+            fields
         );
 
         return ResponseEntity
-            .status(HttpStatus.UNAUTHORIZED)
+            .status(status)
             .body(response);
     }
 }

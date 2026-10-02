@@ -19,6 +19,20 @@ import java.util.List;
 @Configuration
 public class SecurityConfig {
 
+    private final ApiAuthenticationEntryPoint authenticationEntryPoint;
+    private final ApiAccessDeniedHandler accessDeniedHandler;
+
+    public SecurityConfig(
+        ApiAuthenticationEntryPoint authenticationEntryPoint,
+        ApiAccessDeniedHandler accessDeniedHandler
+    ) {
+        this.authenticationEntryPoint =
+            authenticationEntryPoint;
+
+        this.accessDeniedHandler =
+            accessDeniedHandler;
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(
         HttpSecurity http
@@ -61,10 +75,27 @@ public class SecurityConfig {
                     .authenticated()
             )
 
+            .exceptionHandling(exception ->
+                exception
+                    .authenticationEntryPoint(
+                        authenticationEntryPoint
+                    )
+                    .accessDeniedHandler(
+                        accessDeniedHandler
+                    )
+            )
+
             .oauth2ResourceServer(oauth2 ->
-                oauth2.jwt(
-                    Customizer.withDefaults()
-                )
+                oauth2
+                    .authenticationEntryPoint(
+                        authenticationEntryPoint
+                    )
+                    .accessDeniedHandler(
+                        accessDeniedHandler
+                    )
+                    .jwt(
+                        Customizer.withDefaults()
+                    )
             );
 
         return http.build();

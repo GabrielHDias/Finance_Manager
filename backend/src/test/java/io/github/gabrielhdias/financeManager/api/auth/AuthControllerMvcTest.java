@@ -2,6 +2,7 @@ package io.github.gabrielhdias.financeManager.api.auth;
 
 import io.github.gabrielhdias.financeManager.api.auth.dto.LoginResponse;
 import io.github.gabrielhdias.financeManager.config.security.SecurityConfig;
+import io.github.gabrielhdias.financeManager.config.security.SecurityTestConfig;
 import io.github.gabrielhdias.financeManager.domain.auth.AuthService;
 import io.github.gabrielhdias.financeManager.domain.exception.InvalidCredentialsException;
 import org.junit.jupiter.api.Test;
@@ -19,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AuthController.class)
-@Import(SecurityConfig.class)
+@Import(SecurityTestConfig.class)
 class AuthControllerMvcTest {
 
     @Autowired

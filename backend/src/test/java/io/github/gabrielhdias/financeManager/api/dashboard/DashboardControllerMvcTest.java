@@ -1,6 +1,7 @@
 package io.github.gabrielhdias.financeManager.api.dashboard;
 
 import io.github.gabrielhdias.financeManager.config.security.SecurityConfig;
+import io.github.gabrielhdias.financeManager.config.security.SecurityTestConfig;
 import io.github.gabrielhdias.financeManager.domain.dashboard.CategoryExpenseSummary;
 import io.github.gabrielhdias.financeManager.domain.dashboard.DashboardService;
 import io.github.gabrielhdias.financeManager.domain.dashboard.FinancialSummary;
@@ -25,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(DashboardController.class)
-@Import(SecurityConfig.class)
+@Import(SecurityTestConfig.class)
 class DashboardControllerMvcTest {
 
     @Autowired

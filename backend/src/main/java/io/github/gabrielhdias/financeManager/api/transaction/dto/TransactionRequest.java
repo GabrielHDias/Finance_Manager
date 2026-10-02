@@ -35,9 +35,11 @@ public record TransactionRequest(
     TransactionType type,
 
     @NotNull(message = "A conta é obrigatória")
+    @Positive(message = "O identificador da conta deve ser maior que zero")
     Long accountId,
 
     @NotNull(message = "A categoria é obrigatória")
+    @Positive(message = "O identificador da categoria deve ser maior que zero")
     Long categoryId
 ) {
 }

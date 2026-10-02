@@ -1,6 +1,7 @@
 package io.github.gabrielhdias.financeManager.api.transaction;
 
 import io.github.gabrielhdias.financeManager.config.security.SecurityConfig;
+import io.github.gabrielhdias.financeManager.config.security.SecurityTestConfig;
 import io.github.gabrielhdias.financeManager.domain.account.Account;
 import io.github.gabrielhdias.financeManager.domain.category.Category;
 import io.github.gabrielhdias.financeManager.domain.exception.BusinessRuleException;
@@ -30,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(TransactionController.class)
-@Import(SecurityConfig.class)
+@Import(SecurityTestConfig.class)
 class TransactionControllerMvcTest {
 
     @Autowired

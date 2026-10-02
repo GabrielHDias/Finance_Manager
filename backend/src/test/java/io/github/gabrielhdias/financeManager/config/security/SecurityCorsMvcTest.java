@@ -23,7 +23,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         "app.cors.allowed-origin=http://localhost:3000"
     }
 )
-@Import(SecurityConfig.class)
+@Import({
+    SecurityConfig.class,
+    ApiAuthenticationEntryPoint.class,
+    ApiAccessDeniedHandler.class
+})
 class SecurityCorsMvcTest {
 
     @Autowired
