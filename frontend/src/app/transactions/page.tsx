@@ -3,18 +3,12 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ApiError } from "@/lib/api-error";
+import { formatCurrency } from "@/lib/formatters";
 import { findAllTransactions } from "@/services/transaction-service";
 import type {
   TransactionResponse,
   TransactionType,
 } from "@/types/transaction";
-
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  }).format(amount);
-}
 
 function formatDate(date: string): string {
   const [year, month, day] = date.split("-");
