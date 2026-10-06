@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ApiError } from "@/lib/api-error";
+import { formatCurrency } from "@/lib/formatters";
 import {
   getDashboardSummary,
   getExpensesByCategory,
@@ -11,13 +12,6 @@ import type {
   DashboardSummaryResponse,
   ExpenseByCategoryResponse,
 } from "@/types/dashboard";
-
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  }).format(amount);
-}
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -72,32 +66,46 @@ export default function DashboardPage() {
   }
 
   return (
-    <main>
-      <h1>Dashboard</h1>
+  <main>
+    <h1>Dashboard</h1>
 
-      <section>
-        <h2>Resumo financeiro</h2>
+    <section className="card">
+      <h2>Resumo financeiro</h2>
 
-        <p>Receitas: {formatCurrency(summary.totalIncome)}</p>
-        <p>Despesas: {formatCurrency(summary.totalExpense)}</p>
-        <p>Saldo: {formatCurrency(summary.balance)}</p>
-      </section>
+      <div className="summary-grid">
+        <div>
+          <strong>Receitas</strong>
+          <p>{formatCurrency(summary.totalIncome)}</p>
+        </div>
 
-      <section>
-        <h2>Despesas por categoria</h2>
+        <div>
+          <strong>Despesas</strong>
+          <p>{formatCurrency(summary.totalExpense)}</p>
+        </div>
 
-        {expensesByCategory.length === 0 ? (
-          <p>Nenhuma despesa cadastrada.</p>
-        ) : (
-          <ul>
-            {expensesByCategory.map((expense) => (
-              <li key={expense.categoryId}>
-                {expense.categoryName}: {formatCurrency(expense.amount)}
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-    </main>
-  );
+        <div>
+          <strong>Saldo</strong>
+          <p>{formatCurrency(summary.balance)}</p>
+        </div>
+      </div>
+    </section>
+
+    <section className="card">
+      <h2>Despesas por categoria</h2>
+
+      {expensesByCategory.length === 0 ? (
+        <p>Nenhuma despesa cadastrada.</p>
+      ) : (
+        <ul className="data-list">
+          {expensesByCategory.map((expense) => (
+            <li key={expense.categoryId}>
+              <span>{expense.categoryName}</span>
+              <strong>{formatCurrency(expense.amount)}</strong>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  </main>
+);
 }

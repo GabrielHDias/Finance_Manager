@@ -3,13 +3,13 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ApiError } from "@/lib/api-error";
-import { saveAccessToken } from "@/lib/token-storage";
-import { login } from "@/services/auth-service";
+import { createUser } from "@/services/user-service";
 import Link from "next/link";
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const router = useRouter();
 
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -18,25 +18,42 @@ export default function LoginPage() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
+    const trimmedName = name.trim();
+    const trimmedEmail = email.trim();
+
+    if (!trimmedName) {
+      setErrorMessage("Informe o nome.");
+      return;
+    }
+
+    if (!trimmedEmail) {
+      setErrorMessage("Informe o e-mail.");
+      return;
+    }
+
+    if (!password) {
+      setErrorMessage("Informe a senha.");
+      return;
+    }
+
     setSubmitting(true);
     setErrorMessage("");
 
     try {
-      const response = await login({
-        email: email.trim(),
+      await createUser({
+        name: trimmedName,
+        email: trimmedEmail,
         password,
       });
 
-      saveAccessToken(response.accessToken);
-
-      router.replace("/dashboard");
+      router.push("/login");
     } catch (error) {
       if (error instanceof ApiError) {
         setErrorMessage(error.message);
         return;
       }
 
-      setErrorMessage("Não foi possível conectar ao servidor.");
+      setErrorMessage("Não foi possível criar o usuário.");
     } finally {
       setSubmitting(false);
     }
@@ -44,9 +61,22 @@ export default function LoginPage() {
 
   return (
     <main>
-      <h1>Entrar</h1>
+      <h1>Criar conta</h1>
 
       <form onSubmit={handleSubmit}>
+        <div>
+          <label htmlFor="name">Nome</label>
+
+          <input
+            id="name"
+            name="name"
+            type="text"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            required
+          />
+        </div>
+
         <div>
           <label htmlFor="email">E-mail</label>
 
@@ -78,11 +108,11 @@ export default function LoginPage() {
         )}
 
         <button type="submit" disabled={submitting}>
-          {submitting ? "Entrando..." : "Entrar"}
+          {submitting ? "Criando..." : "Criar usuário"}
         </button>
       </form>
       <p>
-  Ainda não possui conta? <Link href="/register">Criar conta</Link>
+  Já possui conta? <Link href="/login">Entrar</Link>
 </p>
     </main>
   );

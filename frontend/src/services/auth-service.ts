@@ -4,11 +4,15 @@ import type { LoginRequest, LoginResponse } from "@/types/auth";
 export async function login(
   credentials: LoginRequest,
 ): Promise<LoginResponse> {
-  return apiRequest<LoginResponse>("/auth/login", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
+  return apiRequest<LoginResponse>(
+    "/auth/login",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(credentials),
     },
-    body: JSON.stringify(credentials),
-  });
+    false,
+  );
 }
