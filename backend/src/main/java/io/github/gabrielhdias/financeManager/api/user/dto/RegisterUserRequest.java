@@ -24,8 +24,8 @@ public record RegisterUserRequest(
     @NotBlank(message = "A senha é obrigatória")
     @Size(
         min = 8,
-        max = 100,
-        message = "A senha deve possuir entre 8 e 100 caracteres"
+        max = 72,
+        message = "A senha deve possuir entre 8 e 72 caracteres"
     )
     String password
 ) {

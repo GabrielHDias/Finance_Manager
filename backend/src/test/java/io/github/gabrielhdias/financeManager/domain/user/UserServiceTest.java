@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Optional;
 
@@ -216,4 +217,32 @@ class UserServiceTest {
             exception.getMessage()
         );
     }
+    @Test
+    void shouldRejectPasswordsExceedingBcryptByteLimit() {
+        for (String password : new String[] {"a".repeat(73), "é".repeat(37), "🔒".repeat(19)}) {
+            IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> userService.register("Teste", "limit@example.test", password)
+            );
+            assertEquals(
+                "A senha é muito longa. Use uma senha menor, especialmente se incluir acentos ou emojis.",
+                exception.getMessage()
+            );
+        }
+        verifyNoInteractions(passwordEncoder);
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void shouldAcceptPasswordsAtBcryptByteLimitWithoutTruncation() {
+        BCryptPasswordEncoder realEncoder = new BCryptPasswordEncoder();
+        UserService service = new UserService(userRepository, realEncoder);
+        when(userRepository.save(any(User.class)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+        for (String password : new String[] {"a".repeat(72), "é".repeat(36), "🔒".repeat(18)}) {
+            User user = service.register("Teste", "limit@example.test", password);
+            assertTrue(realEncoder.matches(password, user.getPasswordHash()));
+        }
+    }
+
 }

@@ -6,6 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
 @Service
@@ -39,6 +40,12 @@ public class UserService {
         if (rawPassword == null || rawPassword.isBlank()) {
             throw new IllegalArgumentException(
                 "A senha não pode estar vazia"
+            );
+        }
+
+        if (rawPassword.getBytes(StandardCharsets.UTF_8).length > 72) {
+            throw new IllegalArgumentException(
+                "A senha é muito longa. Use uma senha menor, especialmente se incluir acentos ou emojis."
             );
         }
 

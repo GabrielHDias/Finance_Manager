@@ -17,6 +17,7 @@ export default function LoginPage() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (submitting) return;
 
     setSubmitting(true);
     setErrorMessage("");
@@ -52,6 +53,9 @@ export default function LoginPage() {
 
           <input
             id="email"
+            autoComplete="username"
+            maxLength={255}
+            disabled={submitting}
             name="email"
             type="email"
             value={email}
@@ -65,6 +69,8 @@ export default function LoginPage() {
 
           <input
             id="password"
+            autoComplete="current-password"
+            disabled={submitting}
             name="password"
             type="password"
             value={password}
@@ -74,7 +80,7 @@ export default function LoginPage() {
         </div>
 
         {errorMessage && (
-        <p className="error-message">{errorMessage}</p>
+        <p className="error-message" role="alert">{errorMessage}</p>
         )}
 
         <button type="submit" disabled={submitting}>
