@@ -7,6 +7,7 @@ import { formatCurrency } from "@/lib/formatters";
 import { formatDate, parseDisplayDate } from "@/lib/dates";
 import DateInput from "@/components/date-input";
 import { matchesTransactionFilters, mergeTransaction, sortTransactions } from "@/lib/transaction-list";
+import { downloadTransactionCsv } from "@/lib/transaction-csv";
 import { findAllAccounts } from "@/services/account-service";
 import { findAllCategories } from "@/services/category-service";
 import { createTransaction, deleteTransaction, findAllTransactions, updateTransaction } from "@/services/transaction-service";
@@ -31,10 +32,11 @@ export default function TransactionsPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [listFailed, setListFailed] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const busy = loading || submitting || deleting;
+  const busy = loading || submitting || deleting || exporting;
 
   useEffect(() => {
     let cancelled = false;
@@ -156,6 +158,26 @@ export default function TransactionsPage() {
       setListFailed(false);
     } catch (error) { setListFailed(true); handleError(error); }
     finally { setLoading(false); }
+  }
+
+  async function handleExport() {
+    if (busy || listFailed || transactions.length === 0) return;
+    setExporting(true);
+    setErrorMessage("");
+    setSuccessMessage("");
+    try {
+      const items = sortTransactions(await findAllTransactions(filters));
+      if (items.length === 0) {
+        setSuccessMessage("Nenhuma transação encontrada para exportar com os filtros aplicados.");
+        return;
+      }
+      downloadTransactionCsv(items);
+      setSuccessMessage(`CSV gerado com ${items.length} ${items.length === 1 ? "transação" : "transações"}.`);
+    } catch (error) {
+      handleError(error);
+    } finally {
+      setExporting(false);
+    }
   }
 
   function handleFilters(event: FormEvent<HTMLFormElement>) {
@@ -339,6 +361,17 @@ export default function TransactionsPage() {
       </section>
       <section className="card" aria-busy={loading}>
         <h2>Transações cadastradas</h2>
+        <p id="export-help">Exporte em CSV usando os filtros aplicados à lista. Após alterar os campos, clique em Aplicar filtros antes de exportar.</p>
+        <button
+          className="button--secondary"
+          type="button"
+          disabled={busy || listFailed || transactions.length === 0}
+          aria-describedby="export-help"
+          onClick={handleExport}
+        >
+          {exporting ? "Exportando..." : "Exportar CSV"}
+        </button>
+        <p>O relatório inclui data, descrição, valor, tipo, conta e categoria.</p>
         {loading ? <p role="status">Carregando transações...</p> : listFailed ? (
           <p>Lista indisponível. Tente aplicar os filtros novamente ou recarregue a página.</p>
         ) : transactions.length === 0 ? (

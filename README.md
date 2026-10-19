@@ -2,7 +2,7 @@
 
 Aplicação de gerenciamento financeiro pessoal e projeto de aprendizado Full Stack e DevOps, com Java 21, Spring Boot, Next.js, TypeScript e PostgreSQL 17.
 
-O MVP inclui cadastro e autenticação, contas financeiras, categorias, receitas e despesas, edição e exclusão, filtros de transações e dashboard por período. Os saldos são calculados pelas transações, e os dados pertencem ao usuário autenticado. A importação CSV oferece prévia, validação por linha e prevenção de duplicados.
+O MVP inclui cadastro e autenticação, contas financeiras, categorias, receitas e despesas, edição e exclusão, filtros de transações e dashboard por período. Os saldos são calculados pelas transações, e os dados pertencem ao usuário autenticado. A importação CSV oferece prévia, validação por linha e prevenção de duplicados. A exportação CSV gera relatórios com os filtros aplicados.
 
 ## Preparar as variáveis
 
@@ -155,12 +155,28 @@ Endpoints autenticados, em `multipart/form-data`:
 
 A prévia não cria rascunhos persistentes. O arquivo é enviado novamente na confirmação e não é armazenado no servidor.
 
+## Exportar transações CSV
+
+Na tela **Transações**, aplique os filtros desejados e clique em **Exportar CSV** na seção de transações cadastradas. Sem filtros, o arquivo inclui todas as transações do usuário autenticado. Alterações nos campos de filtro só entram na exportação depois de clicar em **Aplicar filtros**.
+
+A exportação consulta novamente a listagem autenticada com os filtros aplicados e gera `transacoes.csv` no navegador. O botão fica indisponível durante outras operações, quando a lista falha ou quando está vazia. Falhas de autenticação seguem o fluxo de login existente; falhas de consulta não geram um arquivo parcial.
+
+O relatório usa UTF-8 com BOM, separador `;`, datas `DD/MM/YYYY`, valores com vírgula e duas casas decimais, tipos `RECEITA` e `DESPESA`, e colunas `data;descricao;valor;tipo;conta;categoria`. Aspas e quebras de linha são preservadas dentro de campos delimitados. Textos que podem ser interpretados como fórmulas recebem um apóstrofo inicial para leitura como texto nas planilhas.
+
+Este relatório possui colunas adicionais de conta e categoria e não é o modelo de importação de quatro colunas. Para importar, use **Baixar modelo CSV** na página de importação.
+
+Teste do serializador (após instalar as dependências do frontend):
+
+```bash
+node --test scripts/transaction-csv.test.mjs
+```
+
 ## Integração contínua
 
 O workflow `.github/workflows/ci.yml` é acionado em pushes, pull requests e execução manual:
 
 1. **Backend:** Java 21, Maven Wrapper, testes e empacotamento; relatórios de testes ficam disponíveis como artefato.
-2. **Frontend:** Node.js 24, instalação pelo lockfile, testes do inicializador, lint, TypeScript e build.
+2. **Frontend:** Node.js 24, instalação pelo lockfile, testes do inicializador e da exportação CSV, lint, TypeScript e build.
 3. **Containers:** construção dos dois serviços, espera por saúde, validação integrada e remoção do banco temporário.
 
 Os jobs de backend e frontend executam em paralelo; o teste dos containers começa após ambos passarem. O CI gera credenciais apenas para seu ambiente temporário e não exige segredos de produção. Não há etapa de deploy nesse workflow.
