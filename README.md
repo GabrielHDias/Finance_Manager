@@ -221,6 +221,10 @@ O workflow `.github/workflows/ci.yml` é acionado em pushes, pull requests e exe
 
 Os jobs de backend e frontend executam em paralelo; o teste dos containers começa após ambos passarem. O CI gera credenciais apenas para seu ambiente temporário e não exige segredos de produção. Não há etapa de deploy nesse workflow.
 
+## Demonstração na EC2
+
+O [guia de deploy](docs/deploy-ec2.md) descreve a entrega de imagens pré-construídas para uma EC2 x86_64, acesso inicial por túnel SSH, HTTPS com domínio, volumes persistentes e backup. Use `compose.demo.yml` para essa modalidade; `compose.app.yml` continua sendo o ambiente local.
+
 ## Estrutura
 
 - `backend/`: API, regras de negócio, migrações, testes e Dockerfile.

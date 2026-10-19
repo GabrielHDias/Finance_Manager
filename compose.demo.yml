@@ -1,0 +1,93 @@
+name: finance-manager-demo
+
+x-runtime: &runtime
+  restart: unless-stopped
+  logging:
+    driver: json-file
+    options:
+      max-size: "10m"
+      max-file: "3"
+
+services:
+  db:
+    <<: *runtime
+    image: postgres:17
+    mem_limit: 256m
+    command: ["postgres", "-c", "shared_buffers=64MB", "-c", "max_connections=30"]
+    environment:
+      POSTGRES_DB: finance_manager
+      POSTGRES_USER: finance_manager
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD no arquivo de ambiente}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U finance_manager -d finance_manager"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  backend:
+    <<: *runtime
+    image: ${BACKEND_IMAGE:?Defina BACKEND_IMAGE}
+    mem_limit: 768m
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/finance_manager
+      DB_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET:?Defina JWT_SECRET}
+      CORS_ALLOWED_ORIGIN: ${APP_ORIGIN:-http://localhost:8088}
+      JAVA_TOOL_OPTIONS: -XX:MaxRAMPercentage=60.0 -XX:InitialRAMPercentage=20.0 -XX:+ExitOnOutOfMemoryError
+      SPRINGDOC_API_DOCS_ENABLED: "false"
+      SPRINGDOC_SWAGGER_UI_ENABLED: "false"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      # Check that the API security filter responds without publishing a port.
+      test: ["CMD-SHELL", "test \"$$(curl --silent --output /dev/null --write-out '%{http_code}' http://localhost:8080/accounts)\" = 401"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 60s
+
+  frontend:
+    <<: *runtime
+    image: ${FRONTEND_IMAGE:?Defina FRONTEND_IMAGE; construa com NEXT_PUBLIC_API_URL=/api}
+    mem_limit: 384m
+    environment:
+      NODE_OPTIONS: --max-old-space-size=256
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/login').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 15s
+
+  proxy:
+    <<: *runtime
+    image: caddy:2-alpine
+    mem_limit: 128m
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:${HTTP_PORT:-8088}:80"
+      - "${BIND_ADDRESS:-127.0.0.1}:${HTTPS_PORT:-8443}:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      frontend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:2019/config/"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+volumes:
+  postgres_data:
+  caddy_data:
+  caddy_config:
