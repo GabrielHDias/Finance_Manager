@@ -180,7 +180,7 @@ export default function TransactionsPage() {
     <main>
       <h1>Transações</h1>
       {errorMessage && <p className="error-message" role="alert">{errorMessage}</p>}
-      {successMessage && <p role="status">{successMessage}</p>}
+      {successMessage && <p className="success-message" role="status">{successMessage}</p>}
       <section className="card">
         <h2>{editingId === null ? "Nova transação" : "Editar transação"}</h2>
         {!loading && (accounts.length === 0 || categories.length === 0) && (
@@ -295,7 +295,7 @@ export default function TransactionsPage() {
           {submitting ? "Salvando..." : editingId === null ? "Criar transação" : "Salvar alterações"}
         </button>
         {editingId !== null && (
-          <button type="button" disabled={busy} onClick={resetForm}>Cancelar edição</button>
+          <button className="button--secondary" type="button" disabled={busy} onClick={resetForm}>Cancelar edição</button>
         )}
       </form>
 
@@ -326,7 +326,7 @@ export default function TransactionsPage() {
             </select>
           </div>
           <button type="submit" disabled={busy}>Aplicar filtros</button>
-          <button type="reset" disabled={busy}>Limpar filtros</button>
+          <button className="button--secondary" type="reset" disabled={busy}>Limpar filtros</button>
         </form>
       </section>
       <section className="card" aria-busy={loading}>
@@ -355,15 +355,15 @@ export default function TransactionsPage() {
                   {pendingDelete === transaction.id ? (
                     <>
                       <p>Excluir “{transaction.description}”? O saldo será recalculado. Esta ação não pode ser desfeita.</p>
-                      <button type="button" disabled={busy} onClick={() => handleDelete(transaction.id)}>
+                      <button className="button--danger" type="button" disabled={busy} onClick={() => handleDelete(transaction.id)}>
                         {deleting ? "Excluindo..." : "Confirmar exclusão"}
                       </button>
-                      <button type="button" disabled={busy} onClick={() => setPendingDelete(null)}>Cancelar exclusão</button>
+                      <button className="button--secondary" type="button" disabled={busy} onClick={() => setPendingDelete(null)}>Cancelar exclusão</button>
                     </>
                   ) : (
                     <>
-                      <button type="button" disabled={busy} onClick={() => startEditing(transaction)} aria-label={`Editar ${transaction.description}`}>Editar</button>
-                      <button type="button" disabled={busy} onClick={() => { setPendingDelete(transaction.id); setErrorMessage(""); setSuccessMessage(""); }} aria-label={`Excluir ${transaction.description}`}>Excluir</button>
+                      <button className="button--secondary" type="button" disabled={busy} onClick={() => startEditing(transaction)} aria-label={`Editar ${transaction.description}`}>Editar</button>
+                      <button className="button--danger-quiet" type="button" disabled={busy} onClick={() => { setPendingDelete(transaction.id); setErrorMessage(""); setSuccessMessage(""); }} aria-label={`Excluir ${transaction.description}`}>Excluir</button>
                     </>
                   )}
                 </div>

@@ -32,19 +32,19 @@ export default function ResourceActions({
             {" "}{kind === "conta" ? "Contas" : "Categorias"} com transações vinculadas não podem ser excluídas.
           </p>
           {errorMessage && <p className="error-message" role="alert">{errorMessage}</p>}
-          <button type="button" disabled={disabled} onClick={onConfirmDelete}>
+          <button className="button--danger" type="button" disabled={disabled} onClick={onConfirmDelete}>
             {deleting ? "Excluindo..." : "Confirmar exclusão"}
           </button>
-          <button type="button" disabled={disabled} onClick={onCancelDelete}>
+          <button className="button--secondary" type="button" disabled={disabled} onClick={onCancelDelete}>
             Cancelar exclusão
           </button>
         </>
       ) : (
         <>
-          <button type="button" disabled={disabled} onClick={onEdit} aria-label={`Editar ${kind} ${name}`}>
+          <button className="button--secondary" type="button" disabled={disabled} onClick={onEdit} aria-label={`Editar ${kind} ${name}`}>
             Editar
           </button>
-          <button type="button" disabled={disabled} onClick={onRequestDelete} aria-label={`Excluir ${kind} ${name}`}>
+          <button className="button--danger-quiet" type="button" disabled={disabled} onClick={onRequestDelete} aria-label={`Excluir ${kind} ${name}`}>
             Excluir
           </button>
         </>

@@ -127,7 +127,7 @@ export default function CategoriesPage() {
   return (
     <main>
       <h1>Categorias</h1>
-      {successMessage && <p role="status">{successMessage}</p>}
+      {successMessage && <p className="success-message" role="status">{successMessage}</p>}
       <section className="card">
         <h2>{editingId === null ? "Nova categoria" : "Editar categoria"}</h2>
         <form className="simple-form" onSubmit={handleSubmit}>
@@ -148,7 +148,7 @@ export default function CategoriesPage() {
             {submitting ? "Salvando..." : editingId === null ? "Criar categoria" : "Salvar alterações"}
           </button>
           {editingId !== null && (
-            <button type="button" disabled={busy} onClick={() => {
+            <button className="button--secondary" type="button" disabled={busy} onClick={() => {
               resetForm();
               setErrorMessage("");
             }}>

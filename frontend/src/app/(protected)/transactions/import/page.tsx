@@ -166,7 +166,7 @@ export default function ImportTransactionsPage() {
           <button type="button" disabled={busy || preview.invalid > 0 || !preview.ready} onClick={handleConfirm}>
             {working === "confirm" ? "Importando..." : `Confirmar importação de ${preview.ready} ${preview.ready === 1 ? "transação" : "transações"}`}
           </button>
-          <button type="button" disabled={busy} onClick={() => setPreview(null)}>Descartar prévia</button>
+          <button className="button--secondary" type="button" disabled={busy} onClick={() => setPreview(null)}>Descartar prévia</button>
         </div>
         <p>Duplicados são verificados novamente na confirmação; se outra importação já tiver gravado algum registro, ele será ignorado.</p>
         <label htmlFor="import-filter">Linhas da prévia</label>
@@ -189,7 +189,7 @@ export default function ImportTransactionsPage() {
             {row.errors.length > 0 && <ul>{row.errors.map(message => <li key={message}>{message}</li>)}</ul>}
           </li>)}
         </ol>
-        {visible < rows.length && <button type="button" disabled={busy} onClick={() => setVisible(current => current + 50)}>Mostrar mais linhas</button>}
+        {visible < rows.length && <button className="button--secondary" type="button" disabled={busy} onClick={() => setVisible(current => current + 50)}>Mostrar mais linhas</button>}
       </section>}
     </main>
   );

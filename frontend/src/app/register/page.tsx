@@ -69,7 +69,8 @@ export default function RegisterPage() {
   }
 
   return (
-    <main>
+    <main className="auth-card">
+      <p className="auth-brand">Finance Manager</p>
       <h1>Criar conta</h1>
 
       <form onSubmit={handleSubmit}>
@@ -89,7 +90,7 @@ export default function RegisterPage() {
             onChange={(event) => setName(event.target.value)}
             required
           />
-          {fieldErrors.name && <p id="name-error" role="alert">{fieldErrors.name}</p>}
+          {fieldErrors.name && <p id="name-error" className="field-error" role="alert">{fieldErrors.name}</p>}
         </div>
 
         <div>
@@ -108,7 +109,7 @@ export default function RegisterPage() {
             onChange={(event) => setEmail(event.target.value)}
             required
           />
-          {fieldErrors.email && <p id="email-error" role="alert">{fieldErrors.email}</p>}
+          {fieldErrors.email && <p id="email-error" className="field-error" role="alert">{fieldErrors.email}</p>}
         </div>
 
         <div>
@@ -129,7 +130,7 @@ export default function RegisterPage() {
             required
           />
           <small id="password-help">Use de 8 a 72 caracteres. Acentos e emojis podem reduzir o limite.</small>
-          {fieldErrors.password && <p id="password-error" role="alert">{fieldErrors.password}</p>}
+          {fieldErrors.password && <p id="password-error" className="field-error" role="alert">{fieldErrors.password}</p>}
         </div>
 
         {errorMessage && (

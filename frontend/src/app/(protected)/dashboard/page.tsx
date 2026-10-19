@@ -108,7 +108,7 @@ export default function DashboardPage() {
             <input id="dashboard-end" name="endDate" type="date" disabled={loading} />
           </div>
           <button type="submit" disabled={loading}>Aplicar período</button>
-          <button type="reset" disabled={loading}>Limpar período</button>
+          <button className="button--secondary" type="reset" disabled={loading}>Limpar período</button>
         </form>
         {validationMessage && <p className="error-message" role="alert">{validationMessage}</p>}
       </section>
@@ -123,15 +123,15 @@ export default function DashboardPage() {
               <div className="summary-grid">
                 <div>
                   <strong>Receitas</strong>
-                  <p>{formatCurrency(dashboard.summary.totalIncome)}</p>
+                  <p className="financial-value--income">{formatCurrency(dashboard.summary.totalIncome)}</p>
                 </div>
                 <div>
                   <strong>Despesas</strong>
-                  <p>{formatCurrency(dashboard.summary.totalExpense)}</p>
+                  <p className="financial-value--expense">{formatCurrency(dashboard.summary.totalExpense)}</p>
                 </div>
                 <div>
                   <strong>{dashboard.period.startDate || dashboard.period.endDate ? "Saldo do período" : "Saldo"}</strong>
-                  <p>{formatCurrency(dashboard.summary.balance)}</p>
+                  <p className={dashboard.summary.balance > 0 ? "financial-value--income" : dashboard.summary.balance < 0 ? "financial-value--expense" : undefined}>{formatCurrency(dashboard.summary.balance)}</p>
                 </div>
               </div>
             </section>

@@ -44,7 +44,8 @@ export default function LoginPage() {
   }
 
   return (
-    <main>
+    <main className="auth-card">
+      <p className="auth-brand">Finance Manager</p>
       <h1>Entrar</h1>
 
       <form onSubmit={handleSubmit}>

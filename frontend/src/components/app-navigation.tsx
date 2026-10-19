@@ -15,41 +15,41 @@ export default function AppNavigation() {
   }
 
   return (
-    <nav className="app-navigation">
+    <nav className="app-navigation" aria-label="Navegação principal">
       <div className="app-navigation__links">
         <Link
           href="/dashboard"
-          className={pathname === "/dashboard" ? "active" : ""}
+          className={pathname === "/dashboard" ? "active" : ""} aria-current={pathname === "/dashboard" ? "page" : undefined}
         >
           Dashboard
         </Link>
 
         <Link
           href="/accounts"
-          className={pathname === "/accounts" ? "active" : ""}
+          className={pathname === "/accounts" ? "active" : ""} aria-current={pathname === "/accounts" ? "page" : undefined}
         >
           Contas financeiras
         </Link>
 
         <Link
           href="/categories"
-          className={pathname === "/categories" ? "active" : ""}
+          className={pathname === "/categories" ? "active" : ""} aria-current={pathname === "/categories" ? "page" : undefined}
         >
           Categorias
         </Link>
 
         <Link
           href="/transactions"
-          className={pathname === "/transactions" ? "active" : ""}
+          className={pathname === "/transactions" ? "active" : ""} aria-current={pathname === "/transactions" ? "page" : undefined}
         >
           Transações
         </Link>
-        <Link href="/transactions/import" className={pathname === "/transactions/import" ? "active" : ""}>
+        <Link href="/transactions/import" className={pathname === "/transactions/import" ? "active" : ""} aria-current={pathname === "/transactions/import" ? "page" : undefined}>
           Importar CSV
         </Link>
       </div>
 
-      <button type="button" onClick={handleLogout}>
+      <button className="button--secondary" type="button" onClick={handleLogout}>
         Sair
       </button>
     </nav>

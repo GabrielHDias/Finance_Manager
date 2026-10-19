@@ -171,7 +171,7 @@ export default function AccountsPage() {
   return (
     <main>
       <h1>Contas financeiras</h1>
-      {successMessage && <p role="status">{successMessage}</p>}
+      {successMessage && <p className="success-message" role="status">{successMessage}</p>}
       <section className="card">
         <h2>{editingId === null ? "Nova conta" : "Editar conta"}</h2>
         <form className="simple-form" onSubmit={handleSubmit}>
@@ -192,7 +192,7 @@ export default function AccountsPage() {
             {submitting ? "Salvando..." : editingId === null ? "Criar conta" : "Salvar alterações"}
           </button>
           {editingId !== null && (
-            <button type="button" disabled={busy} onClick={() => {
+            <button className="button--secondary" type="button" disabled={busy} onClick={() => {
               resetForm();
               setErrorMessage("");
             }}>
@@ -222,7 +222,7 @@ export default function AccountsPage() {
                       <>
                         <span>Saldo indisponível. </span>
                         <button
-                          type="button"
+                          className="button--secondary" type="button"
                           disabled={busy}
                           onClick={() => loadAccountBalance(item.id)}
                           aria-label={`Tentar carregar saldo de ${item.name} novamente`}
@@ -231,7 +231,7 @@ export default function AccountsPage() {
                         </button>
                       </>
                     ) : balances[item.id] !== undefined ? (
-                      <strong>{formatCurrency(balances[item.id])}</strong>
+                      <strong className={`account-balance${balances[item.id] > 0 ? " financial-value--income" : balances[item.id] < 0 ? " financial-value--expense" : ""}`}>{formatCurrency(balances[item.id])}</strong>
                     ) : <span>Carregando saldo...</span>}
                   </div>
                 </div>
