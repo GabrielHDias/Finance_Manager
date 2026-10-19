@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ApiError } from "@/lib/api-error";
+import { formatDate } from "@/lib/dates";
 import { findAllAccounts } from "@/services/account-service";
 import { findAllCategories } from "@/services/category-service";
 import { confirmCsv, previewCsv } from "@/services/csv-import-service";
@@ -103,7 +104,7 @@ export default function ImportTransactionsPage() {
       <section className="card">
         <h2>Preparar o arquivo</h2>
         <p>CSV em UTF-8, até 1 MiB e 1000 registros. Use ponto e vírgula ou vírgula como separador.</p>
-        <p>Cabeçalhos: <code>data;descricao;valor;tipo</code>. Datas em AAAA-MM-DD ou DD/MM/AAAA; valores positivos com até duas casas decimais, sem separador de milhar. Tipos: RECEITA ou DESPESA.</p>
+        <p>Cabeçalhos: <code>data;descricao;valor;tipo</code>. Use datas em DD/MM/YYYY; valores positivos com até duas casas decimais, sem separador de milhar. Tipos: RECEITA ou DESPESA.</p>
         <a className="text-link" href="/modelo-transacoes.csv" download>Baixar modelo CSV</a>
         <p>Duplicados têm a mesma conta, categoria, data, descrição, valor e tipo. Confira se registros iguais representam movimentações diferentes antes de usar esta importação.</p>
       </section>
@@ -182,7 +183,7 @@ export default function ImportTransactionsPage() {
             <h3>Linha {row.line} — {labels[row.status]}</h3>
             <dl>
               <div><dt>Descrição</dt><dd>{row.description || "(vazia)"}</dd></div>
-              <div><dt>Data</dt><dd>{row.date || "(vazia)"}</dd></div>
+              <div><dt>Data</dt><dd>{formatDate(row.date) || "(vazia)"}</dd></div>
               <div><dt>Valor</dt><dd>{row.amount || "(vazio)"}</dd></div>
               <div><dt>Tipo</dt><dd>{row.type === "INCOME" ? "Receita" : row.type === "EXPENSE" ? "Despesa" : row.type || "(vazio)"}</dd></div>
             </dl>

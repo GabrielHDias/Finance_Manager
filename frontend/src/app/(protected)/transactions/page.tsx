@@ -4,6 +4,8 @@ import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ApiError } from "@/lib/api-error";
 import { formatCurrency } from "@/lib/formatters";
+import { formatDate, parseDisplayDate } from "@/lib/dates";
+import DateInput from "@/components/date-input";
 import { matchesTransactionFilters, mergeTransaction, sortTransactions } from "@/lib/transaction-list";
 import { findAllAccounts } from "@/services/account-service";
 import { findAllCategories } from "@/services/category-service";
@@ -11,11 +13,6 @@ import { createTransaction, deleteTransaction, findAllTransactions, updateTransa
 import type { AccountResponse } from "@/types/account";
 import type { CategoryResponse } from "@/types/category";
 import type { TransactionFilters, TransactionResponse, TransactionType } from "@/types/transaction";
-
-function formatDate(date: string): string {
-  const [year, month, day] = date.split("-");
-  return `${day}/${month}/${year}`;
-}
 
 export default function TransactionsPage() {
   const router = useRouter();
@@ -88,7 +85,7 @@ export default function TransactionsPage() {
     setEditingId(transaction.id);
     setDescription(transaction.description);
     setAmount(String(transaction.amount));
-    setDate(transaction.date);
+    setDate(formatDate(transaction.date));
     setType(transaction.type);
     setAccountId(String(transaction.accountId));
     setCategoryId(String(transaction.categoryId));
@@ -109,11 +106,15 @@ export default function TransactionsPage() {
     if (!date || !accountId || !categoryId) {
       setErrorMessage("Informe a data, a conta e a categoria."); return;
     }
+    const apiDate = parseDisplayDate(date);
+    if (!apiDate) {
+      setErrorMessage("Informe uma data válida no formato DD/MM/YYYY."); return;
+    }
     setSubmitting(true);
     setErrorMessage("");
     setSuccessMessage("");
     try {
-      const request = { description: description.trim(), amount: numericAmount, date, type,
+      const request = { description: description.trim(), amount: numericAmount, date: apiDate, type,
         accountId: Number(accountId), categoryId: Number(categoryId) };
       const saved = editingId === null
         ? await createTransaction(request)
@@ -160,8 +161,15 @@ export default function TransactionsPage() {
   function handleFilters(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    const startDate = String(data.get("startDate") || "");
-    const endDate = String(data.get("endDate") || "");
+    const startValue = String(data.get("startDate") || "");
+    const endValue = String(data.get("endDate") || "");
+    const startDate = startValue ? parseDisplayDate(startValue) : undefined;
+    const endDate = endValue ? parseDisplayDate(endValue) : undefined;
+    if (startDate === null || endDate === null) {
+      setErrorMessage("Informe datas válidas no formato DD/MM/YYYY.");
+      setSuccessMessage("");
+      return;
+    }
     if (startDate && endDate && startDate > endDate) {
       setErrorMessage("A data inicial deve ser anterior ou igual à data final.");
       setSuccessMessage("");
@@ -221,10 +229,9 @@ export default function TransactionsPage() {
         <div>
           <label htmlFor="date">Data</label>
 
-          <input
+          <DateInput
             id="date"
             name="date"
-            type="date"
             value={date}
             onChange={(event) => setDate(event.target.value)}
             required
@@ -303,8 +310,8 @@ export default function TransactionsPage() {
       <section className="card">
         <h2>Filtros</h2>
         <form className="transaction-form" onSubmit={handleFilters} onReset={() => loadTransactions({})}>
-          <div><label htmlFor="filter-start">Data inicial</label><input id="filter-start" name="startDate" type="date" disabled={busy} /></div>
-          <div><label htmlFor="filter-end">Data final</label><input id="filter-end" name="endDate" type="date" disabled={busy} /></div>
+          <div><label htmlFor="filter-start">Data inicial</label><DateInput id="filter-start" name="startDate" disabled={busy} /></div>
+          <div><label htmlFor="filter-end">Data final</label><DateInput id="filter-end" name="endDate" disabled={busy} /></div>
           <div>
             <label htmlFor="filter-type">Tipo de transação</label>
             <select id="filter-type" name="type" disabled={busy}>

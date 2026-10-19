@@ -4,6 +4,8 @@ import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ApiError } from "@/lib/api-error";
 import { formatCurrency } from "@/lib/formatters";
+import { formatDate, parseDisplayDate } from "@/lib/dates";
+import DateInput from "@/components/date-input";
 import {
   getDashboardSummary,
   getExpensesByCategory,
@@ -18,11 +20,6 @@ interface DashboardData {
   period: DashboardPeriod;
   summary: DashboardSummaryResponse;
   expenses: ExpenseByCategoryResponse[];
-}
-
-function formatDate(date: string): string {
-  const [year, month, day] = date.split("-");
-  return `${day}/${month}/${year}`;
 }
 
 function formatPeriod(period: DashboardPeriod): string {
@@ -83,8 +80,14 @@ export default function DashboardPage() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    const startDate = String(data.get("startDate") || "");
-    const endDate = String(data.get("endDate") || "");
+    const startValue = String(data.get("startDate") || "");
+    const endValue = String(data.get("endDate") || "");
+    const startDate = startValue ? parseDisplayDate(startValue) : undefined;
+    const endDate = endValue ? parseDisplayDate(endValue) : undefined;
+    if (startDate === null || endDate === null) {
+      setValidationMessage("Informe datas válidas no formato DD/MM/YYYY.");
+      return;
+    }
     if (startDate && endDate && startDate > endDate) {
       setValidationMessage("A data inicial deve ser anterior ou igual à data final.");
       return;
@@ -101,11 +104,11 @@ export default function DashboardPage() {
         <form className="transaction-form" onSubmit={handleSubmit} onReset={() => applyPeriod({})}>
           <div>
             <label htmlFor="dashboard-start">Data inicial</label>
-            <input id="dashboard-start" name="startDate" type="date" disabled={loading} />
+            <DateInput id="dashboard-start" name="startDate" disabled={loading} />
           </div>
           <div>
             <label htmlFor="dashboard-end">Data final</label>
-            <input id="dashboard-end" name="endDate" type="date" disabled={loading} />
+            <DateInput id="dashboard-end" name="endDate" disabled={loading} />
           </div>
           <button type="submit" disabled={loading}>Aplicar período</button>
           <button className="button--secondary" type="reset" disabled={loading}>Limpar período</button>
