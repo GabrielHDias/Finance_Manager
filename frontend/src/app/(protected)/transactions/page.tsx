@@ -215,6 +215,7 @@ export default function TransactionsPage() {
 
           <input
             id="amount"
+            className="amount-input"
             name="amount"
             type="number"
             min="0.01"
@@ -233,7 +234,7 @@ export default function TransactionsPage() {
             id="date"
             name="date"
             value={date}
-            onChange={(event) => setDate(event.target.value)}
+            onValueChange={setDate}
             required
             disabled={busy}
           />

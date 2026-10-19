@@ -129,6 +129,76 @@ select:disabled {
   cursor: not-allowed;
 }
 
+/* Keep numeric validation while removing the amount field's stepper buttons. */
+.amount-input {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.amount-input::-webkit-inner-spin-button,
+.amount-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.date-input {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.date-input > input {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+}
+
+.date-input__picker {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 44px;
+  min-height: 44px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  color: var(--color-primary);
+}
+
+.date-input__picker:focus-within {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+.date-input__picker:hover {
+  background: var(--color-primary-soft);
+}
+
+.date-input__picker:has(input:disabled) {
+  opacity: 0.55;
+}
+
+.date-input__picker input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.date-input__picker input::-webkit-calendar-picker-indicator {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 input[type="file"] {
   padding: var(--space-2);
 }
