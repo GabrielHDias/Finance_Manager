@@ -404,6 +404,43 @@ button:disabled {
   font-variant-numeric: tabular-nums;
 }
 
+.budget-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: var(--space-4);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.budget-card {
+  min-width: 0;
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  overflow-wrap: anywhere;
+}
+
+.budget-card dl > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-block: var(--space-2);
+}
+
+.budget-card dd {
+  margin: 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.budget-card progress {
+  display: block;
+  width: 100%;
+  accent-color: var(--color-primary);
+}
+
 .pagination-controls {
   display: flex;
   flex-wrap: wrap;

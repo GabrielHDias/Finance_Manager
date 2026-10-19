@@ -38,6 +38,10 @@ export default function AppNavigation() {
           Categorias
         </Link>
 
+        <Link href="/budgets" className={pathname === "/budgets" ? "active" : ""} aria-current={pathname === "/budgets" ? "page" : undefined}>
+          Orçamentos
+        </Link>
+
         <Link
           href="/transactions"
           className={pathname === "/transactions" ? "active" : ""} aria-current={pathname === "/transactions" ? "page" : undefined}

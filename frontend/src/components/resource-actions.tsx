@@ -30,6 +30,7 @@ export default function ResourceActions({
           <p>
             Excluir a {kind} “{name}”? Esta ação não pode ser desfeita.
             {" "}{kind === "conta" ? "Contas" : "Categorias"} com transações vinculadas não podem ser excluídas.
+            {kind === "categoria" && " Remova também os orçamentos vinculados antes de excluir a categoria."}
           </p>
           {errorMessage && <p className="error-message" role="alert">{errorMessage}</p>}
           <button className="button--danger" type="button" disabled={disabled} onClick={onConfirmDelete}>

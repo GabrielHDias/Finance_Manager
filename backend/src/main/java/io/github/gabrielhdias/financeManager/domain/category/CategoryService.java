@@ -17,15 +17,18 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
     private final TransactionRepository transactionRepository;
+    private final io.github.gabrielhdias.financeManager.domain.budget.BudgetRepository budgetRepository;
 
     public CategoryService(
         CategoryRepository categoryRepository,
         UserRepository userRepository,
-        TransactionRepository transactionRepository
+        TransactionRepository transactionRepository,
+        io.github.gabrielhdias.financeManager.domain.budget.BudgetRepository budgetRepository
     ) {
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
         this.transactionRepository = transactionRepository;
+        this.budgetRepository = budgetRepository;
     }
 
     @Transactional
@@ -92,6 +95,9 @@ public class CategoryService {
             );
         }
 
+        if (budgetRepository.existsByCategoryId(categoryId)) {
+            throw new BusinessRuleException("Remova os orçamentos vinculados antes de excluir a categoria");
+        }
         categoryRepository.delete(category);
     }
 

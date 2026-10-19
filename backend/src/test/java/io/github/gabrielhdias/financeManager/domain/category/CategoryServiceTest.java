@@ -31,6 +31,9 @@ class CategoryServiceTest {
     @Mock
     private TransactionRepository transactionRepository;
 
+    @Mock
+    private io.github.gabrielhdias.financeManager.domain.budget.BudgetRepository budgetRepository;
+
     @InjectMocks
     private CategoryService categoryService;
 

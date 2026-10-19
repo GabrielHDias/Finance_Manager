@@ -155,6 +155,22 @@ Endpoints autenticados, em `multipart/form-data`:
 
 A prévia não cria rascunhos persistentes. O arquivo é enviado novamente na confirmação e não é armazenado no servidor.
 
+## Orçamentos mensais por categoria
+
+Em **Orçamentos**, selecione mês e ano, escolha uma categoria e informe um limite positivo. **Salvar limite** cria o orçamento ou atualiza o limite da mesma categoria e mês. Os limites de meses diferentes são independentes e não são repetidos automaticamente.
+
+Os indicadores mostram limite, despesas registradas no mês, valor disponível ou excedido e percentual utilizado. Entram despesas de todas as contas do usuário, inclusive datas futuras dentro do mês; receitas não compensam gastos. Edição, exclusão e importação de despesas se refletem ao consultar o mês novamente. A barra para no limite, mas o percentual e o valor excedido continuam mostrando o consumo total.
+
+Excluir orçamento mantém as transações. Categorias com orçamentos precisam ter esses vínculos removidos antes de serem excluídas.
+
+API autenticada:
+
+- `GET /budgets?year=2026&month=10`: orçamentos e consumo do mês.
+- `PUT /budgets`: corpo com `categoryId`, `year`, `month`, `limitAmount`; cria ou atualiza atomicamente o limite e retorna o acompanhamento da categoria.
+- `DELETE /budgets/{id}`: remove somente o orçamento pertencente ao usuário.
+
+Cada resposta inclui `id`, `categoryId`, `categoryName`, `periodStart`, `limitAmount`, `spent` e `remaining`. O ano deve estar entre 1 e 9999, o mês entre 1 e 12 e o limite deve ser positivo, com até duas casas decimais. `remaining` negativo indica excesso. A migração Flyway V2 cria a tabela de limites e a restrição de um orçamento por categoria/mês, preservando os dados existentes.
+
 ## Paginação de transações
 
 A lista carrega 10 transações por página, com opções de 25 ou 50. **Página anterior** e **Próxima página** mantêm os filtros aplicados; a tela informa o intervalo de registros e o total de páginas. Aplicar ou limpar filtros e trocar o tamanho retornam à primeira página.

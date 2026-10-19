@@ -85,6 +85,18 @@ assert.equal(beyondPage.totalElements, 2);
 for (const query of ['page=-1', 'size=0', 'size=101', 'page=abc']) await request('GET', `/transactions/page?${query}`, undefined, 400);
 await request('GET', '/transactions/page?startDate=2026-11-01&endDate=2026-10-01', undefined, 409);
 await request('GET', '/transactions/page', undefined, 401, false);
+const budget = await request('PUT', '/budgets', { categoryId: category.id, year: 2026, month: 10, limitAmount: 150 });
+assert.equal(budget.spent, 100);
+assert.equal(budget.remaining, 50);
+assert.equal((await request('GET', '/budgets?year=2026&month=10')).length, 1);
+assert.deepEqual(await request('GET', '/budgets?year=2026&month=11'), []);
+await request('GET', '/budgets?year=2026&month=10', undefined, 401, false);
+await request('PUT', '/budgets', { categoryId: category.id, year: 2026, month: 10, limitAmount: 1 }, 401, false);
+await request('DELETE', `/budgets/${budget.id}`, undefined, 401, false);
+for (const fields of [{ limitAmount: 0 }, { limitAmount: 1.001 }, { month: 13 }, { year: 0 }]) {
+  await request('PUT', '/budgets', { categoryId: category.id, year: 2026, month: 10, limitAmount: 150, ...fields }, 400);
+}
+await request('GET', '/budgets?year=0&month=10', undefined, 400);
 assert.equal((await request('GET', `/accounts/${account.id}/balance`)).balance, 900);
 assert.deepEqual(await request('GET', '/dashboard/summary?startDate=2026-10-01&endDate=2026-10-31'), { totalIncome: 1000, totalExpense: 100, balance: 900 });
 await request('PUT', `/accounts/${account.id}`, { name: 'Conta renomeada' });
@@ -113,6 +125,9 @@ token = (await request('POST', '/auth/login', { email: secondEmail, password }, 
 const isolatedPage = await request('GET', `/transactions/page?accountId=${account.id}&categoryId=${category.id}`);
 assert.deepEqual(isolatedPage.content, []);
 assert.equal(isolatedPage.totalElements, 0);
+assert.deepEqual(await request('GET', '/budgets?year=2026&month=10'), []);
+await request('PUT', '/budgets', { categoryId: category.id, year: 2026, month: 10, limitAmount: 10 }, 404);
+await request('DELETE', `/budgets/${budget.id}`, undefined, 404);
 for (const path of ['/accounts', '/categories', '/transactions', `/transactions?accountId=${account.id}&categoryId=${category.id}`]) {
   assert.deepEqual(await request('GET', path), [], `Dados de outro usuário expostos em ${path}`);
 }
@@ -143,6 +158,11 @@ await csvRequest('confirm', foreignCsv, account.id, category.id, 'invalid-hash',
 await request('DELETE', `/categories/${secondCategory.id}`, undefined, 204);
 await request('DELETE', `/accounts/${secondAccount.id}`, undefined, 204);
 token = ownerToken;
+const budgetUpdates = await Promise.all([200, 250].map(limitAmount => request('PUT', '/budgets', { categoryId: category.id, year: 2026, month: 10, limitAmount })));
+assert.ok(budgetUpdates.every(item => item.id === budget.id));
+const currentBudgets = await request('GET', '/budgets?year=2026&month=10');
+assert.equal(currentBudgets.length, 1);
+assert.equal(currentBudgets[0].spent, 0);
 assert.equal((await request('GET', `/accounts/${account.id}`)).name, 'Conta renomeada');
 assert.equal((await request('GET', `/categories/${category.id}`)).name, 'Categoria renomeada');
 assert.equal((await request('GET', `/transactions/${expense.id}`)).amount, 150);
@@ -196,6 +216,9 @@ assert.equal(imported.length, 3);
 for (const item of imported) await request('DELETE', `/transactions/${item.id}`, undefined, 204);
 assert.equal((await request('GET', `/accounts/${account.id}/balance`)).balance, 850);
 
+await request('DELETE', `/budgets/${budget.id}`, undefined, 204);
+assert.equal((await request('GET', `/transactions/${expense.id}`)).amount, 150);
+assert.deepEqual(await request('GET', '/budgets?year=2026&month=10'), []);
 await request('DELETE', `/transactions/${expense.id}`, undefined, 204);
 assert.equal((await request('GET', `/accounts/${account.id}/balance`)).balance, 1000);
 await request('DELETE', `/transactions/${income.id}`, undefined, 204);
