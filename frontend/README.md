@@ -1,36 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Frontend — Finance Manager
 
-## Getting Started
+Interface em Next.js e TypeScript para autenticação, contas, categorias, transações e dashboard por período.
 
-First, run the development server:
+Use Node.js 24, conforme `.nvmrc` na raiz do repositório. As instruções completas para banco, backend, Docker e CI estão no [README principal](../README.md).
+
+## Desenvolvimento
+
+Na raiz, execute `node scripts/init-env.mjs` para preparar os arquivos locais. Dentro de `frontend`:
 
 ```bash
+npm ci
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+A interface fica em `http://localhost:3000`. A variável `NEXT_PUBLIC_API_URL` em `.env.local` aponta para a API, por padrão `http://localhost:8080`. Reinicie o servidor de desenvolvimento se alterar esse arquivo.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Qualidade
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run lint
+npm run typecheck
+npm run build
+```
 
-## Learn More
+Ou execute todas as verificações:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run check
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+`typecheck` executa `next typegen` antes de `tsc`, permitindo verificar um checkout novo sem depender de arquivos gerados por um servidor de desenvolvimento anterior.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Execução com Docker
 
-## Deploy on Vercel
+O Dockerfile usa build em etapas e a saída standalone do Next.js. Na raiz, `docker compose -f compose.app.yml up --build --detach --wait` constrói e inicia todos os serviços.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+A URL pública da API é um argumento de build da imagem, pois `NEXT_PUBLIC_API_URL` é incorporada ao JavaScript enviado ao navegador. Os arquivos `.env.local` e `node_modules` da máquina não entram no contexto da imagem.

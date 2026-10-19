@@ -1,0 +1,97 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          cache-dependency-path: backend/pom.xml
+      - name: Testes e empacotamento
+        run: ./mvnw --batch-mode --no-transfer-progress verify
+      - name: Relatórios de testes
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: backend-tests
+          path: backend/target/surefire-reports/*.xml
+          if-no-files-found: ignore
+          retention-days: 7
+
+  frontend:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      NEXT_PUBLIC_API_URL: http://localhost:8080
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Testar configuração inicial
+        run: node --test scripts/init-env.test.mjs
+      - name: Instalar dependências
+        working-directory: frontend
+        run: npm ci
+      - name: Lint, tipos e build
+        working-directory: frontend
+        run: npm run check
+
+  containers:
+    needs: [backend, frontend]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      COMPOSE_PROJECT_NAME: finance-manager-ci
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - name: Preparar variáveis de teste
+        run: node scripts/init-env.mjs
+      - name: Validar configuração dos serviços
+        run: docker compose -f compose.app.yml config --quiet
+      - name: Construir e iniciar aplicação
+        run: docker compose -f compose.app.yml up --build --detach --wait --wait-timeout 180
+      - name: Validar fluxo integrado
+        env:
+          SMOKE_API_URL: http://localhost:8080
+          SMOKE_FRONTEND_URL: http://localhost:3000
+        run: node scripts/smoke-test.mjs
+      - name: Logs em caso de falha
+        if: failure()
+        run: docker compose -f compose.app.yml logs --no-color
+      - name: Encerrar ambiente de teste
+        if: always()
+        run: docker compose -f compose.app.yml down --volumes --remove-orphans
