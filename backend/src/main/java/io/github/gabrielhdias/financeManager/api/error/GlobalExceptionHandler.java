@@ -19,6 +19,19 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(org.springframework.web.multipart.MaxUploadSizeExceededException.class)
+    public ResponseEntity<ApiErrorResponse> handleLargeUpload(HttpServletRequest request) {
+        return buildResponse(HttpStatus.PAYLOAD_TOO_LARGE, "Payload Too Large",
+            "O arquivo deve ter no máximo 1 MiB.", request, Map.of());
+    }
+
+    @ExceptionHandler({org.springframework.web.multipart.support.MissingServletRequestPartException.class,
+        org.springframework.web.bind.MissingServletRequestParameterException.class})
+    public ResponseEntity<ApiErrorResponse> handleMissingImportPart(HttpServletRequest request) {
+        return buildResponse(HttpStatus.BAD_REQUEST, "Bad Request",
+            "Envie o arquivo CSV, a conta, a categoria e, na confirmação, o identificador da prévia.", request, Map.of());
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponse> handleValidationException(
         MethodArgumentNotValidException exception,
