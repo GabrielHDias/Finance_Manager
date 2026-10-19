@@ -123,7 +123,7 @@ SMOKE_FRONTEND_URL=http://localhost:3000 \
 node scripts/smoke-test.mjs
 ```
 
-Esse fluxo cria um usuário de teste, exercita autenticação, recursos, transações, filtros, saldos e dashboard; ao final remove as transações, a conta e a categoria que criou. O usuário de teste permanece até a remoção do banco descartável.
+Esse fluxo cria usuários de teste, exercita autenticação, recursos, transações, filtros, saldos e dashboard, e confirma que um usuário não consegue consultar ou alterar os dados do outro. Também valida duplicidades, intervalos invertidos e acesso sem autenticação. Ao final remove os recursos financeiros que criou; os usuários de teste permanecem até a remoção do banco descartável.
 
 ## Integração contínua
 

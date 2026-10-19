@@ -30,10 +30,25 @@ for (const asset of assets) {
   assert.equal(response.status, 200, `Arquivo do frontend indisponível: ${asset}`);
 }
 
+// Exercise the real password encoder at its UTF-8 boundary, including Unicode.
+for (const password of ['a'.repeat(73), 'é'.repeat(37), '🔒'.repeat(19), 'curta']) {
+  const error = await request('POST', '/users', { name: 'Limite de senha', email: `smoke-${randomUUID()}@example.test`, password }, 400, false);
+  assert.match(error.fields.password ?? error.message, /senha/i);
+  assert.ok(!error.message.includes('password cannot'), 'O erro deve orientar o usuário em português.');
+}
+for (const password of ['a'.repeat(72), 'é'.repeat(36), '🔒'.repeat(18)]) {
+  const email = `smoke-${randomUUID()}@example.test`;
+  const user = await request('POST', '/users', { name: 'Limite aceito', email, password }, 201, false);
+  assert.deepEqual(Object.keys(user).sort(), ['email', 'id', 'name']);
+  assert.ok((await request('POST', '/auth/login', { email, password }, 200, false)).accessToken);
+}
+
 const email = `smoke-${randomUUID()}@example.test`;
 const password = randomBytes(24).toString('base64url');
 await request('POST', '/users', { name: 'Validação automatizada', email, password }, 201, false);
-token = (await request('POST', '/auth/login', { email, password }, 200, false)).accessToken;
+await request('POST', '/users', { name: 'Duplicado', email, password }, 409, false);
+await request('POST', '/auth/login', { email, password: 'incorrect-password' }, 401, false);
+token = (await request('POST', '/auth/login', { email: email.toUpperCase(), password }, 200, false)).accessToken;
 assert.ok(token);
 const account = await request('POST', '/accounts', { name: 'Conta de validação' }, 201);
 const category = await request('POST', '/categories', { name: 'Categoria de validação' }, 201);
@@ -60,6 +75,53 @@ await request('DELETE', `/accounts/${account.id}`, undefined, 409);
 await request('DELETE', `/categories/${category.id}`, undefined, 409);
 await request('POST', '/transactions', { ...common, description: 'Valor inválido', amount: 0, type: 'EXPENSE', date: '2026-10-01' }, 400);
 await request('GET', '/dashboard/summary', undefined, 401, false);
+// A second user must not see or mutate the first user's financial data.
+const ownerToken = token;
+const secondEmail = `smoke-${randomUUID()}@example.test`;
+await request('POST', '/users', { name: 'Validação de isolamento', email: secondEmail, password }, 201, false);
+token = (await request('POST', '/auth/login', { email: secondEmail, password }, 200, false)).accessToken;
+for (const path of ['/accounts', '/categories', '/transactions', `/transactions?accountId=${account.id}&categoryId=${category.id}`]) {
+  assert.deepEqual(await request('GET', path), [], `Dados de outro usuário expostos em ${path}`);
+}
+assert.deepEqual(await request('GET', '/dashboard/summary'), { totalIncome: 0, totalExpense: 0, balance: 0 });
+assert.deepEqual(await request('GET', '/dashboard/expenses-by-category'), []);
+for (const [path, body] of [
+  [`/accounts/${account.id}`, { name: 'Alteração indevida' }],
+  [`/categories/${category.id}`, { name: 'Alteração indevida' }],
+  [`/transactions/${expense.id}`, { ...common, description: 'Alteração indevida', amount: 1, type: 'EXPENSE', date: '2026-11-01' }],
+]) {
+  await request('GET', path, undefined, 404);
+  await request('PUT', path, body, 404);
+  await request('DELETE', path, undefined, 404);
+}
+await request('GET', `/accounts/${account.id}/balance`, undefined, 404);
+const secondAccount = await request('POST', '/accounts', { name: 'Conta do segundo usuário' }, 201);
+const secondCategory = await request('POST', '/categories', { name: 'Categoria do segundo usuário' }, 201);
+for (const links of [
+  { accountId: account.id, categoryId: secondCategory.id },
+  { accountId: secondAccount.id, categoryId: category.id },
+]) {
+  await request('POST', '/transactions', { ...links, description: 'Vínculo indevido', amount: 1, type: 'EXPENSE', date: '2026-10-19' }, 404);
+}
+await request('DELETE', `/categories/${secondCategory.id}`, undefined, 204);
+await request('DELETE', `/accounts/${secondAccount.id}`, undefined, 204);
+token = ownerToken;
+assert.equal((await request('GET', `/accounts/${account.id}`)).name, 'Conta renomeada');
+assert.equal((await request('GET', `/categories/${category.id}`)).name, 'Categoria renomeada');
+assert.equal((await request('GET', `/transactions/${expense.id}`)).amount, 150);
+assert.equal((await request('GET', `/accounts/${account.id}/balance`)).balance, 850);
+await request('POST', '/accounts', { name: 'Conta renomeada' }, 409);
+await request('POST', '/categories', { name: 'Categoria renomeada' }, 409);
+for (const path of ['/transactions', '/dashboard/summary', '/dashboard/expenses-by-category']) {
+  await request('GET', `${path}?startDate=2026-11-01&endDate=2026-10-01`, undefined, 409);
+}
+for (const path of ['/accounts', '/categories', '/transactions', '/dashboard/summary', '/dashboard/expenses-by-category']) {
+  await request('GET', path, undefined, 401, false);
+}
+token = 'invalid-token';
+await request('GET', '/accounts', undefined, 401);
+token = ownerToken;
+
 await request('DELETE', `/transactions/${expense.id}`, undefined, 204);
 assert.equal((await request('GET', `/accounts/${account.id}/balance`)).balance, 1000);
 await request('DELETE', `/transactions/${income.id}`, undefined, 204);
