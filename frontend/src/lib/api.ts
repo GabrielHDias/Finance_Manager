@@ -36,12 +36,25 @@ export async function apiRequest<T>(
   }
 
   if (!response.ok) {
-    const errorResponse: ApiErrorResponse = await response.json();
+    const errorResponse: Partial<ApiErrorResponse> | null = await response
+      .json()
+      .catch(() => null);
 
-    throw new ApiError(errorResponse);
+    throw new ApiError({
+      timestamp: errorResponse?.timestamp ?? new Date().toISOString(),
+      status: response.status,
+      error: errorResponse?.error ?? response.statusText,
+      message: errorResponse?.message ?? "Não foi possível completar a operação.",
+      path: errorResponse?.path ?? path,
+      fields: errorResponse?.fields ?? {},
+    });
   }
 
-  const data: T = await response.json();
+  if (response.status === 204 || response.status === 205) {
+    return undefined as T;
+  }
 
-  return data;
+  const body = await response.text();
+
+  return body.trim() ? (JSON.parse(body) as T) : (undefined as T);
 }
