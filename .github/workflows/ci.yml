@@ -62,6 +62,8 @@ jobs:
         run: npm ci
       - name: Testar exportação CSV
         run: node --test scripts/transaction-csv.test.mjs
+      - name: Testar comparação mensal
+        run: node --test scripts/monthly-summary.test.mjs
       - name: Lint, tipos e build
         working-directory: frontend
         run: npm run check

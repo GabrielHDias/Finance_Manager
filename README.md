@@ -155,6 +155,20 @@ Endpoints autenticados, em `multipart/form-data`:
 
 A prévia não cria rascunhos persistentes. O arquivo é enviado novamente na confirmação e não é armazenado no servidor.
 
+## Comparação mensal no dashboard
+
+O **Resumo mensal** compara o mês de referência com o mês anterior, mostrando receitas, despesas, saldo do mês e a diferença em reais de cada indicador. Ao abrir o dashboard, usa o mês atual do navegador; para consultar outro mês, selecione mês e ano e clique em **Comparar meses**.
+
+Essa seleção é independente do filtro geral de período. Cada consulta usa os limites completos do mês, exibidos em DD/MM/YYYY; inclui todas as transações datadas nesse intervalo, inclusive datas futuras registradas. Janeiro compara com dezembro do ano anterior, e fevereiro considera anos bissextos.
+
+O saldo mensal é receitas menos despesas, não o saldo acumulado das contas. Meses sem movimentação exibem valores zero e uma mensagem; falhas têm opção de tentar novamente. As consultas reutilizam a API autenticada existente e seus filtros por data.
+
+Testes da comparação:
+
+```bash
+node --test scripts/monthly-summary.test.mjs
+```
+
 ## Exportar transações CSV
 
 Na tela **Transações**, aplique os filtros desejados e clique em **Exportar CSV** na seção de transações cadastradas. Sem filtros, o arquivo inclui todas as transações do usuário autenticado. Alterações nos campos de filtro só entram na exportação depois de clicar em **Aplicar filtros**.
@@ -176,7 +190,7 @@ node --test scripts/transaction-csv.test.mjs
 O workflow `.github/workflows/ci.yml` é acionado em pushes, pull requests e execução manual:
 
 1. **Backend:** Java 21, Maven Wrapper, testes e empacotamento; relatórios de testes ficam disponíveis como artefato.
-2. **Frontend:** Node.js 24, instalação pelo lockfile, testes do inicializador e da exportação CSV, lint, TypeScript e build.
+2. **Frontend:** Node.js 24, instalação pelo lockfile, testes do inicializador, da exportação CSV e da comparação mensal, lint, TypeScript e build.
 3. **Containers:** construção dos dois serviços, espera por saúde, validação integrada e remoção do banco temporário.
 
 Os jobs de backend e frontend executam em paralelo; o teste dos containers começa após ambos passarem. O CI gera credenciais apenas para seu ambiente temporário e não exige segredos de produção. Não há etapa de deploy nesse workflow.

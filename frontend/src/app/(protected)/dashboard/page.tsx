@@ -6,6 +6,7 @@ import { ApiError } from "@/lib/api-error";
 import { formatCurrency } from "@/lib/formatters";
 import { formatDate, parseDisplayDate } from "@/lib/dates";
 import DateInput from "@/components/date-input";
+import MonthlySummary from "@/components/monthly-summary";
 import {
   getDashboardSummary,
   getExpensesByCategory,
@@ -156,6 +157,7 @@ export default function DashboardPage() {
           </>
         )}
       </div>
+      <MonthlySummary />
     </main>
   );
 }

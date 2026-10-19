@@ -404,6 +404,22 @@ button:disabled {
   font-variant-numeric: tabular-nums;
 }
 
+.monthly-summary__metrics h3 {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.monthly-summary__metrics .monthly-summary__detail {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+
+.monthly-summary__note {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
 .data-list {
   margin: 0;
   padding: 0;
