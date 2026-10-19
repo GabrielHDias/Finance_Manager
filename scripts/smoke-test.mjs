@@ -19,6 +19,22 @@ async function request(method, path, body, expected = 200, authenticated = true)
   return content ? JSON.parse(content) : undefined;
 }
 
+async function csvRequest(action, csv, accountId, categoryId, previewHash, expected = 200, authenticated = true) {
+  const body = new FormData();
+  body.set('file', new Blob([csv], { type: 'text/csv' }), 'transactions.csv');
+  body.set('accountId', String(accountId));
+  body.set('categoryId', String(categoryId));
+  if (previewHash) body.set('previewHash', previewHash);
+  const response = await fetch(`${api}/transactions/import/${action}`, {
+    method: 'POST', body, headers: authenticated && token ? { Authorization: `Bearer ${token}` } : {},
+    signal: AbortSignal.timeout(20000),
+  });
+  const result = await response.json();
+  assert.equal(response.status, expected, `CSV ${action}: ${response.status} ${JSON.stringify(result)}`);
+  count++;
+  return result;
+}
+
 const page = await fetch(`${frontend}/login`, { signal: AbortSignal.timeout(15000) });
 assert.equal(page.status, 200, 'A página de login deve responder.');
 const html = await page.text();
@@ -103,6 +119,10 @@ for (const links of [
 ]) {
   await request('POST', '/transactions', { ...links, description: 'Vínculo indevido', amount: 1, type: 'EXPENSE', date: '2026-10-19' }, 404);
 }
+const foreignCsv = 'data;descricao;valor;tipo\n2026-10-19;Teste de isolamento CSV;1;RECEITA';
+await csvRequest('preview', foreignCsv, account.id, secondCategory.id, undefined, 404);
+await csvRequest('preview', foreignCsv, secondAccount.id, category.id, undefined, 404);
+await csvRequest('confirm', foreignCsv, account.id, category.id, 'invalid-hash', 404);
 await request('DELETE', `/categories/${secondCategory.id}`, undefined, 204);
 await request('DELETE', `/accounts/${secondAccount.id}`, undefined, 204);
 token = ownerToken;
@@ -121,6 +141,43 @@ for (const path of ['/accounts', '/categories', '/transactions', '/dashboard/sum
 token = 'invalid-token';
 await request('GET', '/accounts', undefined, 401);
 token = ownerToken;
+
+// CSV preview must not write; invalid or changed inputs must not partially import.
+const header = 'data;descricao;valor;tipo\n';
+const csv = header + '2026-10-03;CSV receita;500;RECEITA\n04/10/2026;CSV despesa;25,00;DESPESA\n2026-10-04;CSV despesa;25.0;EXPENSE';
+await csvRequest('preview', csv, account.id, category.id, undefined, 401, false);
+const csvPreview = await csvRequest('preview', csv, account.id, category.id);
+assert.equal(csvPreview.ready, 2);
+assert.equal(csvPreview.duplicates, 1);
+assert.equal(csvPreview.invalid, 0);
+assert.equal((await request('GET', '/transactions')).length, 2);
+const invalidCsv = csv + '\n2026-02-31;Inválida;0;DESPESA';
+const invalidPreview = await csvRequest('preview', invalidCsv, account.id, category.id);
+assert.equal(invalidPreview.invalid, 1);
+await csvRequest('confirm', invalidCsv, account.id, category.id, invalidPreview.hash, 409);
+await csvRequest('confirm', csv + '\n2026-10-19;Mudou;1;RECEITA', account.id, category.id, csvPreview.hash, 409);
+assert.equal((await request('GET', '/transactions')).length, 2);
+assert.deepEqual(await csvRequest('confirm', csv, account.id, category.id, csvPreview.hash), { imported: 2, skipped: 1 });
+assert.deepEqual(await csvRequest('confirm', csv, account.id, category.id, csvPreview.hash), { imported: 0, skipped: 3 });
+assert.equal((await request('GET', `/accounts/${account.id}/balance`)).balance, 1325);
+const manualDuplicate = await csvRequest('preview', header + '2026-11-01;Despesa editada;150;DESPESA', account.id, category.id);
+assert.equal(manualDuplicate.duplicates, 1);
+assert.equal(manualDuplicate.ready, 0);
+const concurrentCsv = header + '2026-10-19;CSV concorrente;10;RECEITA';
+const concurrentPreview = await csvRequest('preview', concurrentCsv, account.id, category.id);
+const simultaneous = await Promise.all([
+  csvRequest('confirm', concurrentCsv, account.id, category.id, concurrentPreview.hash),
+  csvRequest('confirm', concurrentCsv, account.id, category.id, concurrentPreview.hash),
+]);
+assert.equal(simultaneous.reduce((sum, item) => sum + item.imported, 0), 1);
+assert.equal(simultaneous.reduce((sum, item) => sum + item.skipped, 0), 1);
+await csvRequest('preview', header + '2026-10-19;"aspas sem fechar;1;RECEITA', account.id, category.id, undefined, 400);
+await csvRequest('preview', new Uint8Array([0xc3, 0x28]), account.id, category.id, undefined, 400);
+await csvRequest('preview', 'x'.repeat(1024 * 1024 + 100), account.id, category.id, undefined, 413);
+const imported = (await request('GET', '/transactions')).filter(item => item.description.startsWith('CSV '));
+assert.equal(imported.length, 3);
+for (const item of imported) await request('DELETE', `/transactions/${item.id}`, undefined, 204);
+assert.equal((await request('GET', `/accounts/${account.id}/balance`)).balance, 850);
 
 await request('DELETE', `/transactions/${expense.id}`, undefined, 204);
 assert.equal((await request('GET', `/accounts/${account.id}/balance`)).balance, 1000);

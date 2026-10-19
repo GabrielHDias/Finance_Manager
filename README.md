@@ -2,7 +2,7 @@
 
 Aplicação de gerenciamento financeiro pessoal e projeto de aprendizado Full Stack e DevOps, com Java 21, Spring Boot, Next.js, TypeScript e PostgreSQL 17.
 
-O MVP inclui cadastro e autenticação, contas financeiras, categorias, receitas e despesas, edição e exclusão, filtros de transações e dashboard por período. Os saldos são calculados pelas transações, e os dados pertencem ao usuário autenticado. Importação de CSV permanece no backlog.
+O MVP inclui cadastro e autenticação, contas financeiras, categorias, receitas e despesas, edição e exclusão, filtros de transações e dashboard por período. Os saldos são calculados pelas transações, e os dados pertencem ao usuário autenticado. A importação CSV oferece prévia, validação por linha e prevenção de duplicados.
 
 ## Preparar as variáveis
 
@@ -123,7 +123,37 @@ SMOKE_FRONTEND_URL=http://localhost:3000 \
 node scripts/smoke-test.mjs
 ```
 
-Esse fluxo cria usuários de teste, exercita autenticação, recursos, transações, filtros, saldos e dashboard, e confirma que um usuário não consegue consultar ou alterar os dados do outro. Também valida duplicidades, intervalos invertidos e acesso sem autenticação. Ao final remove os recursos financeiros que criou; os usuários de teste permanecem até a remoção do banco descartável.
+Esse fluxo cria usuários de teste, exercita autenticação, recursos, transações, filtros, saldos e dashboard, e confirma que um usuário não consegue consultar ou alterar os dados do outro. Também valida duplicidades, intervalos invertidos, acesso sem autenticação e importação CSV, incluindo prévia sem gravação, erros sem importação parcial, repetição e confirmações simultâneas. Ao final remove os recursos financeiros que criou; os usuários de teste permanecem até a remoção do banco descartável.
+
+## Importar transações CSV
+
+Acesse **Importar CSV** na navegação. Escolha uma conta e uma categoria já cadastradas; ambas serão usadas em todas as linhas do arquivo. O modelo pode ser baixado na própria tela.
+
+```csv
+data;descricao;valor;tipo
+2026-10-01;Salário;3000,00;RECEITA
+02/10/2026;Supermercado;150,50;DESPESA
+```
+
+- UTF-8, com ou sem BOM; até 1 MiB e 1000 registros.
+- Cabeçalhos `data`, `descricao`, `valor`, `tipo`, em qualquer ordem; sem colunas extras. Nomes dos cabeçalhos não diferenciam maiúsculas de minúsculas.
+- Separadores `;` ou `,`. Campos com separador ou quebra de linha devem estar entre aspas duplas; uma aspa no conteúdo deve ser duplicada.
+- Datas `AAAA-MM-DD` ou `DD/MM/AAAA`, validadas sem corrigir dias inexistentes.
+- Valores positivos, com ponto ou vírgula decimal e até duas casas; sem símbolo de moeda nem separador de milhar. Com CSV separado por vírgulas, coloque valores com vírgula decimal entre aspas.
+- Tipos `RECEITA` / `DESPESA` ou `INCOME` / `EXPENSE`.
+
+**Gerar prévia** não grava transações. A tela informa as novas, duplicadas e inválidas, com erros e números de linha. Corrija todas as inválidas e envie o arquivo novamente antes de confirmar. Alterar arquivo, conta ou categoria descarta a prévia anterior.
+
+**Confirmar importação** grava as linhas novas em uma única transação de banco. Duplicados são ignorados, tanto dentro do arquivo quanto na comparação com transações existentes, inclusive criadas manualmente. A correspondência exige a mesma conta, categoria, data, descrição após remover espaços externos, valor e tipo. Movimentações diferentes com esses mesmos dados também serão tratadas como duplicadas; confira essa regra antes de importar.
+
+A API verifica novamente os duplicados na confirmação e serializa importações na mesma conta. Confirmar novamente um arquivo sem alterações nos dados persistidos não acrescenta registros repetidos. Se um registro for editado ou removido depois, uma nova importação compara o arquivo com o estado atual do banco.
+
+Endpoints autenticados, em `multipart/form-data`:
+
+- `POST /transactions/import/preview`: `file`, `accountId`, `categoryId`.
+- `POST /transactions/import/confirm`: os mesmos campos e `previewHash` retornado na prévia. O hash vincula o arquivo e a seleção; ele não substitui a autenticação e a validação da API.
+
+A prévia não cria rascunhos persistentes. O arquivo é enviado novamente na confirmação e não é armazenado no servidor.
 
 ## Integração contínua
 
