@@ -28,3 +28,18 @@ export async function getAccountBalance(
     `/accounts/${accountId}/balance`,
   );
 }
+
+export async function renameAccount(
+  id: number,
+  request: CreateAccountRequest,
+): Promise<AccountResponse> {
+  return apiRequest<AccountResponse>(`/accounts/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(request),
+  });
+}
+
+export async function deleteAccount(id: number): Promise<void> {
+  return apiRequest<void>(`/accounts/${id}`, { method: "DELETE" });
+}

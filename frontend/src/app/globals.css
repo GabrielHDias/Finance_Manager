@@ -273,3 +273,43 @@ ul {
 .transaction-amount--expense {
   color: #b91c1c;
 }
+.transaction-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.transaction-actions p {
+  flex-basis: 100%;
+  margin: 0 0 8px;
+}
+
+.resource-list li {
+  display: block;
+}
+
+.resource-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.resource-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.resource-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.resource-actions p {
+  flex-basis: 100%;
+  margin: 0;
+}

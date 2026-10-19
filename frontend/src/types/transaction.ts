@@ -20,3 +20,11 @@ export interface TransactionResponse {
   categoryId: number;
   categoryName: string;
 }
+
+export interface TransactionFilters {
+  startDate?: string;
+  endDate?: string;
+  type?: TransactionType;
+  accountId?: number;
+  categoryId?: number;
+}
