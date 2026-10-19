@@ -9,3 +9,7 @@ export interface ExpenseByCategoryResponse {
   categoryName: string;
   amount: number;
 }
+export interface DashboardPeriod {
+  startDate?: string;
+  endDate?: string;
+}
