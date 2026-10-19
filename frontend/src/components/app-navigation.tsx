@@ -44,6 +44,9 @@ export default function AppNavigation() {
         >
           Transações
         </Link>
+        <Link href="/transactions/import" className={pathname === "/transactions/import" ? "active" : ""}>
+          Importar CSV
+        </Link>
       </div>
 
       <button type="button" onClick={handleLogout}>

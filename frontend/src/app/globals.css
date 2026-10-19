@@ -88,6 +88,7 @@ ul {
 
 .app-navigation {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   gap: 16px;
@@ -101,6 +102,8 @@ ul {
 
 .app-navigation__links {
   display: flex;
+  flex-wrap: wrap;
+  min-width: 0;
   align-items: center;
   gap: 24px;
 }
@@ -328,3 +331,18 @@ ul {
   flex-basis: 100%;
   margin: 0;
 }
+
+.text-link { text-decoration: underline; text-underline-offset: 3px; }
+.csv-file-field { grid-column: 1 / -1; }
+.csv-preview, .csv-row { overflow-wrap: anywhere; min-width: 0; }
+.csv-preview > select { display: block; margin-top: 8px; }
+.csv-preview-list { list-style: none; padding: 0; }
+.csv-row { margin: 16px 0; padding: 16px; border: 1px solid #cbd5e1; border-left: 4px solid #166534; border-radius: 6px; }
+.csv-row--invalid { border-left-color: #b91c1c; }
+.csv-row--duplicate { border-left-color: #92400e; }
+.csv-row h3 { margin-top: 0; font-size: 1rem; }
+.csv-row dl { margin: 0; }
+.csv-row dl > div { margin: 8px 0; }
+.csv-row dt { font-weight: bold; }
+.csv-row dd { margin: 4px 0 0; white-space: pre-wrap; }
+.csv-row ul { margin-bottom: 0; }
