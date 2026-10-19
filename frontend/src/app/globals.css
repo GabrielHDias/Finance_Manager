@@ -60,6 +60,8 @@ form div {
 
 input,
 select {
+  min-width: 0;
+  max-width: 100%;
   padding: 10px 12px;
   border: 1px solid #cbd5e1;
   border-radius: 6px;
@@ -160,6 +162,8 @@ ul {
 }
 
 .data-list li {
+  min-width: 0;
+  overflow-wrap: anywhere;
   display: flex;
   justify-content: space-between;
   gap: 16px;
@@ -189,6 +193,8 @@ ul {
 }
 
 .transaction-item {
+  min-width: 0;
+  overflow-wrap: anywhere;
   padding: 16px;
   border: 1px solid #e2e8f0;
   border-radius: 6px;
@@ -225,6 +231,15 @@ ul {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
   max-width: 720px;
+}
+
+.transaction-form > div {
+  min-width: 0;
+}
+
+.transaction-form input,
+.transaction-form select {
+  width: 100%;
 }
 
 .transaction-form button {
