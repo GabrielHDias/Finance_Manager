@@ -7,6 +7,8 @@ import io.github.gabrielhdias.financeManager.domain.category.CategoryRepository;
 import io.github.gabrielhdias.financeManager.domain.exception.BusinessRuleException;
 import io.github.gabrielhdias.financeManager.domain.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -90,6 +92,20 @@ public class TransactionService {
             type,
             accountId,
             categoryId
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Transaction> pageByUser(
+        Long userId, LocalDate startDate, LocalDate endDate,
+        TransactionType type, Long accountId, Long categoryId, int page, int size
+    ) {
+        validatePeriod(startDate, endDate);
+        if (page < 0 || size < 1 || size > 100) {
+            throw new IllegalArgumentException("A página deve ser maior ou igual a zero e o tamanho deve estar entre 1 e 100.");
+        }
+        return transactionRepository.findPageByFilters(
+            userId, startDate, endDate, type, accountId, categoryId, PageRequest.of(page, size)
         );
     }
 

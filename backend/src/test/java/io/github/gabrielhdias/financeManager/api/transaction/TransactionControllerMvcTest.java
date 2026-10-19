@@ -273,6 +273,44 @@ class TransactionControllerMvcTest {
                 .exists());
     }
 
+    @Test
+    void shouldReturnPageWithStableMetadataAndFilters() throws Exception {
+        Transaction transaction = createMockTransaction();
+        when(authenticatedUser.getId()).thenReturn(1L);
+        when(transactionService.pageByUser(
+            1L, LocalDate.of(2026, 10, 1), LocalDate.of(2026, 10, 31),
+            TransactionType.EXPENSE, 10L, 20L, 1, 1
+        )).thenReturn(new org.springframework.data.domain.PageImpl<>(
+            List.of(transaction), org.springframework.data.domain.PageRequest.of(1, 1), 2
+        ));
+        mockMvc.perform(get("/transactions/page").with(jwt())
+                .param("startDate", "2026-10-01").param("endDate", "2026-10-31")
+                .param("type", "EXPENSE").param("accountId", "10").param("categoryId", "20")
+                .param("page", "1").param("size", "1"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.content[0].id").value(100))
+            .andExpect(jsonPath("$.page").value(1))
+            .andExpect(jsonPath("$.size").value(1))
+            .andExpect(jsonPath("$.totalElements").value(2))
+            .andExpect(jsonPath("$.totalPages").value(2));
+    }
+
+    @Test
+    void shouldProtectPaginatedEndpoint() throws Exception {
+        mockMvc.perform(get("/transactions/page")).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void shouldReturnBadRequestForInvalidPageSize() throws Exception {
+        when(authenticatedUser.getId()).thenReturn(1L);
+        when(transactionService.pageByUser(1L, null, null, null, null, null, 0, 101))
+            .thenThrow(new IllegalArgumentException("Tamanho inválido"));
+        mockMvc.perform(get("/transactions/page").with(jwt()).param("size", "101"))
+            .andExpect(status().isBadRequest());
+        mockMvc.perform(get("/transactions/page").with(jwt()).param("page", "abc"))
+            .andExpect(status().isBadRequest());
+    }
+
     private Transaction createMockTransaction() {
         Account account = mock(Account.class);
         Category category = mock(Category.class);

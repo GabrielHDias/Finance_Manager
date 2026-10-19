@@ -6,11 +6,11 @@ import { ApiError } from "@/lib/api-error";
 import { formatCurrency } from "@/lib/formatters";
 import { formatDate, parseDisplayDate } from "@/lib/dates";
 import DateInput from "@/components/date-input";
-import { matchesTransactionFilters, mergeTransaction, sortTransactions } from "@/lib/transaction-list";
+import { matchesTransactionFilters, sortTransactions } from "@/lib/transaction-list";
 import { downloadTransactionCsv } from "@/lib/transaction-csv";
 import { findAllAccounts } from "@/services/account-service";
 import { findAllCategories } from "@/services/category-service";
-import { createTransaction, deleteTransaction, findAllTransactions, updateTransaction } from "@/services/transaction-service";
+import { createTransaction, deleteTransaction, findAllTransactions, findTransactionPage, updateTransaction } from "@/services/transaction-service";
 import type { AccountResponse } from "@/types/account";
 import type { CategoryResponse } from "@/types/category";
 import type { TransactionFilters, TransactionResponse, TransactionType } from "@/types/transaction";
@@ -18,6 +18,7 @@ import type { TransactionFilters, TransactionResponse, TransactionType } from "@
 export default function TransactionsPage() {
   const router = useRouter();
   const [transactions, setTransactions] = useState<TransactionResponse[]>([]);
+  const [pagination, setPagination] = useState({ page: 0, size: 10, totalElements: 0, totalPages: 0 });
   const [accounts, setAccounts] = useState<AccountResponse[]>([]);
   const [categories, setCategories] = useState<CategoryResponse[]>([]);
   const [description, setDescription] = useState("");
@@ -43,10 +44,11 @@ export default function TransactionsPage() {
     async function loadPageData() {
       try {
         const [items, accountsResponse, categoriesResponse] = await Promise.all([
-          findAllTransactions(), findAllAccounts(), findAllCategories(),
+          findTransactionPage(), findAllAccounts(), findAllCategories(),
         ]);
         if (cancelled) return;
-        setTransactions(sortTransactions(items));
+        setTransactions(items.content);
+        setPagination({ page: items.page, size: items.size, totalElements: items.totalElements, totalPages: items.totalPages });
         setAccounts(accountsResponse);
         setCategories(categoriesResponse);
       } catch (error) {
@@ -121,11 +123,10 @@ export default function TransactionsPage() {
       const saved = editingId === null
         ? await createTransaction(request)
         : await updateTransaction(editingId, request);
-      setTransactions((current) => mergeTransaction(current, saved, filters));
       const action = editingId === null ? "Transação criada." : "Transação atualizada.";
-      setSuccessMessage(matchesTransactionFilters(saved, filters)
-        ? action : `${action} Ela não corresponde aos filtros ativos e não aparece nesta lista.`);
       resetForm();
+      await refreshAfterMutation(matchesTransactionFilters(saved, filters)
+        ? action : `${action} Ela não corresponde aos filtros ativos e não aparece nesta lista.`, 0);
     } catch (error) { handleError(error); }
     finally { setSubmitting(false); }
   }
@@ -137,25 +138,44 @@ export default function TransactionsPage() {
     setSuccessMessage("");
     try {
       await deleteTransaction(id);
-      setTransactions((current) => current.filter((transaction) => transaction.id !== id));
       if (editingId === id) resetForm();
       setPendingDelete(null);
-      setSuccessMessage("Transação excluída.");
+      await refreshAfterMutation("Transação excluída.", pagination.page);
     } catch (error) { handleError(error); }
     finally { setDeleting(false); }
   }
 
-  async function loadTransactions(nextFilters: TransactionFilters) {
+  async function refreshPage(nextFilters: TransactionFilters, page: number, size: number) {
+    let result = await findTransactionPage(nextFilters, page, size);
+    // Removing the last row of a page (including in another session) can shrink the page count.
+    if (result.page > 0 && result.page >= result.totalPages) {
+      result = await findTransactionPage(nextFilters, Math.max(result.totalPages - 1, 0), size);
+    }
+    setTransactions(result.content);
+    setPagination({ page: result.page, size: result.size, totalElements: result.totalElements, totalPages: result.totalPages });
+    setFilters(nextFilters);
+    setListFailed(false);
+  }
+
+  async function refreshAfterMutation(message: string, page: number) {
+    setSuccessMessage(message);
+    try {
+      await refreshPage(filters, page, pagination.size);
+    } catch (error) {
+      setListFailed(true);
+      setTransactions([]);
+      handleError(error);
+    }
+  }
+
+  async function loadTransactions(nextFilters: TransactionFilters, page = 0, size = pagination.size) {
     if (busy) return;
     setLoading(true);
     setErrorMessage("");
     setSuccessMessage("");
     setPendingDelete(null);
     try {
-      const items = await findAllTransactions(nextFilters);
-      setTransactions(sortTransactions(items));
-      setFilters(nextFilters);
-      setListFailed(false);
+      await refreshPage(nextFilters, page, size);
     } catch (error) { setListFailed(true); handleError(error); }
     finally { setLoading(false); }
   }
@@ -359,8 +379,19 @@ export default function TransactionsPage() {
           <button className="button--secondary" type="reset" disabled={busy}>Limpar filtros</button>
         </form>
       </section>
-      <section className="card" aria-busy={loading}>
+      <section className="card" aria-busy={busy}>
         <h2>Transações cadastradas</h2>
+        <nav className="pagination-controls" aria-label="Paginação de transações">
+          <div>
+            <label htmlFor="transaction-page-size">Transações por página</label>
+            <select id="transaction-page-size" value={pagination.size} disabled={busy || listFailed} onChange={event => loadTransactions(filters, 0, Number(event.target.value))}>
+              <option value="10">10</option><option value="25">25</option><option value="50">50</option>
+            </select>
+          </div>
+          <button className="button--secondary" type="button" disabled={busy || listFailed || pagination.page === 0} onClick={() => loadTransactions(filters, pagination.page - 1)}>Página anterior</button>
+          <button className="button--secondary" type="button" disabled={busy || listFailed || pagination.page + 1 >= pagination.totalPages} onClick={() => loadTransactions(filters, pagination.page + 1)}>Próxima página</button>
+        </nav>
+        {!loading && !listFailed && <p role="status">{pagination.totalElements === 0 ? "0 transações." : `Mostrando ${pagination.page * pagination.size + 1} a ${pagination.page * pagination.size + transactions.length} de ${pagination.totalElements} transações. Página ${pagination.page + 1} de ${pagination.totalPages}.`}</p>}
         <p id="export-help">Exporte em CSV usando os filtros aplicados à lista. Após alterar os campos, clique em Aplicar filtros antes de exportar.</p>
         <button
           className="button--secondary"
@@ -371,7 +402,7 @@ export default function TransactionsPage() {
         >
           {exporting ? "Exportando..." : "Exportar CSV"}
         </button>
-        <p>O relatório inclui data, descrição, valor, tipo, conta e categoria.</p>
+        <p>O relatório inclui data, descrição, valor, tipo, conta e categoria de todas as páginas.</p>
         {loading ? <p role="status">Carregando transações...</p> : listFailed ? (
           <p>Lista indisponível. Tente aplicar os filtros novamente ou recarregue a página.</p>
         ) : transactions.length === 0 ? (

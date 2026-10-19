@@ -28,3 +28,11 @@ export interface TransactionFilters {
   accountId?: number;
   categoryId?: number;
 }
+
+export interface TransactionPage {
+  content: TransactionResponse[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+}

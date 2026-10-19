@@ -38,6 +38,24 @@ class TransactionServiceTest {
     private TransactionService transactionService;
 
     @Test
+    void shouldRejectInvalidPaginationBeforeQuerying() {
+        for (int[] bounds : new int[][] {{-1, 10}, {0, 0}, {0, 101}, {0, -1}}) {
+            assertThrows(IllegalArgumentException.class, () -> transactionService.pageByUser(
+                1L, null, null, null, null, null, bounds[0], bounds[1]
+            ));
+        }
+        verifyNoInteractions(transactionRepository);
+    }
+
+    @Test
+    void shouldValidatePeriodForPagination() {
+        assertThrows(BusinessRuleException.class, () -> transactionService.pageByUser(
+            1L, LocalDate.of(2026, 11, 1), LocalDate.of(2026, 10, 1), null, null, null, 0, 10
+        ));
+        verifyNoInteractions(transactionRepository);
+    }
+
+    @Test
     void shouldCreateTransactionWhenAccountAndCategoryBelongToUser() {
         Long userId = 1L;
         Long accountId = 10L;

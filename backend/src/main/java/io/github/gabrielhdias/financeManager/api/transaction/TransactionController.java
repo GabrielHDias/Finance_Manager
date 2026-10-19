@@ -2,6 +2,7 @@ package io.github.gabrielhdias.financeManager.api.transaction;
 
 import io.github.gabrielhdias.financeManager.api.transaction.dto.TransactionRequest;
 import io.github.gabrielhdias.financeManager.api.transaction.dto.TransactionResponse;
+import io.github.gabrielhdias.financeManager.api.transaction.dto.TransactionPageResponse;
 import io.github.gabrielhdias.financeManager.domain.transaction.Transaction;
 import io.github.gabrielhdias.financeManager.domain.transaction.TransactionService;
 import io.github.gabrielhdias.financeManager.domain.transaction.TransactionType;
@@ -102,6 +103,25 @@ public class TransactionController {
                 .toList();
 
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/page")
+    public ResponseEntity<TransactionPageResponse> page(
+        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+        @RequestParam(required = false) TransactionType type,
+        @RequestParam(required = false) Long accountId,
+        @RequestParam(required = false) Long categoryId,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size
+    ) {
+        var result = transactionService.pageByUser(
+            authenticatedUser.getId(), startDate, endDate, type, accountId, categoryId, page, size
+        );
+        return ResponseEntity.ok(new TransactionPageResponse(
+            result.getContent().stream().map(TransactionMapper::toResponse).toList(),
+            result.getNumber(), result.getSize(), result.getTotalElements(), result.getTotalPages()
+        ));
     }
 
     @GetMapping("/{id}")

@@ -2,6 +2,8 @@ package io.github.gabrielhdias.financeManager.domain.transaction;
 
 import io.github.gabrielhdias.financeManager.domain.dashboard.CategoryExpenseSummary;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -62,6 +64,36 @@ public interface TransactionRepository
         @Param("type") TransactionType type,
         @Param("accountId") Long accountId,
         @Param("categoryId") Long categoryId
+    );
+
+    @Query(value = """
+            SELECT t FROM Transaction t
+            JOIN FETCH t.account
+            JOIN FETCH t.category
+            WHERE t.account.user.id = :userId
+              AND t.date >= COALESCE(:startDate, t.date)
+              AND t.date <= COALESCE(:endDate, t.date)
+              AND t.type = COALESCE(:type, t.type)
+              AND t.account.id = COALESCE(:accountId, t.account.id)
+              AND t.category.id = COALESCE(:categoryId, t.category.id)
+            ORDER BY t.date DESC, t.id DESC
+            """, countQuery = """
+            SELECT COUNT(t) FROM Transaction t
+            WHERE t.account.user.id = :userId
+              AND t.date >= COALESCE(:startDate, t.date)
+              AND t.date <= COALESCE(:endDate, t.date)
+              AND t.type = COALESCE(:type, t.type)
+              AND t.account.id = COALESCE(:accountId, t.account.id)
+              AND t.category.id = COALESCE(:categoryId, t.category.id)
+            """)
+    Page<Transaction> findPageByFilters(
+        @Param("userId") Long userId,
+        @Param("startDate") LocalDate startDate,
+        @Param("endDate") LocalDate endDate,
+        @Param("type") TransactionType type,
+        @Param("accountId") Long accountId,
+        @Param("categoryId") Long categoryId,
+        Pageable pageable
     );
 
     @Query("""

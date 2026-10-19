@@ -724,6 +724,53 @@ class TransactionRepositoryTest
         );
     }
 
+    @Test
+    void shouldPageFilteredRowsAndCountsWithoutLeakingOtherUsers() {
+        TestData owner = createTestData("page-owner@email.com");
+        TestData foreign = createTestData("page-foreign@email.com");
+        for (int i = 1; i <= 3; i++) {
+            persistTransaction("Página " + i, "10.00", LocalDate.of(2026, 10, 19), TransactionType.EXPENSE, owner.account(), owner.category());
+        }
+        persistTransaction("Receita", "100.00", LocalDate.of(2026, 10, 19), TransactionType.INCOME, owner.account(), owner.category());
+        persistTransaction("Fora do período", "100.00", LocalDate.of(2026, 11, 1), TransactionType.EXPENSE, owner.account(), owner.category());
+        persistTransaction("Outro usuário", "999.00", LocalDate.of(2026, 10, 19), TransactionType.EXPENSE, foreign.account(), foreign.category());
+        Account otherAccount = new Account("Outra conta", owner.user());
+        Category otherCategory = new Category("Outra categoria", owner.user());
+        entityManager.persist(otherAccount);
+        entityManager.persist(otherCategory);
+        persistTransaction("Outra conta", "50.00", LocalDate.of(2026, 10, 19), TransactionType.EXPENSE, otherAccount, owner.category());
+        persistTransaction("Outra categoria", "50.00", LocalDate.of(2026, 10, 19), TransactionType.EXPENSE, owner.account(), otherCategory);
+        entityManager.flush();
+        entityManager.clear();
+
+        var first = transactionRepository.findPageByFilters(
+            owner.user().getId(), LocalDate.of(2026, 10, 1), LocalDate.of(2026, 10, 31),
+            TransactionType.EXPENSE, owner.account().getId(), owner.category().getId(), org.springframework.data.domain.PageRequest.of(0, 2)
+        );
+        var second = transactionRepository.findPageByFilters(
+            owner.user().getId(), LocalDate.of(2026, 10, 1), LocalDate.of(2026, 10, 31),
+            TransactionType.EXPENSE, owner.account().getId(), owner.category().getId(), org.springframework.data.domain.PageRequest.of(1, 2)
+        );
+        assertEquals(3, first.getTotalElements());
+        assertEquals(2, first.getTotalPages());
+        assertEquals(List.of("Página 3", "Página 2"), first.getContent().stream().map(Transaction::getDescription).toList());
+        assertEquals(List.of("Página 1"), second.getContent().stream().map(Transaction::getDescription).toList());
+        assertEquals(3, second.getTotalElements());
+        assertEquals("Conta Teste", first.getContent().getFirst().getAccount().getName());
+    }
+
+    @Test
+    void shouldReturnEmptyPageBeyondLastAndKeepCorrectTotal() {
+        TestData owner = createTestData("page-empty@email.com");
+        persistTransaction("Única", "10.00", LocalDate.of(2026, 10, 19), TransactionType.EXPENSE, owner.account(), owner.category());
+        entityManager.flush();
+        var result = transactionRepository.findPageByFilters(owner.user().getId(), null, null, null, null, null,
+            org.springframework.data.domain.PageRequest.of(9, 10));
+        assertEquals(0, result.getNumberOfElements());
+        assertEquals(1, result.getTotalElements());
+        assertEquals(1, result.getTotalPages());
+    }
+
     private TestData createTestData(String email) {
         User user = createUser(email);
 

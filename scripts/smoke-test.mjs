@@ -71,6 +71,20 @@ const category = await request('POST', '/categories', { name: 'Categoria de vali
 const common = { accountId: account.id, categoryId: category.id };
 const income = await request('POST', '/transactions', { ...common, description: 'Receita de validação', amount: 1000, type: 'INCOME', date: '2026-10-01' }, 201);
 const expense = await request('POST', '/transactions', { ...common, description: 'Despesa de validação', amount: 100, type: 'EXPENSE', date: '2026-10-15' }, 201);
+const firstPage = await request('GET', '/transactions/page?page=0&size=1');
+assert.equal(firstPage.totalElements, 2);
+assert.equal(firstPage.totalPages, 2);
+assert.equal(firstPage.content[0].id, expense.id);
+assert.equal((await request('GET', '/transactions/page?page=1&size=1')).content[0].id, income.id);
+const filteredPage = await request('GET', `/transactions/page?startDate=2026-10-01&endDate=2026-10-31&type=EXPENSE&accountId=${account.id}&categoryId=${category.id}&size=1`);
+assert.equal(filteredPage.totalElements, 1);
+assert.equal(filteredPage.content[0].id, expense.id);
+const beyondPage = await request('GET', '/transactions/page?page=99&size=1');
+assert.deepEqual(beyondPage.content, []);
+assert.equal(beyondPage.totalElements, 2);
+for (const query of ['page=-1', 'size=0', 'size=101', 'page=abc']) await request('GET', `/transactions/page?${query}`, undefined, 400);
+await request('GET', '/transactions/page?startDate=2026-11-01&endDate=2026-10-01', undefined, 409);
+await request('GET', '/transactions/page', undefined, 401, false);
 assert.equal((await request('GET', `/accounts/${account.id}/balance`)).balance, 900);
 assert.deepEqual(await request('GET', '/dashboard/summary?startDate=2026-10-01&endDate=2026-10-31'), { totalIncome: 1000, totalExpense: 100, balance: 900 });
 await request('PUT', `/accounts/${account.id}`, { name: 'Conta renomeada' });
@@ -96,6 +110,9 @@ const ownerToken = token;
 const secondEmail = `smoke-${randomUUID()}@example.test`;
 await request('POST', '/users', { name: 'Validação de isolamento', email: secondEmail, password }, 201, false);
 token = (await request('POST', '/auth/login', { email: secondEmail, password }, 200, false)).accessToken;
+const isolatedPage = await request('GET', `/transactions/page?accountId=${account.id}&categoryId=${category.id}`);
+assert.deepEqual(isolatedPage.content, []);
+assert.equal(isolatedPage.totalElements, 0);
 for (const path of ['/accounts', '/categories', '/transactions', `/transactions?accountId=${account.id}&categoryId=${category.id}`]) {
   assert.deepEqual(await request('GET', path), [], `Dados de outro usuário expostos em ${path}`);
 }

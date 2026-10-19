@@ -3,17 +3,32 @@ import type {
   CreateTransactionRequest,
   TransactionFilters,
   TransactionResponse,
+  TransactionPage,
 } from "@/types/transaction";
 
-export async function findAllTransactions(
-  filters: TransactionFilters = {},
-): Promise<TransactionResponse[]> {
+function filterQuery(filters: TransactionFilters): URLSearchParams {
   const query = new URLSearchParams();
   for (const [key, value] of Object.entries(filters)) {
     if (value !== undefined && value !== "") query.set(key, String(value));
   }
+  return query;
+}
+
+export async function findAllTransactions(
+  filters: TransactionFilters = {},
+): Promise<TransactionResponse[]> {
+  const query = filterQuery(filters);
   const suffix = query.size ? `?${query}` : "";
   return apiRequest<TransactionResponse[]>(`/transactions${suffix}`);
+}
+
+export async function findTransactionPage(
+  filters: TransactionFilters = {}, page = 0, size = 10,
+): Promise<TransactionPage> {
+  const query = filterQuery(filters);
+  query.set("page", String(page));
+  query.set("size", String(size));
+  return apiRequest<TransactionPage>(`/transactions/page?${query}`);
 }
 
 export async function createTransaction(

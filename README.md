@@ -155,6 +155,16 @@ Endpoints autenticados, em `multipart/form-data`:
 
 A prévia não cria rascunhos persistentes. O arquivo é enviado novamente na confirmação e não é armazenado no servidor.
 
+## Paginação de transações
+
+A lista carrega 10 transações por página, com opções de 25 ou 50. **Página anterior** e **Próxima página** mantêm os filtros aplicados; a tela informa o intervalo de registros e o total de páginas. Aplicar ou limpar filtros e trocar o tamanho retornam à primeira página.
+
+Após criar ou editar, a lista consulta novamente a primeira página para manter a ordem por data e identificador decrescentes. Após excluir, permanece na página atual ou retorna à última página existente quando necessário. Se a atualização da lista falhar após uma gravação bem-sucedida, a confirmação da gravação permanece visível junto do erro da consulta.
+
+Endpoint autenticado: `GET /transactions/page?page=0&size=10`, com os mesmos filtros `startDate`, `endDate`, `type`, `accountId` e `categoryId`. A resposta contém `content`, `page`, `size`, `totalElements` e `totalPages`. A página da API começa em zero; `size` aceita de 1 a 100. Os registros e a contagem são filtrados pelo usuário autenticado e pela mesma seleção. Páginas além da última retornam conteúdo vazio e preservam a contagem.
+
+`GET /transactions` mantém o contrato anterior e a consulta completa. **Exportar CSV** continua gerando todas as transações dos filtros aplicados, independentemente da página visível.
+
 ## Comparação mensal no dashboard
 
 O **Resumo mensal** compara o mês de referência com o mês anterior, mostrando receitas, despesas, saldo do mês e a diferença em reais de cada indicador. Ao abrir o dashboard, usa o mês atual do navegador; para consultar outro mês, selecione mês e ano e clique em **Comparar meses**.
