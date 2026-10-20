@@ -15,7 +15,7 @@
 .filters > p { margin: 0 0 var(--space-4); color: var(--color-text-muted); font-size: 0.875rem; }
 .filters :global(.transaction-form) {
   max-width: none;
-  grid-template-columns: minmax(180px, 1fr) minmax(180px, 1fr) auto auto;
+  grid-template-columns: minmax(150px, 1fr) minmax(150px, 1fr) auto auto auto;
   align-items: end;
 }
 .filters :global(.transaction-form) button { grid-column: auto; }

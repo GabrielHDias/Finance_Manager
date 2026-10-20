@@ -42,6 +42,59 @@ class DashboardControllerMvcTest {
     private JwtDecoder jwtDecoder;
 
     @Test
+    void chartRequiresAuthentication() throws Exception {
+        mockMvc.perform(get("/dashboard/transactions-summary")
+            .param("type", "EXPENSE").param("groupBy", "DAY")
+            .param("startDate", "2026-10-01").param("endDate", "2026-10-02"))
+            .andExpect(status().isUnauthorized());
+    }
+
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.CsvSource({
+        "INVALID,DAY,2026-10-01,2026-10-02",
+        "INCOME,YEAR,2026-10-01,2026-10-02",
+        "INCOME,DAY,invalid,2026-10-02",
+        "INCOME,MONTH,2026-02-30,2026-10-02"
+    })
+    void chartRejectsMalformedParameters(String type, String group, String start, String end) throws Exception {
+        mockMvc.perform(get("/dashboard/transactions-summary")
+            .param("type", type).param("groupBy", group).param("startDate", start).param("endDate", end)
+            .with(jwt().jwt(jwt -> jwt.subject("7"))))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void chartRejectsMissingPeriod() throws Exception {
+        mockMvc.perform(get("/dashboard/transactions-summary").param("type", "EXPENSE").param("groupBy", "DAY")
+            .with(jwt().jwt(jwt -> jwt.subject("7"))))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void chartUsesAuthenticatedOwnerAndSerializesMoneyAsStrings() throws Exception {
+        var start = LocalDate.of(2026, 10, 1);
+        var end = LocalDate.of(2026, 10, 2);
+        when(authenticatedUser.getId()).thenReturn(7L);
+        when(dashboardService.getTransactionsSummary(7L,
+            io.github.gabrielhdias.financeManager.domain.transaction.TransactionType.INCOME,
+            io.github.gabrielhdias.financeManager.domain.dashboard.ChartGrouping.DAY, start, end))
+            .thenReturn(new io.github.gabrielhdias.financeManager.domain.dashboard.TransactionChartSummary(
+                io.github.gabrielhdias.financeManager.domain.transaction.TransactionType.INCOME,
+                io.github.gabrielhdias.financeManager.domain.dashboard.ChartGrouping.DAY,
+                new BigDecimal("0.30"), List.of(new io.github.gabrielhdias.financeManager.domain.dashboard.TransactionChartSummary.Item("2026-10-01", "01/10/2026", new BigDecimal("0.30")))));
+        mockMvc.perform(get("/dashboard/transactions-summary").param("type", "INCOME").param("groupBy", "DAY")
+            .param("startDate", start.toString()).param("endDate", end.toString()).param("userId", "99")
+            .with(jwt().jwt(jwt -> jwt.subject("7"))))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.total").value("0.30"))
+            .andExpect(jsonPath("$.items[0].total").value("0.30"))
+            .andExpect(jsonPath("$.items[0].key").value("2026-10-01"));
+        org.mockito.Mockito.verify(dashboardService).getTransactionsSummary(7L,
+            io.github.gabrielhdias.financeManager.domain.transaction.TransactionType.INCOME,
+            io.github.gabrielhdias.financeManager.domain.dashboard.ChartGrouping.DAY, start, end);
+    }
+
+    @Test
     void shouldReturnUnauthorizedWhenRequestHasNoToken()
         throws Exception {
 

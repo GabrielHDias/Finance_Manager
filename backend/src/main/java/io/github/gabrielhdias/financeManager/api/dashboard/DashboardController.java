@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.github.gabrielhdias.financeManager.api.dashboard.dto.TransactionChartResponse;
+import io.github.gabrielhdias.financeManager.domain.dashboard.ChartGrouping;
+import io.github.gabrielhdias.financeManager.domain.transaction.TransactionType;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -36,6 +39,17 @@ public class DashboardController {
     ) {
         this.dashboardService = dashboardService;
         this.authenticatedUser = authenticatedUser;
+    }
+
+    @GetMapping("/transactions-summary")
+    public ResponseEntity<TransactionChartResponse> getTransactionsSummary(
+        @RequestParam TransactionType type,
+        @RequestParam ChartGrouping groupBy,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        var summary = dashboardService.getTransactionsSummary(authenticatedUser.getId(), type, groupBy, startDate, endDate);
+        return ResponseEntity.ok(TransactionChartResponse.from(summary));
     }
 
     @GetMapping("/summary")

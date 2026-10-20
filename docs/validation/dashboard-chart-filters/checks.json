@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-20",
+  "branch": "feat/dashboard-chart-filters",
+  "backend": {
+    "command": "./mvnw test",
+    "tests": 197,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "frontend": {
+    "install": "passed (npm ci --no-audit --no-fund)",
+    "lint": "passed",
+    "typecheck": "passed",
+    "build": "passed",
+    "chartE2E": {
+      "startTime": "2026-10-20T23:10:26.108Z",
+      "duration": 11098.215,
+      "expected": 8,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    }
+  },
+  "gitDiffCheck": "passed",
+  "remoteCI": "not run; no commits or push",
+  "commits": false,
+  "merge": false,
+  "deploy": false
+}

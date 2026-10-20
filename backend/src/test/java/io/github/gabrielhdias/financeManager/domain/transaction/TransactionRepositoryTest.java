@@ -26,6 +26,49 @@ class TransactionRepositoryTest
     @Autowired
     private EntityManager entityManager;
 
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.EnumSource(TransactionType.class)
+    void chartAggregationsRespectOwnerTypeInclusiveDatesAndPrecision(TransactionType type) {
+        TestData owner = createTestData("chart-owner@example.test");
+        TestData other = createTestData("chart-other@example.test");
+        LocalDate start = LocalDate.of(2025, 12, 31);
+        LocalDate end = LocalDate.of(2026, 1, 2);
+        persistTransaction("Boundary start", "0.10", start, type, owner.account(), owner.category());
+        persistTransaction("Same day", "0.20", start, type, owner.account(), owner.category());
+        persistTransaction("Boundary end", "99999999999999999.99", end, type, owner.account(), owner.category());
+        persistTransaction("Before", "100.00", start.minusDays(1), type, owner.account(), owner.category());
+        persistTransaction("After", "100.00", end.plusDays(1), type, owner.account(), owner.category());
+        persistTransaction("Other owner", "900.00", start, type, other.account(), other.category());
+        persistTransaction("Other type", "900.00", start, type == TransactionType.INCOME ? TransactionType.EXPENSE : TransactionType.INCOME, owner.account(), owner.category());
+        entityManager.flush();
+        var service = new io.github.gabrielhdias.financeManager.domain.dashboard.DashboardService(transactionRepository);
+        for (var group : io.github.gabrielhdias.financeManager.domain.dashboard.ChartGrouping.values()) {
+            var summary = service.getTransactionsSummary(owner.user().getId(), type, group, start, end);
+            assertEquals(new BigDecimal("100000000000000000.29"), summary.total());
+        }
+        var daily = transactionRepository.sumByDay(owner.user().getId(), type, start, end);
+        assertEquals(2, daily.size());
+        assertEquals(start, daily.getFirst().date());
+        assertEquals(new BigDecimal("0.30"), daily.getFirst().amount());
+        var monthly = transactionRepository.sumByMonth(owner.user().getId(), type, start, end);
+        assertEquals(2025, monthly.getFirst().year());
+        assertEquals(12, monthly.getFirst().month());
+        assertEquals(2026, monthly.getLast().year());
+        assertEquals(1, monthly.getLast().month());
+    }
+
+    @Test
+    void chartMonthlyDoesNotCombineJanuaryOfDifferentYears() {
+        TestData owner = createTestData("chart-years@example.test");
+        persistTransaction("First January", "10.10", LocalDate.of(2025, 1, 31), TransactionType.INCOME, owner.account(), owner.category());
+        persistTransaction("Next January", "20.20", LocalDate.of(2026, 1, 1), TransactionType.INCOME, owner.account(), owner.category());
+        entityManager.flush();
+        var rows = transactionRepository.sumByMonth(owner.user().getId(), TransactionType.INCOME, LocalDate.of(2025, 1, 31), LocalDate.of(2026, 1, 1));
+        assertEquals(2, rows.size());
+        assertEquals(new BigDecimal("10.10"), rows.getFirst().amount());
+        assertEquals(new BigDecimal("20.20"), rows.getLast().amount());
+    }
+
     @Test
     void batchedBalancesIncludeEmptyAccountsAndIsolateOwnersAtMaximumPrecision() {
         TestData owner = createTestData("batch-owner@example.test");

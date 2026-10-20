@@ -1,0 +1,11 @@
+{
+  "command": "./node_modules/.bin/playwright test e2e/finance.spec.ts",
+  "stats": {
+    "startTime": "2026-10-20T23:09:21.721Z",
+    "duration": 23017.684,
+    "expected": 5,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}
