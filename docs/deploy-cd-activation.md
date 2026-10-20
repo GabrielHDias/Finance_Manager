@@ -66,3 +66,26 @@ deploy. A autorização para avançar não comprova que a infraestrutura esteja 
   limpeza de regras expiradas. Ver [guia OIDC](deploy-oidc.md).
 - Os 34 testes Python e a validação actionlint dos dois workflows passaram
   localmente. A criação do IAM e a ativação de CD ainda precisam ser concluídas.
+
+## Role criada e preparação do runtime
+
+- O usuário criou manualmente o provider/role IAM com os documentos revisados e
+  informou o ARN. As variáveis AWS foram cadastradas em `prod`.
+- A primeira execução real do workflow de limpeza concluiu com sucesso, provando
+  assunção OIDC e leitura das regras na EC2:
+  [execução 39474803912](https://github.com/GabrielHDias/Finance_Manager/actions/runs/39474803912).
+- A criação do novo acesso SSH foi inicialmente barrada pela revisão automática.
+  O usuário então autorizou especificamente a chave, fingerprint, scripts root,
+  Secret GitHub e token GHCR temporário. A instalação foi feita após essa autorização.
+- A chave de deploy é diferente da chave administrativa. O gateway aceita status
+  e restringe deploy aos digests deste repositório; um teste real de `id` foi rejeitado.
+- Foi registrado o baseline da revisão legada, com fingerprint de migrations
+  `306155450ca70ff22ca7dbcdc18b33fa515983f0`, imagens locais imutáveis e perfil
+  explícito de saúde legado. Os quatro containers continuaram em execução.
+- Scripts e gateway foram instalados como root, preservando `.env.demo`, Compose,
+  volumes e identidades dos containers. O registro privado `.deploy/adoption.json`
+  permite conferir a preservação após o primeiro deploy.
+- A chave exclusiva e known_hosts foram cadastrados nos Secrets de `prod`, sem
+  incluir a chave administrativa. O token de leitura GHCR será temporário por job.
+- Os 41 testes Python passaram localmente. Ainda faltam integrar esta adaptação,
+  testar SSH a partir do runner com abertura/revogação e acompanhar o primeiro CD.

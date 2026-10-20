@@ -188,6 +188,7 @@ jobs:
       cancel-in-progress: false
     permissions:
       contents: read
+      packages: read
       id-token: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -236,6 +237,8 @@ jobs:
           DEPLOY_USER: ${{ vars.DEPLOY_USER }}
           DEPLOY_PORT: ${{ vars.DEPLOY_PORT || '22' }}
           DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
+          DEPLOY_REGISTRY_USER: ${{ github.actor }}
+          DEPLOY_REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
           DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
           RELEASE_SHA: ${{ github.sha }}

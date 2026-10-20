@@ -84,12 +84,13 @@ checkout usa `contents: read` e não persiste credenciais. Configure as permiss�
 do pacote/organização para permitir esse repositório publicar e preservar os
 pacotes necessários à recuperação. As imagens podem permanecer privadas.
 
-Na EC2, configurar uma vez login Docker como o mesmo usuário de deploy, usando
-credencial de leitura GHCR com `read:packages` e acesso aos dois pacotes (e SSO,
-se aplicável). Use credential helper ou arquivo Docker protegido; `docker login`
-pode armazenar token codificado, sem criptografia. Informe token por stdin e não
-por argumento. O token de publicação não é copiado à EC2. Imagens públicas podem
-ser baixadas anonimamente. Não efetue login ou cadastre tokens sem autorização.
+O job de deploy usa `GITHUB_TOKEN` com `packages: read` para baixar imagens
+privadas. O token é enviado somente pelo stdin da conexão SSH cifrada, nunca em
+argumentos ou logs. A EC2 faz login em um `DOCKER_CONFIG` temporário privado,
+removido ao terminar, preservando o login Docker do host. Não é necessário criar
+PAT de leitura ou cadastrar credencial GHCR persistente na EC2. Em encerramento
+abrupto, pode restar a pasta temporária privada; o token perde validade com o job.
+A assunção OIDC da AWS continua independente desse token de registry.
 
 Não remova imagens em uso, a versão anterior ou pacotes GHCR referenciados pelo
 histórico. A primeira versão vinda de `docker load` pode existir apenas no host;
@@ -116,7 +117,7 @@ Confirmar os nomes exatos dos checks após a primeira execução. Nenhuma prote�
 | `prod` secret | `DEPLOY_SSH_KEY` | Chave privada exclusiva, compatível com autenticação não interativa |
 | `prod` secret | `DEPLOY_KNOWN_HOSTS` | Entrada(s) verificadas da chave do host |
 | Automático | `GITHUB_TOKEN` | Fornecido pelo GitHub; não cadastrar PAT para publicar |
-| Somente EC2 | Credencial GHCR de leitura | Login Docker privado do usuário de deploy |
+| Automático no deploy | Token GHCR temporário | `GITHUB_TOKEN` com `packages: read`, enviado por stdin SSH |
 | Somente EC2 | `DB_PASSWORD`, `JWT_SECRET`, demais configurações | Permanecem em `.env.demo` |
 
 ## Adoção da versão atual
@@ -136,9 +137,9 @@ o script confia nessa identificação informada pelo operador.
 Na EC2, como usuário de deploy, substituindo os placeholders:
 
 ```bash
-python3 /CAMINHO/EXISTENTE/deploy-cd.py bootstrap /CAMINHO/EXISTENTE \
+sudo python3 /CAMINHO/EXISTENTE/deploy-cd.py bootstrap /CAMINHO/EXISTENTE \
   --revision <SHA_INSTALADO_COMPLETO> --migrations <HASH_MIGRATIONS_INSTALADAS>
-python3 /CAMINHO/EXISTENTE/deploy-cd.py status /CAMINHO/EXISTENTE
+sudo python3 /CAMINHO/EXISTENTE/deploy-cd.py status /CAMINHO/EXISTENTE
 ```
 
 O bootstrap captura os IDs Docker das imagens de backend/frontend em execução,
@@ -201,7 +202,7 @@ atualização. A trava local impede operações concorrentes mesmo fora do GitHu
 Rollback manual, como usuário de deploy:
 
 ```bash
-python3 /CAMINHO/EXISTENTE/deploy-cd.py rollback /CAMINHO/EXISTENTE
+sudo python3 /CAMINHO/EXISTENTE/deploy-cd.py rollback /CAMINHO/EXISTENTE
 ```
 
 Usa `previous.json`, exige migrations iguais, imagens disponíveis localmente e
@@ -291,3 +292,35 @@ Referências: [dependências entre jobs](https://docs.github.com/en/actions/how-
   containers/Playwright, publicação GHCR, conexão SSH ou validação da EC2.
   Essas validações externas permanecem necessárias antes de declarar CD funcional.
 - Nenhum deploy, alteração AWS/GitHub, cadastro de credencial ou commit foi feito.
+
+
+## Adoção da instalação legada e chave restrita
+
+A versão inspecionada na EC2 é `2068eb335e4adcb82dd7d0532143ed186a661550`,
+anterior aos endpoints de saúde. Para **essa adoção explícita**, o administrador
+executa bootstrap com `--legacy-health`, após conferir a revisão e o fingerprint
+de migrations. Esse perfil exige containers saudáveis, uma conexão JDBC ativa
+com o banco e HTTPS `/login`=200 e `/api/accounts`=401. Ele é registrado no estado
+e preservado para eventual rollback. Não é selecionado automaticamente se
+readiness falhar; novas entregas sempre exigem readiness/liveness modernos.
+
+O script escreve uma pequena sobreposição Compose em `.deploy/healthcheck.override.json`
+para usar o check adequado de backend a cada estado, sem sobrescrever o Compose
+instalado ou `.env.demo`. Somente backend/frontend são atualizados. Depois do pull,
+os dois digests precisam ter o label OCI de revisão igual ao SHA aprovado.
+
+Na adoção preparada, o usuário SSH continua `ubuntu`, usando uma chave exclusiva
+com `restrict` e forced-command. Não se concede shell interativo, forwarding ou
+acesso geral ao Docker por essa chave. O gateway root-owned é instalado em
+`/usr/local/libexec/finance-manager-deploy-gateway`, com configuração privada em
+`/etc/finance-manager-deploy.json`. Aceita somente status/deploy na raiz aprovada,
+SHAs completos e digests dos dois pacotes GHCR deste repositório. Bootstrap,
+rollback manual e manutenção usam o acesso administrativo existente.
+Os scripts e `.deploy/` são privados/root-owned. O usuário administrador já possui
+sudo; sua chave pessoal não é cadastrada no GitHub. A nova chave precisa ser
+autorizada no host e guardada em `prod/DEPLOY_SSH_KEY`.
+
+Para verificar OIDC, abertura/revogação e a chave restrita **sem atualizar
+containers**, executar manualmente o workflow `Limpar regras SSH expiradas` na
+main com `test_access=true`. O teste abre uma regra /32, consulta status e revoga
+sua regra em `always()`. `PROD_CD_ENABLED` pode continuar `false` durante esse teste.

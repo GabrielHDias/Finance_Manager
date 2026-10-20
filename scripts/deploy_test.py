@@ -38,7 +38,7 @@ class DeployTest(unittest.TestCase):
              patch.object(self.app, 'health') as health, \
              patch.object(self.app, 'config'), \
              patch.object(self.app, 'apply', side_effect=failure) as apply, \
-             patch.object(deploy, 'command', side_effect=lambda args: OLD['backend'] if args[-1] == OLD['backend'] else OLD['frontend']):
+             patch.object(deploy, 'command', side_effect=lambda args: NEW['revision'] if any('org.opencontainers.image.revision' in a for a in args) else (OLD['backend'] if args[-1] == OLD['backend'] else OLD['frontend'])):
             self.app.run(self.args)
             return apply, health
 
@@ -91,7 +91,7 @@ class DeployTest(unittest.TestCase):
         with patch.object(self.app, 'apply', side_effect=deploy.DeployError('schema failure')) as apply, \
              patch.object(self.app, 'snapshot', return_value=OLD), \
              patch.object(self.app, 'health'), patch.object(self.app, 'config'), \
-             patch.object(deploy, 'command', side_effect=lambda args: args[-1]):
+             patch.object(deploy, 'command', side_effect=lambda args: NEW['revision'] if any('org.opencontainers.image.revision' in a for a in args) else args[-1]):
             with self.assertRaisesRegex(deploy.DeployError, 'recuperação assistida'):
                 self.app.run(argparse.Namespace(action='deploy', **changed))
             apply.assert_called_once_with(changed)

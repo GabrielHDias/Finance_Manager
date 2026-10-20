@@ -85,7 +85,7 @@ executar qualquer criação. O script gerador não instala ou modifica IAM.
 `DEPLOY_PORT` deve ser 22 para este procedimento. O check de configuração recusa
 outras portas antes de abrir a regra. Variáveis SSH/registry e bootstrap continuam
 conforme o [runbook principal](deploy-cd.md). OIDC resolve o acesso AWS à regra de
-rede; ele não substitui a chave SSH exclusiva nem a autenticação de leitura GHCR.
+rede; ele não substitui a chave SSH exclusiva. A leitura GHCR usa o token temporário do job, encaminhado por stdin SSH e removido ao término.
 
 ## Validação e recuperação
 

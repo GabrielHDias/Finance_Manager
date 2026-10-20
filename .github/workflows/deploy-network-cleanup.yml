@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: '17 * * * *'
   workflow_dispatch:
+    inputs:
+      test_access:
+        description: Testar OIDC, regra SSH e consulta de status, sem alterar containers
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -28,7 +33,8 @@ jobs:
         with:
           ref: ${{ github.sha }}
           persist-credentials: false
-      - uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502
+      - id: aws
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502
         with:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           aws-region: ${{ vars.AWS_REGION }}
@@ -39,3 +45,25 @@ jobs:
         env:
           DEPLOY_SECURITY_GROUP_ID: ${{ vars.DEPLOY_SECURITY_GROUP_ID }}
         run: python3 scripts/deploy-network.py sweep
+      - name: Testar abertura de SSH temporário
+        id: network
+        if: github.event_name == 'workflow_dispatch' && inputs.test_access
+        env:
+          DEPLOY_SECURITY_GROUP_ID: ${{ vars.DEPLOY_SECURITY_GROUP_ID }}
+        run: python3 scripts/deploy-network.py open
+      - name: Consultar status pela chave restrita, sem alterar a aplicação
+        if: github.event_name == 'workflow_dispatch' && inputs.test_access
+        env:
+          DEPLOY_ACTION: status
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ vars.DEPLOY_USER }}
+          DEPLOY_PORT: ${{ vars.DEPLOY_PORT || '22' }}
+          DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: python3 scripts/deploy-ssh.py
+      - name: Revogar regra do teste mesmo em caso de falha
+        if: always() && steps.aws.outcome == 'success' && steps.network.outcome != 'skipped'
+        env:
+          DEPLOY_SECURITY_GROUP_ID: ${{ vars.DEPLOY_SECURITY_GROUP_ID }}
+        run: python3 scripts/deploy-network.py close
