@@ -1,5 +1,7 @@
 # Demonstração na EC2
 
+Para automatizar atualizações preservando esta instalação, consulte o [runbook de CD com GHCR](deploy-cd.md). A entrega por pacote abaixo permanece disponível; após adotar CD, não altere imagens manualmente sem reconciliar o estado `.deploy/`, pois isso será detectado como divergência.
+
 A configuração `compose.demo.yml` executa PostgreSQL 17, API Java 21,
 frontend Next.js e Caddy. Use uma EC2 Linux x86_64 com Docker e Compose v2,
 com pelo menos 2 GiB de RAM e 20 GiB de disco para esta demonstração.

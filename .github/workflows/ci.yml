@@ -10,7 +10,8 @@ permissions:
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  # Do not interrupt a production operation when another commit arrives.
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
   backend:
@@ -118,3 +119,108 @@ jobs:
       - name: Encerrar ambiente de teste
         if: always()
         run: docker compose -f compose.app.yml down --volumes --remove-orphans
+
+  publish:
+    needs: [containers]
+    if: >-
+      vars.PROD_CD_ENABLED == 'true' &&
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      backend: ${{ steps.images.outputs.backend }}
+      frontend: ${{ steps.images.outputs.frontend }}
+      migrations: ${{ steps.images.outputs.migrations }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Publicar imagens da revisão aprovada
+        id: images
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REGISTRY_USER: ${{ github.actor }}
+          REPOSITORY: ${{ github.repository }}
+          RELEASE_SHA: ${{ github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          export DOCKER_CONFIG="$RUNNER_TEMP/ghcr-auth"
+          mkdir -m 700 -p "$DOCKER_CONFIG"
+          trap 'docker logout ghcr.io >/dev/null 2>&1 || true' EXIT
+          printf '%s' "$GHCR_TOKEN" | docker login ghcr.io -u "$REGISTRY_USER" --password-stdin
+          namespace="ghcr.io/${REPOSITORY,,}"
+          docker buildx create --name cd-builder --driver docker-container --use
+          for service in backend frontend; do
+            args=()
+            if [[ "$service" == frontend ]]; then
+              args+=(--build-arg NEXT_PUBLIC_API_URL=/api)
+            fi
+            docker buildx build --platform linux/amd64 --push \
+              --tag "$namespace-$service:$RELEASE_SHA" \
+              --label "org.opencontainers.image.revision=$RELEASE_SHA" \
+              --label "org.opencontainers.image.source=https://github.com/$REPOSITORY" \
+              --metadata-file "$RUNNER_TEMP/$service.json" \
+              "${args[@]}" "./$service"
+            digest=$(jq -er '.["containerimage.digest"]' "$RUNNER_TEMP/$service.json")
+            [[ "$digest" =~ ^sha256:[0-9a-f]{64}$ ]]
+            printf '%s=%s-%s@%s\n' "$service" "$namespace" "$service" "$digest" >> "$GITHUB_OUTPUT"
+            printf '%s: `%s-%s@%s`\n' "$service" "$namespace" "$service" "$digest" >> "$GITHUB_STEP_SUMMARY"
+          done
+          printf 'migrations=%s\n' "$(git rev-parse "$RELEASE_SHA:backend/src/main/resources/db/migration")" >> "$GITHUB_OUTPUT"
+          printf 'Commit: `%s`\n' "$RELEASE_SHA" >> "$GITHUB_STEP_SUMMARY"
+
+  deploy:
+    needs: [publish]
+    if: vars.PROD_CD_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    environment:
+      name: prod
+      url: ${{ vars.PROD_URL }}
+    concurrency:
+      group: deploy-prod
+      cancel-in-progress: false
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Impedir entrega obsoleta após espera ou aprovação
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          head=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq '.object.sha')
+          test "$head" = "$RELEASE_SHA"
+      - name: Atualizar EC2 e validar saúde com rollback protegido
+        env:
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ vars.DEPLOY_USER }}
+          DEPLOY_PORT: ${{ vars.DEPLOY_PORT || '22' }}
+          DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+          RELEASE_SHA: ${{ github.sha }}
+          MIGRATIONS_SHA: ${{ needs.publish.outputs.migrations }}
+          BACKEND_IMAGE: ${{ needs.publish.outputs.backend }}
+          FRONTEND_IMAGE: ${{ needs.publish.outputs.frontend }}
+        run: python3 scripts/deploy-ssh.py
+      - name: Registrar resultado
+        if: always()
+        env:
+          RESULT: ${{ job.status }}
+          RELEASE_SHA: ${{ github.sha }}
+          BACKEND_IMAGE: ${{ needs.publish.outputs.backend }}
+          FRONTEND_IMAGE: ${{ needs.publish.outputs.frontend }}
+        run: |
+          printf 'CD: %s\nCommit: `%s`\nBackend: `%s`\nFrontend: `%s`\n' \
+            "$RESULT" "$RELEASE_SHA" "$BACKEND_IMAGE" "$FRONTEND_IMAGE" >> "$GITHUB_STEP_SUMMARY"

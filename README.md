@@ -219,9 +219,11 @@ O workflow `.github/workflows/ci.yml` é acionado em pushes, pull requests e exe
 2. **Frontend:** Node.js 24, instalação pelo lockfile, testes do inicializador, da exportação CSV e da comparação mensal, lint, TypeScript e build.
 3. **Containers:** construção dos dois serviços, espera por saúde, validação integrada e remoção do banco temporário.
 
-Os jobs de backend e frontend executam em paralelo; o teste dos containers começa após ambos passarem. O CI gera credenciais apenas para seu ambiente temporário e não exige segredos de produção. Não há etapa de deploy nesse workflow.
+Os jobs de backend e frontend executam em paralelo; o teste dos containers começa após ambos passarem. O CI gera credenciais apenas para seu ambiente temporário e não exige segredos de produção. Após os checks, o mesmo workflow pode publicar imagens no GHCR e atualizar a EC2. O CD fica desabilitado até autorização e configuração explícita; veja o [runbook de CD](docs/deploy-cd.md).
 
 ## Demonstração na EC2
+
+A atualização automatizada por GitHub Actions/GHCR está descrita no [runbook de CD](docs/deploy-cd.md), com [diagnóstico da instalação documentada](docs/deploy-cd-diagnosis.md), preparação, ativação, saúde e rollback.
 
 O [guia de deploy](docs/deploy-ec2.md) descreve a entrega de imagens pré-construídas para uma EC2 x86_64, acesso inicial por túnel SSH, HTTPS com domínio, volumes persistentes e backup. Use `compose.demo.yml` para essa modalidade; `compose.app.yml` continua sendo o ambiente local.
 

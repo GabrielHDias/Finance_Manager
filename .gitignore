@@ -31,3 +31,6 @@ Thumbs.db
 
 __pycache__/
 *.pyc
+
+# Estado operacional privado do CD na EC2
+.deploy/
