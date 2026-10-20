@@ -46,6 +46,11 @@
       "digest": "sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e",
       "platform": "linux/amd64",
       "source": "https://registry-1.docker.io/v2/docker/dockerfile/manifests/1"
+    },
+    "aws-actions/configure-aws-credentials": {
+      "tag": "v6.3.0",
+      "sha": "e1253824e5c10ff9df46874f81ed3ec929e19cfd",
+      "source": "https://github.com/aws-actions/configure-aws-credentials/releases/tag/v6.3.0"
     }
   }
 }
