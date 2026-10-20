@@ -3,6 +3,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { ApiError } from "@/lib/api-error";
+import { validInput, ratio, sign } from "@/lib/money";
 import { formatCurrency } from "@/lib/formatters";
 import { formatDate } from "@/lib/dates";
 import { MONTH_NAMES, monthLabel, monthPeriod } from "@/lib/monthly-summary";
@@ -73,8 +74,8 @@ export default function BudgetsPage() {
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (busy || !data || loadFailed) return;
-    const amount = Number(limit);
-    if (!categoryId || !limit || !Number.isFinite(amount) || amount <= 0) {
+    const amount = limit;
+    if (!categoryId || !limit || !validInput(amount)) {
       setError("Informe a categoria e um limite positivo."); return;
     }
     setWorking(true); setError(""); setSuccess("");
@@ -151,10 +152,10 @@ export default function BudgetsPage() {
                 <dl>
                   <div><dt>Limite</dt><dd>{formatCurrency(budget.limitAmount)}</dd></div>
                   <div><dt>Gasto no mês</dt><dd>{formatCurrency(budget.spent)}</dd></div>
-                  <div><dt>{budget.remaining < 0 ? "Excedido em" : "Disponível"}</dt><dd className={budget.remaining < 0 ? "financial-value--expense" : undefined}>{formatCurrency(Math.abs(budget.remaining))}</dd></div>
+                  <div><dt>{sign(budget.remaining) < 0 ? "Excedido em" : "Disponível"}</dt><dd className={sign(budget.remaining) < 0 ? "financial-value--expense" : undefined}>{formatCurrency(budget.remaining.replace(/^-/, ""))}</dd></div>
                 </dl>
-                <progress max={budget.limitAmount} value={Math.min(budget.spent, budget.limitAmount)} aria-label={`Consumo do orçamento de ${budget.categoryName}`} />
-                <p className={budget.remaining <= 0 ? "financial-value--expense" : undefined}>{budget.remaining < 0 ? "Limite excedido" : budget.remaining === 0 ? "Limite atingido" : "Dentro do limite"} · {new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 1 }).format(budget.spent / budget.limitAmount * 100)}% utilizado</p>
+                <progress max={1} value={Math.min(ratio(budget.spent, budget.limitAmount), 1)} aria-label={`Consumo do orçamento de ${budget.categoryName}`} />
+                <p className={sign(budget.remaining) <= 0 ? "financial-value--expense" : undefined}>{sign(budget.remaining) < 0 ? "Limite excedido" : sign(budget.remaining) === 0 ? "Limite atingido" : "Dentro do limite"} · {new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 1 }).format(ratio(budget.spent, budget.limitAmount) * 100)}% utilizado</p>
                 <div className="resource-actions">
                   {pendingDelete === budget.id ? <>
                     <p>Excluir o orçamento de {budget.categoryName} deste mês? As transações serão mantidas.</p>

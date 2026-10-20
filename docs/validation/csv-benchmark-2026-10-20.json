@@ -1,0 +1,7 @@
+{
+  "rows": 10000,
+  "bytes": 9650046,
+  "heapDeltaBytes": 49651784,
+  "durationMs": 79.84390000000002,
+  "node": "v24.21.0"
+}

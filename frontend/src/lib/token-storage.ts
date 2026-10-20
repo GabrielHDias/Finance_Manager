@@ -13,7 +13,13 @@ export function getAccessToken(): string | null {
     return null;
   }
 
-  return sessionStorage.getItem(ACCESS_TOKEN_KEY);
+  const token = sessionStorage.getItem(ACCESS_TOKEN_KEY);
+  if (!token) return null;
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
+    if (typeof payload.exp !== "number" || payload.exp * 1000 <= Date.now()) return null;
+    return token;
+  } catch { return null; }
 }
 
 export function removeAccessToken(): void {

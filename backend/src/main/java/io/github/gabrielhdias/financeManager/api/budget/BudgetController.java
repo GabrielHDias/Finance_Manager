@@ -10,6 +10,10 @@ import jakarta.validation.constraints.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import tools.jackson.databind.annotation.JsonSerialize;
+import io.github.gabrielhdias.financeManager.api.money.MoneySerializer;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
 @RestController
@@ -46,6 +50,6 @@ public class BudgetController {
         @Min(1) @Max(9999) int year,
         @Min(1) @Max(12) int month,
         @NotNull(message = "Informe o limite") @Positive(message = "O limite deve ser positivo")
-        @Digits(integer = 17, fraction = 2, message = "Use até duas casas decimais") BigDecimal limitAmount
+        @Digits(integer = 17, fraction = 2, message = "Use até duas casas decimais") @JsonFormat(shape = JsonFormat.Shape.STRING) @JsonSerialize(using = MoneySerializer.class) @Schema(type = "string", implementation = String.class, example = "0.30") BigDecimal limitAmount
     ) {}
 }

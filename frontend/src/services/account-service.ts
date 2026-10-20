@@ -43,3 +43,7 @@ export async function renameAccount(
 export async function deleteAccount(id: number): Promise<void> {
   return apiRequest<void>(`/accounts/${id}`, { method: "DELETE" });
 }
+
+export async function getAccountBalances(): Promise<AccountBalanceResponse[]> {
+  return apiRequest<AccountBalanceResponse[]>("/accounts/balances");
+}

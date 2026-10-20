@@ -1,0 +1,13 @@
+{
+  "before": 200,
+  "database_paused": {
+    "liveness": 200,
+    "readiness": 503
+  },
+  "database_resumed": {
+    "liveness": 200,
+    "readiness": 200
+  },
+  "public_body": "status only",
+  "environment": "task-owned disposable PostgreSQL, no preexisting services changed"
+}

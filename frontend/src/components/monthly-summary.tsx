@@ -1,5 +1,7 @@
 "use client";
 
+import { sign } from "@/lib/money";
+
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { ApiError } from "@/lib/api-error";
@@ -117,19 +119,19 @@ export default function MonthlySummary() {
                 const value = data.current[metric.key];
                 const previous = data.previous[metric.key];
                 const difference = monthlyDifference(value, previous);
-                const color = metric.key === "totalIncome" ? "financial-value--income" : metric.key === "totalExpense" ? "financial-value--expense" : value > 0 ? "financial-value--income" : value < 0 ? "financial-value--expense" : undefined;
+                const color = metric.key === "totalIncome" ? "financial-value--income" : metric.key === "totalExpense" ? "financial-value--expense" : sign(value) > 0 ? "financial-value--income" : sign(value) < 0 ? "financial-value--expense" : undefined;
                 return (
                   <div key={metric.key}>
                     <h3>{metric.label}</h3>
                     <p className={color}>{formatCurrency(value)}</p>
                     <p className="monthly-summary__detail">Mês anterior: {formatCurrency(previous)}</p>
-                    <p className="monthly-summary__detail">{difference === 0 ? "Sem variação." : `${difference > 0 ? "Aumento" : "Redução"} de ${formatCurrency(Math.abs(difference))}.`}</p>
+                    <p className="monthly-summary__detail">{sign(difference) === 0 ? "Sem variação." : `${sign(difference) > 0 ? "Aumento" : "Redução"} de ${formatCurrency(difference.replace(/^-/, ""))}.`}</p>
                   </div>
                 );
               })}
             </div>
-            {data.current.totalIncome === 0 && data.current.totalExpense === 0 && <p>Nenhuma movimentação no mês selecionado.</p>}
-            {data.previous.totalIncome === 0 && data.previous.totalExpense === 0 && <p>O mês anterior não possui movimentações.</p>}
+            {sign(data.current.totalIncome) === 0 && sign(data.current.totalExpense) === 0 && <p>Nenhuma movimentação no mês selecionado.</p>}
+            {sign(data.previous.totalIncome) === 0 && sign(data.previous.totalExpense) === 0 && <p>O mês anterior não possui movimentações.</p>}
             <p className="monthly-summary__note">Os totais incluem todas as transações datadas em cada mês. Saldo do mês = receitas − despesas; não é o saldo acumulado das contas.</p>
           </>
         )}

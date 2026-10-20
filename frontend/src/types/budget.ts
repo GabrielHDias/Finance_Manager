@@ -3,10 +3,10 @@ export interface BudgetSummary {
   categoryId: number;
   categoryName: string;
   periodStart: string;
-  limitAmount: number;
-  spent: number;
-  remaining: number;
+  limitAmount: string;
+  spent: string;
+  remaining: string;
 }
 
 export interface BudgetPeriod { year: number; month: number }
-export interface SaveBudgetRequest extends BudgetPeriod { categoryId: number; limitAmount: number }
+export interface SaveBudgetRequest extends BudgetPeriod { categoryId: number; limitAmount: string }

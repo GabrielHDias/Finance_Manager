@@ -47,6 +47,29 @@ class TransactionControllerMvcTest {
     private JwtDecoder jwtDecoder;
 
     @Test
+    void shouldRejectAmountsOutsideTheSupportedRangeSpecifically() throws Exception {
+        for (String amount : new String[]{"100000000000000000.00", "1.001", "0.00", "-0.01"}) {
+            String body = "{\"description\":\"Range\",\"amount\":\""+amount+"\",\"date\":\"2026-10-20\",\"type\":\"INCOME\",\"accountId\":1,\"categoryId\":1}";
+            mockMvc.perform(post("/transactions").with(jwt()).contentType(MediaType.APPLICATION_JSON).content(body))
+                .andExpect(status().isBadRequest()).andExpect(jsonPath("$.fields.amount").exists());
+        }
+    }
+
+    @Test
+    void shouldRejectMalformedBodiesParametersAndAmountsWithConsistentJson() throws Exception {
+        for (String body : new String[]{"{", "{\"type\":\"UNKNOWN\"}", "{\"date\":\"2026-02-31\"}",
+            "{\"amount\":\"100000000000000000.00\"}", "{\"amount\":\"1.001\"}"}) {
+            mockMvc.perform(post("/transactions").with(jwt()).contentType(MediaType.APPLICATION_JSON).content(body))
+                .andExpect(status().isBadRequest()).andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.fields").isMap()).andExpect(jsonPath("$.timestamp").isString());
+        }
+        for (String query : new String[]{"type=UNKNOWN", "startDate=invalid", "accountId=abc", "page=bad"}) {
+            mockMvc.perform(get("/transactions/page?" + query).with(jwt()))
+                .andExpect(status().isBadRequest()).andExpect(jsonPath("$.status").value(400));
+        }
+    }
+
+    @Test
     void shouldReturnUnauthorizedWhenRequestHasNoToken()
         throws Exception {
 

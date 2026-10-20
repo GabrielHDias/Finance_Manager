@@ -1,3 +1,4 @@
+import { cents, decimal } from "./money";
 import { formatDate } from "./dates";
 import type { TransactionResponse } from "../types/transaction";
 
@@ -11,7 +12,7 @@ export function serializeTransactionCsv(transactions: readonly TransactionRespon
   const rows = transactions.map(transaction => [
     formatDate(transaction.date),
     transaction.description,
-    transaction.amount.toFixed(2).replace(".", ","),
+    decimal(cents(transaction.amount)).replace(".", ","),
     transaction.type === "INCOME" ? "RECEITA" : "DESPESA",
     transaction.accountName,
     transaction.categoryName,

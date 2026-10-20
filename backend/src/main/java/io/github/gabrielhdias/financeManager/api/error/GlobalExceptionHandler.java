@@ -12,7 +12,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -29,7 +29,7 @@ public class GlobalExceptionHandler {
         org.springframework.web.bind.MissingServletRequestParameterException.class})
     public ResponseEntity<ApiErrorResponse> handleMissingImportPart(HttpServletRequest request) {
         return buildResponse(HttpStatus.BAD_REQUEST, "Bad Request",
-            "Envie o arquivo CSV, a conta, a categoria e, na confirmação, o identificador da prévia.", request, Map.of());
+            "Parâmetros obrigatórios ausentes", request, Map.of());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -139,6 +139,32 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler({org.springframework.http.converter.HttpMessageNotReadableException.class,
+        org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class,
+        org.springframework.web.method.annotation.HandlerMethodValidationException.class})
+    public ResponseEntity<ApiErrorResponse> malformed(HttpServletRequest request) {
+        return buildResponse(HttpStatus.BAD_REQUEST, "Bad Request", "JSON ou parâmetros inválidos", request, Map.of());
+    }
+
+    @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
+    public ResponseEntity<ApiErrorResponse> integrity(org.springframework.dao.DataIntegrityViolationException failure,
+                                                     HttpServletRequest request) {
+        Throwable cause = failure;
+        while (cause != null) {
+            if (cause instanceof org.hibernate.exception.ConstraintViolationException violation) {
+                String name = violation.getConstraintName();
+                if (java.util.Set.of("uk_users_email", "uk_accounts_user_name", "uk_categories_user_name",
+                    "uk_budgets_category_month").contains(name == null ? "" : name))
+                    return buildResponse(HttpStatus.CONFLICT, "Conflict", "Recurso já cadastrado", request, Map.of());
+                if (java.util.Set.of("fk_transactions_account", "fk_transactions_category", "fk_accounts_user",
+                    "fk_categories_user", "monthly_budgets_category_id_fkey").contains(name == null ? "" : name))
+                    return buildResponse(HttpStatus.CONFLICT, "Conflict", "Recurso possui vínculos existentes", request, Map.of());
+            }
+            cause = cause.getCause();
+        }
+        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", "Falha interna de persistência", request, Map.of());
+    }
+
     private ResponseEntity<ApiErrorResponse> buildResponse(
         HttpStatus status,
         String error,
@@ -147,7 +173,7 @@ public class GlobalExceptionHandler {
         Map<String, String> fields
     ) {
         ApiErrorResponse response = new ApiErrorResponse(
-            LocalDateTime.now(),
+            Instant.now(),
             status.value(),
             error,
             message,

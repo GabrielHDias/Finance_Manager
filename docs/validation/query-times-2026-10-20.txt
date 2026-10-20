@@ -1,0 +1,2 @@
+NOTICE:  individual_total_ms=305.695000
+NOTICE:  batch_total_ms=7.085000

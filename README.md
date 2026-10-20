@@ -236,3 +236,11 @@ O [guia de deploy](docs/deploy-ec2.md) descreve a entrega de imagens pré-constr
 Referências: [ordem de inicialização no Docker Compose](https://docs.docker.com/compose/how-tos/startup-order/), [configuração de Node no GitHub Actions](https://github.com/actions/setup-node) e [configuração de Java no GitHub Actions](https://github.com/actions/setup-java).
 
 Autor: Gabriel Heinrick Dias.
+
+## Contratos e runbooks atuais
+
+Consulte [arquitetura](docs/01_ARCHITECTURE.md), [decisões F01–F11](docs/02_DECISION_LOG.md), [segurança e contratos](docs/security-and-contracts.md), [backup/restauração](docs/backup-and-restore.md) e [evidências de validação](docs/validation-f01-f11.md). Dinheiro em respostas JSON é string decimal de duas casas; atualize clientes coordenadamente. Exportações recusam mais de 10000 registros. Saúde pública usa `/health/live` e `/health/ready`.
+
+Testes Node incluem dinheiro, CSV, comparação mensal, tema, inicialização e empacotamento. `python3 scripts/backup_test.py` verifica ferramentas de backup; em ambiente local descartável já iniciado, `cd frontend && E2E_BASE_URL=http://localhost:3000 npm run test:e2e` executa Playwright/axe. Instale antes o Chromium com `npx playwright install --with-deps chromium`. Não executar essas suítes contra uma instalação com dados de uso.
+
+As referências imutáveis verificadas estão em [dependency-pins.json](docs/dependency-pins.json). O mantenedor deve revisá-las mensalmente e após avisos de segurança, repetindo os checks antes da promoção. Configuração existente e checks definidos não comprovam disponibilidade nem controles em produção.

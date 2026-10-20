@@ -2,7 +2,7 @@ name: finance-manager-app
 
 services:
   db:
-    image: postgres:17
+    image: postgres:17@sha256:2d2b8998d31037bf721cfdf764d76ba74171b4fab3431b7f72c27c56ddbdf9e3
     environment:
       POSTGRES_DB: finance_manager
       POSTGRES_USER: finance_manager
@@ -30,7 +30,7 @@ services:
       db:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "curl --fail --silent http://localhost:8080/v3/api-docs > /dev/null"]
+      test: ["CMD-SHELL", "curl --fail --silent --max-time 4 http://localhost:8080/health/ready > /dev/null"]
       interval: 5s
       timeout: 5s
       retries: 30

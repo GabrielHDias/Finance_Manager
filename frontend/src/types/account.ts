@@ -9,5 +9,5 @@ export interface AccountResponse {
 
 export interface AccountBalanceResponse {
   accountId: number;
-  balance: number;
+  balance: string;
 }

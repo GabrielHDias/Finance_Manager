@@ -8,7 +8,7 @@ import ts from '../frontend/node_modules/typescript/lib/typescript.js';
 
 const temp = mkdtempSync(join(tmpdir(), 'finance-monthly-test-'));
 after(() => rmSync(temp, { recursive: true, force: true }));
-for (const name of ['dates', 'monthly-summary']) {
+for (const name of ['money', 'dates', 'monthly-summary']) {
   const source = readFileSync(new URL(`../frontend/src/lib/${name}.ts`, import.meta.url), 'utf8');
   const { outputText } = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2021 } });
   writeFileSync(join(temp, `${name}.js`), outputText);
@@ -45,10 +45,10 @@ test('labels months in Portuguese independently of locale or timezone', () => {
 });
 
 test('differences work with cents, zero bases and negative balances', () => {
-  assert.equal(monthlyDifference(0.3, 0.1), 0.2);
-  assert.equal(monthlyDifference(100, 0), 100);
-  assert.equal(monthlyDifference(0, 100), -100);
-  assert.equal(monthlyDifference(-50, -100), 50);
-  assert.equal(monthlyDifference(-100, 50), -150);
-  assert.equal(monthlyDifference(0, 0), 0);
+  assert.equal(monthlyDifference("0.3", "0.1"), "0.20");
+  assert.equal(monthlyDifference("100", "0"), "100.00");
+  assert.equal(monthlyDifference("0", "100"), "-100.00");
+  assert.equal(monthlyDifference("-50", "-100"), "50.00");
+  assert.equal(monthlyDifference("-100", "50"), "-150.00");
+  assert.equal(monthlyDifference("0", "0"), "0.00");
 });

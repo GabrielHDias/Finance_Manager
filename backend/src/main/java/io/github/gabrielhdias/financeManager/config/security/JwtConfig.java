@@ -38,9 +38,20 @@ public class JwtConfig {
 
     @Bean
     public JwtDecoder jwtDecoder(SecretKey secretKey) {
-        return NimbusJwtDecoder
-            .withSecretKey(secretKey)
-            .macAlgorithm(MacAlgorithm.HS256)
-            .build();
+        NimbusJwtDecoder decoder = NimbusJwtDecoder.withSecretKey(secretKey)
+            .macAlgorithm(MacAlgorithm.HS256).build();
+        decoder.setJwtValidator(new org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator<>(
+            org.springframework.security.oauth2.jwt.JwtValidators.createDefault(), jwt -> {
+                try {
+                    String subject = jwt.getSubject();
+                    if (jwt.getExpiresAt() == null || jwt.getIssuedAt() == null || subject == null || !subject.matches("[1-9][0-9]{0,18}") || Long.parseLong(subject) <= 0)
+                        throw new IllegalArgumentException();
+                    return org.springframework.security.oauth2.core.OAuth2TokenValidatorResult.success();
+                } catch (RuntimeException invalid) {
+                    return org.springframework.security.oauth2.core.OAuth2TokenValidatorResult.failure(
+                        new org.springframework.security.oauth2.core.OAuth2Error("invalid_token", "Invalid subject", null));
+                }
+            }));
+        return decoder;
     }
 }

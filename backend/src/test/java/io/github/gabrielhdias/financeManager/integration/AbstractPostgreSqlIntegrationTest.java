@@ -7,7 +7,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 public abstract class AbstractPostgreSqlIntegrationTest {
 
     private static final PostgreSQLContainer<?> POSTGRESQL_CONTAINER =
-        new PostgreSQLContainer<>("postgres:17")
+        new PostgreSQLContainer<>(org.testcontainers.utility.DockerImageName.parse("postgres:17@sha256:2d2b8998d31037bf721cfdf764d76ba74171b4fab3431b7f72c27c56ddbdf9e3").asCompatibleSubstituteFor("postgres"))
             .withDatabaseName("finance_manager_test")
             .withUsername("finance_manager")
             .withPassword("finance_manager_test");

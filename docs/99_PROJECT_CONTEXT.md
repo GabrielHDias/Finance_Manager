@@ -1,8 +1,7 @@
 # Finance Manager - Project Context
 
-> Documento central de contexto do projeto.
->
-> Este arquivo representa o estado atual do projeto e deve ser atualizado ao final de cada Sprint ou decisão arquitetural importante.
+> Histórico do planejamento inicial, preservado para referência. As versões, sprints e afirmações de status abaixo não descrevem o estado atual.
+> Fontes atuais: [arquitetura](01_ARCHITECTURE.md), [decisões](02_DECISION_LOG.md), [validação F01–F11](validation-f01-f11.md) e README.
 
 ---
 

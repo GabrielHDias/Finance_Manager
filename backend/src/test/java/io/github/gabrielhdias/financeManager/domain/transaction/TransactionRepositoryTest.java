@@ -27,6 +27,21 @@ class TransactionRepositoryTest
     private EntityManager entityManager;
 
     @Test
+    void batchedBalancesIncludeEmptyAccountsAndIsolateOwnersAtMaximumPrecision() {
+        TestData owner = createTestData("batch-owner@example.test");
+        TestData other = createTestData("batch-other@example.test");
+        Account empty = new Account("Empty", owner.account().getUser()); entityManager.persist(empty);
+        persistTransaction("High A", "99999999999999999.99", LocalDate.of(2026,10,1), TransactionType.INCOME, owner.account(), owner.category());
+        persistTransaction("High B", "99999999999999999.99", LocalDate.of(2026,10,1), TransactionType.INCOME, owner.account(), owner.category());
+        persistTransaction("Other", "100.00", LocalDate.of(2026,10,1), TransactionType.INCOME, other.account(), other.category());
+        entityManager.flush();
+        var balances = transactionRepository.balancesByUser(owner.account().getUser().getId(), TransactionType.INCOME);
+        assertEquals(2, balances.size());
+        assertEquals(new BigDecimal("199999999999999999.98"), balances.stream().filter(b -> b.accountId().equals(owner.account().getId())).findFirst().orElseThrow().balance());
+        assertEquals(0, balances.stream().filter(b -> b.accountId().equals(empty.getId())).findFirst().orElseThrow().balance().signum());
+    }
+
+    @Test
     void shouldCalculateBalanceFromIncomeAndExpenses() {
         TestData data = createTestData(
             "balance-test@email.com"

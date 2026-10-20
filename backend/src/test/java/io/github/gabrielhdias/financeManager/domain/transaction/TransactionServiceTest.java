@@ -38,6 +38,13 @@ class TransactionServiceTest {
     private TransactionService transactionService;
 
     @Test
+    void shouldRefuseOversizedExportWithoutReturningTruncatedData() {
+        when(transactionRepository.findLimitedByFilters(any(), any(), any(), any(), any(), any(), any()))
+            .thenReturn(java.util.Collections.nCopies(10001, createTransaction()));
+        assertThrows(BusinessRuleException.class, () -> transactionService.filterByUser(1L,null,null,null,null,null));
+    }
+
+    @Test
     void shouldRejectInvalidPaginationBeforeQuerying() {
         for (int[] bounds : new int[][] {{-1, 10}, {0, 0}, {0, 101}, {0, -1}}) {
             assertThrows(IllegalArgumentException.class, () -> transactionService.pageByUser(
@@ -217,13 +224,14 @@ class TransactionServiceTest {
         List<Transaction> transactions =
             List.of(createTransaction());
 
-        when(transactionRepository.findAllByFilters(
+        when(transactionRepository.findLimitedByFilters(
             userId,
             startDate,
             endDate,
             TransactionType.EXPENSE,
             accountId,
-            categoryId
+            categoryId,
+            org.springframework.data.domain.PageRequest.of(0, 10001)
         )).thenReturn(transactions);
 
         List<Transaction> result =
@@ -239,13 +247,14 @@ class TransactionServiceTest {
         assertEquals(transactions, result);
 
         verify(transactionRepository)
-            .findAllByFilters(
+            .findLimitedByFilters(
                 userId,
                 startDate,
                 endDate,
                 TransactionType.EXPENSE,
                 accountId,
-                categoryId
+                categoryId,
+                org.springframework.data.domain.PageRequest.of(0, 10001)
             );
     }
 
@@ -256,13 +265,14 @@ class TransactionServiceTest {
         List<Transaction> transactions =
             List.of(createTransaction());
 
-        when(transactionRepository.findAllByFilters(
+        when(transactionRepository.findLimitedByFilters(
             userId,
             null,
             null,
             null,
             null,
-            null
+            null,
+            org.springframework.data.domain.PageRequest.of(0, 10001)
         )).thenReturn(transactions);
 
         List<Transaction> result =
@@ -278,13 +288,14 @@ class TransactionServiceTest {
         assertEquals(transactions, result);
 
         verify(transactionRepository)
-            .findAllByFilters(
+            .findLimitedByFilters(
                 userId,
                 null,
                 null,
                 null,
                 null,
-                null
+                null,
+                org.springframework.data.domain.PageRequest.of(0, 10001)
             );
     }
 
@@ -316,7 +327,8 @@ class TransactionServiceTest {
         );
 
         verify(transactionRepository, never())
-            .findAllByFilters(
+            .findLimitedByFilters(
+                any(),
                 any(),
                 any(),
                 any(),

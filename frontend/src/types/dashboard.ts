@@ -1,13 +1,13 @@
 export interface DashboardSummaryResponse {
-  totalIncome: number;
-  totalExpense: number;
-  balance: number;
+  totalIncome: string;
+  totalExpense: string;
+  balance: string;
 }
 
 export interface ExpenseByCategoryResponse {
   categoryId: number;
   categoryName: string;
-  amount: number;
+  amount: string;
 }
 export interface DashboardPeriod {
   startDate?: string;

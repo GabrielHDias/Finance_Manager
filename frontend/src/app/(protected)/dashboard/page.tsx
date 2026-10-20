@@ -1,5 +1,7 @@
 "use client";
 
+import { sign } from "@/lib/money";
+
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ApiError } from "@/lib/api-error";
@@ -142,7 +144,7 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <strong>{dashboard.period.startDate || dashboard.period.endDate ? "Saldo do período" : "Saldo"}</strong>
-                  <p className={dashboard.summary.balance > 0 ? "financial-value--income" : dashboard.summary.balance < 0 ? "financial-value--expense" : undefined}>{formatCurrency(dashboard.summary.balance)}</p>
+                  <p className={sign(dashboard.summary.balance) > 0 ? "financial-value--income" : sign(dashboard.summary.balance) < 0 ? "financial-value--expense" : undefined}>{formatCurrency(dashboard.summary.balance)}</p>
                 </div>
               </div>
             </section>

@@ -85,14 +85,11 @@ public class TransactionService {
             endDate
         );
 
-        return transactionRepository.findAllByFilters(
-            userId,
-            startDate,
-            endDate,
-            type,
-            accountId,
-            categoryId
-        );
+        List<Transaction> result = transactionRepository.findLimitedByFilters(
+            userId, startDate, endDate, type, accountId, categoryId, PageRequest.of(0, 10001));
+        if (result.size() > 10000) throw new BusinessRuleException(
+            "Exportação limitada a 10000 transações. Reduza o período ou aplique filtros.");
+        return result;
     }
 
     @Transactional(readOnly = true)

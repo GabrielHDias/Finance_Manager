@@ -1,3 +1,4 @@
+import { cents, decimal } from "./money";
 import { parseDisplayDate } from "./dates";
 
 export const MONTH_NAMES = [
@@ -33,6 +34,6 @@ export function monthLabel(reference: string): string {
   return `${MONTH_NAMES[Number(reference.slice(5)) - 1]} de ${reference.slice(0, 4)}`;
 }
 
-export function monthlyDifference(current: number, previous: number): number {
-  return (Math.round(current * 100) - Math.round(previous * 100)) / 100;
+export function monthlyDifference(current: string, previous: string): string {
+  return decimal(cents(current) - cents(previous));
 }

@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ApiError } from "@/lib/api-error";
+import { validInput } from "@/lib/money";
 import { formatCurrency } from "@/lib/formatters";
 import { formatDate, parseDisplayDate } from "@/lib/dates";
 import DateInput from "@/components/date-input";
@@ -102,9 +103,9 @@ export default function TransactionsPage() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (busy) return;
-    const numericAmount = Number(amount);
+    const numericAmount = amount;
     if (!description.trim()) { setErrorMessage("Informe a descrição da transação."); return; }
-    if (!amount || !Number.isFinite(numericAmount) || numericAmount <= 0) {
+    if (!validInput(numericAmount)) {
       setErrorMessage("Informe um valor válido."); return;
     }
     if (!date || !accountId || !categoryId) {

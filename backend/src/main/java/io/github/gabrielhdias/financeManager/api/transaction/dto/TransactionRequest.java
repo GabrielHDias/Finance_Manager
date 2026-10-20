@@ -8,6 +8,10 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import tools.jackson.databind.annotation.JsonSerialize;
+import io.github.gabrielhdias.financeManager.api.money.MoneySerializer;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 
 public record TransactionRequest(
@@ -26,7 +30,7 @@ public record TransactionRequest(
         fraction = 2,
         message = "O valor deve possuir no máximo 17 dígitos inteiros e 2 casas decimais"
     )
-    BigDecimal amount,
+    @JsonFormat(shape = JsonFormat.Shape.STRING) @JsonSerialize(using = MoneySerializer.class) @Schema(type = "string", implementation = String.class, example = "0.30") BigDecimal amount,
 
     @NotNull(message = "A data é obrigatória")
     LocalDate date,

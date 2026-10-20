@@ -11,7 +11,7 @@ x-runtime: &runtime
 services:
   db:
     <<: *runtime
-    image: postgres:17
+    image: ${POSTGRES_IMAGE:-postgres:17@sha256:2d2b8998d31037bf721cfdf764d76ba74171b4fab3431b7f72c27c56ddbdf9e3}
     mem_limit: 256m
     command: ["postgres", "-c", "shared_buffers=64MB", "-c", "max_connections=30"]
     environment:
@@ -42,8 +42,7 @@ services:
       db:
         condition: service_healthy
     healthcheck:
-      # Check that the API security filter responds without publishing a port.
-      test: ["CMD-SHELL", "test \"$$(curl --silent --output /dev/null --write-out '%{http_code}' http://localhost:8080/accounts)\" = 401"]
+      test: ["CMD-SHELL", "curl --fail --silent --max-time 4 http://localhost:8080/health/ready > /dev/null"]
       interval: 10s
       timeout: 5s
       retries: 18
@@ -67,7 +66,7 @@ services:
 
   proxy:
     <<: *runtime
-    image: caddy:2-alpine
+    image: ${CADDY_IMAGE:-caddy:2-alpine@sha256:d8542f48d34a9cf4e4c11a478865229840e87e4c96ea3f439101f31a5d35f75f}
     mem_limit: 128m
     environment:
       SITE_ADDRESS: ${SITE_ADDRESS:-:80}

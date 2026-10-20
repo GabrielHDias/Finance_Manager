@@ -1,0 +1,908 @@
+{
+  "base_revision": "4f5d781e116091d42fb14d6392ec700452634191",
+  "working_tree": true,
+  "validation_location": "/tmp/fm-implementation; identical source contents copied into requested repository",
+  "source_fingerprint_sha256": "3944d10121fde827a2640886035a7083e25259b94ea131d2f70c5dfef48c22fc",
+  "files": [
+    {
+      "file": ".editorconfig",
+      "sha256": "86fce1149b51c350ad759e37b9b41ad963f26dd26e4a296d77afd08f943937f8"
+    },
+    {
+      "file": ".env.example",
+      "sha256": "74dd5a3c7561d1b8fd974715639c314e0a5c3c0f7c5296856deaf5125107bd68"
+    },
+    {
+      "file": ".gitattributes",
+      "sha256": "5775a77ad2f6d12dde053a3fb0cca4309189163f0888f4e7e984cd0ab327028b"
+    },
+    {
+      "file": ".github/workflows/ci.yml",
+      "sha256": "9a0ea0b36518747ca6e134e2b4596f17b99436295518b0435602ea2687ba56aa"
+    },
+    {
+      "file": ".gitignore",
+      "sha256": "8b16dda3b1703132ffb1e6e47e68c4f0a38e74bce463dbeb01895080eef87610"
+    },
+    {
+      "file": ".nvmrc",
+      "sha256": "68ca3fba3b7e864770cb61aeb306d4bd4354b68ab4dd38450860c5d823e42a53"
+    },
+    {
+      "file": "LICENSE",
+      "sha256": "58d3449dce333547a140efececddf178c19a2885d6dc028c46e1f3c3cc18818d"
+    },
+    {
+      "file": "README.md",
+      "sha256": "258c4add21e6f1ff45f3fcb3267cb2aae1d4ac0269d98368c8dc4509f6fded6f"
+    },
+    {
+      "file": "backend/.dockerignore",
+      "sha256": "6848f37dcef016f950882a2f13bccc08ff48bc40c516712c8f904f1d1a533b4e"
+    },
+    {
+      "file": "backend/.mvn/wrapper/maven-wrapper.properties",
+      "sha256": "488e1b3f2e641779d4636abf9390845f901e64607261bc3c0b0bfe4fe96e6706"
+    },
+    {
+      "file": "backend/Dockerfile",
+      "sha256": "398e2c44a84e08bce108f52818bfb1bc15e0b63a96d50b277a7835df8fd2333c"
+    },
+    {
+      "file": "backend/mvnw",
+      "sha256": "cae96cef89ebea3531221f4ae17c23cf8edf67d00eae8306d4186ae1bbed4d02"
+    },
+    {
+      "file": "backend/mvnw.cmd",
+      "sha256": "46eedb8419bd14fe70d5bb2916d7b6f51806e51b39d5b76a42610384ca929c1c"
+    },
+    {
+      "file": "backend/pom.xml",
+      "sha256": "84856a6be97306e8161fde24ff669f659b6247433fa1cf0d20f68819badb3fc1"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/FinanceManagerApplication.java",
+      "sha256": "3cb70057df8debf7bcf9c2147ab4ec447ee6d62c64e79cfd279ef20d4f2463fb"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/api/account/AccountController.java",
+      "sha256": "7c73a33f7992f00f41c012237ca1b302592e7104e49c51b0d565eb3d74fc9952"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/api/account/AccountMapper.java",
+      "sha256": "4d31465a98d7bb5d0cfc738ae177f6c3257e4be2b3156c3fed52e26f299c3a77"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/api/account/dto/AccountBalanceResponse.java",
+      "sha256": "93ff5d9b6db121aec4a07866d893956200b2ce073c11b67a4b795886d54abe3b"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/api/account/dto/AccountRequest.java",
+      "sha256": "f5c365d2de270ad914183f6c7ebce4f43ae982164886379dd3194a8800c0db2b"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/api/account/dto/AccountResponse.java",
+      "sha256": "bdf9f97eb6e6da3a8142064b70a194b46b2aeabf7d4b3c5cb0dd1ab8288cf951"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/api/auth/AuthController.java",
+      "sha256": "2631370c42c811f8a5f390672f2816c5b0eb99b7b1a36e4cb1a7bfb01848a3d2"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/api/auth/dto/LoginRequest.java",
+      "sha256": "1a703dd79a2ebb5575b688e89078cfd083c4bfd959bed40fc909a82e3ac94994"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/api/auth/dto/LoginResponse.java",
+      "sha256": "b882cee3388aaafb5ecc7303a5cd9fa596231cf5d7c856fc158bf62bae2e89a0"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/api/budget/BudgetController.java",
+      "sha256": "4d3c14e9b2ea0edc1c128d19f55c9959e9c549dee2280853fb328bd3e8da06d0"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/api/category/CategoryController.java",
+      "sha256": "2a0d42c41784f54e18b61ec4d0385a4b4f8df0d2f90e6661ba1ccd0e335d4a3d"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/api/category/CategoryMapper.java",
+      "sha256": "8226f826256d96209103331f5d34caae417ac1cfaa7048e9744b5700cbb54722"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/api/category/dto/CategoryRequest.java",
+      "sha256": "4e9ac79282eae6438a650a88480a390c1eaf4b6a17a22350b00dc61b234feab9"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/api/category/dto/CategoryResponse.java",
+      "sha256": "2fdf4b3eedf20329435b48effc7acf4018a77318cac4b35b55e36ccce1efd3dc"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/api/dashboard/DashboardController.java",
+      "sha256": "47e49ec3e63d4c2a3ef7dd29a555a13855f023a859ecd24849e75dcb8701c988"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/api/dashboard/DashboardMapper.java",
+      "sha256": "fad2f49343a539202d7a284a57d3260ea810f3ed7f67f4a93a9efdd8b3f3bafc"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/api/dashboard/dto/CategoryExpenseResponse.java",
+      "sha256": "af017d82d65ce413ad8631fa5bb466fe8ec3e83498b27dfada90682650c12e0b"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/api/dashboard/dto/DashboardSummaryResponse.java",
+      "sha256": "89fa46c9b4b7b03af126e3b36e2181274279b928b2f3eed1d710b42c776cb0b9"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/api/error/ApiErrorResponse.java",
+      "sha256": "0d1b0680fdd332271a67efa06f700a8cff43241c7b91f460f9c586cf08dc1efb"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/api/error/GlobalExceptionHandler.java",
+      "sha256": "f6c86bbd3f006c5b4110e1fda7bfd13449fb3f5d21f4ea18a44c4b51564a1966"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/api/health/HealthController.java",
+      "sha256": "f1b1b68ae36890afeec8b8c9cca39c5f7bd6d6a48ec5d2b467df25f56d6ec626"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/api/money/MoneySerializer.java",
+      "sha256": "3f843147826a06788c5608ff8d3fe6a0c8e4b34827a718f74bd601a1388616dd"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/api/transaction/TransactionController.java",
+      "sha256": "228b415fca4ed91cc9a286e15a83a72e774ece2af184b94a096174fdd60a4326"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/api/transaction/TransactionCsvImportController.java",
+      "sha256": "de0d225c5b20da0f6ae67c38f4a110709a43ecefa8b85cdf80ee22f71dd1208c"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/api/transaction/TransactionMapper.java",
+      "sha256": "145ea4fc4a81d843630ed3ff1f89a65fce2342e0f9ec136a422dc3e83aca3ebc"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/api/transaction/dto/TransactionPageResponse.java",
+      "sha256": "1f52c0be7f49014a4f03a2cb545a50957e30a02ad3f1e106297e6aa9d6d1a1cc"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/api/transaction/dto/TransactionRequest.java",
+      "sha256": "8ec4817e1c15856d7d0473dad4746dce8f6401b9e0277bbd140735400b69ac7c"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/api/transaction/dto/TransactionResponse.java",
+      "sha256": "36cc1076da78f9ab90887ccdd07a22f3c40efe111ae61634c00ddb4fc20561e7"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/api/user/UserController.java",
+      "sha256": "f6228cb1100c720460c856443a7cf72b21df8c84035c1ff3894084ba70dafc80"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/api/user/UserMapper.java",
+      "sha256": "e6b2727720bf4fe856ac811c09d121ab177be13423b0d322888fb3fe1561924a"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/api/user/dto/RegisterUserRequest.java",
+      "sha256": "2db3f0edbfef81c7097b3759f27a7691fca939055668f08a8c17923d32844cfb"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/api/user/dto/UserResponse.java",
+      "sha256": "6f14f53261d781f4bcc3a4929a33e40cb85a718f5958a0d21d39c3bdbe1de0ee"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/config/openapi/OpenApiConfig.java",
+      "sha256": "bc08a538074f2ffe4c5445e55d6d7e1bad6a8c2b72a7507c0bcf72f31478f00a"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/config/security/ApiAccessDeniedHandler.java",
+      "sha256": "c0410a6ee9a3d3bece3556a79fbc19f49def70b2cc6f77da847bd1364f29ea38"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/config/security/ApiAuthenticationEntryPoint.java",
+      "sha256": "384cefd7a2618669e568b24a559e16dd94b69bb0166a8f123603c62b44b6921b"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/config/security/AuthRateLimitFilter.java",
+      "sha256": "2d76b9f5516070844ceb5c9cc2a9e4701226236742bd053fdec79bc1bcb3f926"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/config/security/JwtConfig.java",
+      "sha256": "8947be3714e43c2887d6131b28c7473819dd4a326a6913a461668045698bb81f"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/config/security/PasswordEncoderConfig.java",
+      "sha256": "1022dbccbcbd2bfcefa3717f2781dd894000ae0a672102149c12ca07c6e1bb3d"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/config/security/SecurityConfig.java",
+      "sha256": "cd2e00b17e363af1455736fecd2f75d6fa2b86a70aadd1eb68682ad7119b804c"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/domain/account/Account.java",
+      "sha256": "8606ac16d05b0b3b02c3d9915ce3bec0f245f775de6b4a564f90e3ad669c847e"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/domain/account/AccountRepository.java",
+      "sha256": "7c2e87bda839d131612102abf33b39ac5fdc3d2dcd16ee435fbea58d124b16fe"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/domain/account/AccountService.java",
+      "sha256": "4f61aa378ded465abb7b31f73dd83fb8403efe9a08e515b6c8d2541cb8685d3b"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/domain/auth/AuthService.java",
+      "sha256": "a85d910c7b8cdfce9ce6032f0399b6bae7ae278b9835cedf903ac92228502473"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/domain/budget/Budget.java",
+      "sha256": "e1bc65528955743167d86c8b72642f6cdeb3f90e27e51e9aa534342b8fa326cb"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/domain/budget/BudgetRepository.java",
+      "sha256": "a2927ba1d94c06002a3c7379eb7377c945d07e6742b4daa792e82d6ebd9ab4e8"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/domain/budget/BudgetService.java",
+      "sha256": "21d33a74e7ca7a30e031a00fc645e26d0fe155c202a93f90f487b57b58a1a179"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/domain/budget/BudgetSummary.java",
+      "sha256": "bdc9fbd92498a50ee39197cc00326b06bd268b9769d141796fd3a6901f2e0801"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/domain/category/Category.java",
+      "sha256": "9c51346f34c97971b9bb5f7decc774b682c47206e3bf0854eb291fe825d9f581"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/domain/category/CategoryRepository.java",
+      "sha256": "ed44aecb5298de77f2386c9da5b91d8a53c95a36b23dad2520704d3a14351d6d"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/domain/category/CategoryService.java",
+      "sha256": "5d7ac6636d473105b3d563ab9d571e13a9209031d382bc6d7a78e1ebd8e1ca60"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/domain/dashboard/CategoryExpenseSummary.java",
+      "sha256": "448eb6a9867608956725f45c590786e3e41dccff81c29079396db34a4272e55e"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/domain/dashboard/DashboardService.java",
+      "sha256": "afd3683092d8806d85e0a9706e91c927e60832d2b13cda917bf14a25142b0d85"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/domain/dashboard/FinancialSummary.java",
+      "sha256": "89ad0898ff06fb88726e44bc9ffbe6cdb6454d6e59e4b99e3e9782f737374b97"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/domain/exception/BusinessRuleException.java",
+      "sha256": "92f40002ba01f0423a846654b2d84d2186ee9d94a471a57e1584e158761f8a97"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/domain/exception/DuplicateResourceException.java",
+      "sha256": "ed6125bb46f252358fe94e93ff5fa2788682eafd77cf559ef58e95e7030e3e50"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/domain/exception/InvalidCredentialsException.java",
+      "sha256": "a501feb2911f502222d8b598063bf1ee15f461418b4926a56d497ab9ba345207"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/domain/exception/ResourceNotFoundException.java",
+      "sha256": "80e438bbb0ce98ab6c920aafbd0d8be123e5f408ec65f416534136c4b510a794"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/domain/transaction/Transaction.java",
+      "sha256": "6e767b49593d165b1aa6a66dd3803873a96c3ea46e18ff8d9efc5f79a2d874ae"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/domain/transaction/TransactionRepository.java",
+      "sha256": "9f29c0879733fecfd49c71ef01190d30279e0a877205dc0a6ca4787e433661d4"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/domain/transaction/TransactionService.java",
+      "sha256": "4b548d67497f9b70791604435a7940347e7070003783fc3ae9fa49d0e941f5ab"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/domain/transaction/TransactionType.java",
+      "sha256": "5241989e188b6d7a95812a196ad91070a0482d52b233a37da9606edc50860e71"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/domain/transaction/csv/CsvImportPreview.java",
+      "sha256": "155907e925df3add252f7626e6c4a326bb8d57205041320a7a710aa9f37f2a31"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/domain/transaction/csv/CsvImportResult.java",
+      "sha256": "796fd2549fc8667b0659218648c3e2cd7ca531cf59c38f57ef010b3d2cf217e3"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/domain/transaction/csv/CsvImportRow.java",
+      "sha256": "178345b11e5e8121d4c221ffe39b9f5e4b5ac23417f58fc68fba7e2e96797ddd"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/domain/transaction/csv/TransactionCsvImportService.java",
+      "sha256": "c0a8a901a759e373cb77d9a8a7395676a63199c1ce10b146d85fcd9644df0598"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/domain/transaction/csv/TransactionCsvParser.java",
+      "sha256": "48565f82d217e53a358340c16c0a2e017ffe7dad7c8d68bb95a214069a849e54"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/domain/user/User.java",
+      "sha256": "bc66f779bc6fb294c97cb6508b7517ac8da56f4fe97439cb0e6e145f8e600e8b"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/domain/user/UserRepository.java",
+      "sha256": "3899bd8d32a23fd6a164ed143b88e64256ffd39a4ecc34efb1de6d7d38940f9b"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/domain/user/UserService.java",
+      "sha256": "e9f3dcd592cde4d7c9249f95e6ab66a03a05fe6a72b17e54690ca7196cc9ef62"
+    },
+    {
+      "file": "backend/src/main/java/io/github/gabrielhdias/financeManager/security/AuthenticatedUser.java",
+      "sha256": "076d6e88f3a02df4db095b387ec6aaaaf1c9511e04621cc9a0a16b46ab9d9f73"
+    },
+    {
+      "file": "backend/src/main/resources/application.properties",
+      "sha256": "0204b6f6f853c216766c7627fec0f811e2eeacb0538c5567ca5534b0df1b6b1e"
+    },
+    {
+      "file": "backend/src/main/resources/db/migration/V1__create_initial_schema.sql",
+      "sha256": "a255f7fe7dc2b2817829d4c42038b831f4a12b4332f7724d7307fe498a02a7fb"
+    },
+    {
+      "file": "backend/src/main/resources/db/migration/V2__create_monthly_budgets.sql",
+      "sha256": "8fa25051678ac3724d842376371a015a997d8a6c7bc0967248b2da75642fd809"
+    },
+    {
+      "file": "backend/src/test/java/io/github/gabrielhdias/financeManager/FinanceManagerApplicationTests.java",
+      "sha256": "ff9721e702ef27e2a52fcc3a292475d572165814f2572ea8590a0c4c4172b4f8"
+    },
+    {
+      "file": "backend/src/test/java/io/github/gabrielhdias/financeManager/api/account/AccountControllerMvcTest.java",
+      "sha256": "b8d7bee4b008e5716bfae6d216af640be2387f5d40e1030cbdbd26e46cbd4895"
+    },
+    {
+      "file": "backend/src/test/java/io/github/gabrielhdias/financeManager/api/account/AccountControllerTest.java",
+      "sha256": "515357290fdcca8552805ff559072cb9d1e9be2e796a3c6637b7fa3a87ee8769"
+    },
+    {
+      "file": "backend/src/test/java/io/github/gabrielhdias/financeManager/api/auth/AuthControllerMvcTest.java",
+      "sha256": "0276aa39345eab40b71dd7e30266102a06d0ebb35d5b7b5612244bcbb3052c57"
+    },
+    {
+      "file": "backend/src/test/java/io/github/gabrielhdias/financeManager/api/auth/AuthControllerTest.java",
+      "sha256": "103d8e70569d51e34930ae01baaa058e7f5dea975fc97b005a5714b53bbb97cf"
+    },
+    {
+      "file": "backend/src/test/java/io/github/gabrielhdias/financeManager/api/budget/BudgetControllerMvcTest.java",
+      "sha256": "a683336243e0b79178cd162b33ee24a079c631d4989c35e12bf91d313ede68da"
+    },
+    {
+      "file": "backend/src/test/java/io/github/gabrielhdias/financeManager/api/category/CategoryControllerMvcTest.java",
+      "sha256": "2a9c59c3ba82be747bc5fd8c7f1bbb125d576dca4931e159af73cb6e14cb9c0a"
+    },
+    {
+      "file": "backend/src/test/java/io/github/gabrielhdias/financeManager/api/category/CategoryControllerTest.java",
+      "sha256": "6f4e6d5273c75e99fcd63cbf0ddcf8edb6538d7896d88291ac2491068eecd505"
+    },
+    {
+      "file": "backend/src/test/java/io/github/gabrielhdias/financeManager/api/dashboard/DashboardControllerMvcTest.java",
+      "sha256": "0561ac810a2a84ebc859d50112de2c2dc3ebed72c643ad63ce88028f5f2f6019"
+    },
+    {
+      "file": "backend/src/test/java/io/github/gabrielhdias/financeManager/api/dashboard/DashboardControllerTest.java",
+      "sha256": "0d6522aa0aabd0383a88ca8cd07ee1f55f2f16f7957566a1825b5cf0280db053"
+    },
+    {
+      "file": "backend/src/test/java/io/github/gabrielhdias/financeManager/api/error/ContractErrorTest.java",
+      "sha256": "dea94db76c734214bf01e641a1d78417cabc31b296fe4aec555001cde851e9d8"
+    },
+    {
+      "file": "backend/src/test/java/io/github/gabrielhdias/financeManager/api/error/UniquenessRaceIntegrationTest.java",
+      "sha256": "6edc234dbd78a286773b94d231a05dc5cb6d7ff7d773347d2a01269397fb03a8"
+    },
+    {
+      "file": "backend/src/test/java/io/github/gabrielhdias/financeManager/api/health/HealthControllerTest.java",
+      "sha256": "53260b7ec1d28f0edf9fd1e88e5070a2b133977cbfaf9dac2eeaaf1fd6c34685"
+    },
+    {
+      "file": "backend/src/test/java/io/github/gabrielhdias/financeManager/api/transaction/MoneyContractIntegrationTest.java",
+      "sha256": "724f8ff420ba8fec7257372a2946c19ba55b74a18f2601fea3847193c8e53854"
+    },
+    {
+      "file": "backend/src/test/java/io/github/gabrielhdias/financeManager/api/transaction/TransactionControllerMvcTest.java",
+      "sha256": "6269cc2fe1b85168e14001349030b618a4846ffe96e180166df05d279e55d4ea"
+    },
+    {
+      "file": "backend/src/test/java/io/github/gabrielhdias/financeManager/api/transaction/TransactionControllerTest.java",
+      "sha256": "ea56bf25c14ee5c9beac9ff8929bc93852d311e7a2199fa27dabac64fdf8d2b0"
+    },
+    {
+      "file": "backend/src/test/java/io/github/gabrielhdias/financeManager/config/security/ApiAccessDeniedHandlerTest.java",
+      "sha256": "0e25050d3f0a783cfd6420e49355ce443a49142d7fe7f6416ef8cda6efc41162"
+    },
+    {
+      "file": "backend/src/test/java/io/github/gabrielhdias/financeManager/config/security/AuthRateLimitFilterTest.java",
+      "sha256": "340f94adc7cbb5752f3c2805748f0387b4f435b360835405230ac76eb1d705c1"
+    },
+    {
+      "file": "backend/src/test/java/io/github/gabrielhdias/financeManager/config/security/JwtRealMvcTest.java",
+      "sha256": "50f8cd3e089f204e64daf4d527f0e280279f02be0105e250f8e0f1725bdd867e"
+    },
+    {
+      "file": "backend/src/test/java/io/github/gabrielhdias/financeManager/config/security/SecurityCorsMvcTest.java",
+      "sha256": "dafeed04db9ce58d1fbc6c92d1a5720e8fda39f09801c7da6617affbec465874"
+    },
+    {
+      "file": "backend/src/test/java/io/github/gabrielhdias/financeManager/config/security/SecurityErrorResponseMvcTest.java",
+      "sha256": "6c56a479ad393ed36282b1f93c84abd971062623f5dcfb701fc3208b04e42f0f"
+    },
+    {
+      "file": "backend/src/test/java/io/github/gabrielhdias/financeManager/config/security/SecurityTestConfig.java",
+      "sha256": "1706986f118d68a46e705fa6f0302ae710a1346f72a9819bd1b90c2341a1ca8a"
+    },
+    {
+      "file": "backend/src/test/java/io/github/gabrielhdias/financeManager/domain/account/AccountServiceTest.java",
+      "sha256": "8452ef9acbf91a8418c9c3cd18495e043885a17975bcb31a730f6b0ee798b185"
+    },
+    {
+      "file": "backend/src/test/java/io/github/gabrielhdias/financeManager/domain/auth/AuthServiceTest.java",
+      "sha256": "5cee8488a976f5a9d5fac082a71820824dff2d74876a2bd641cb241cd3f6ee41"
+    },
+    {
+      "file": "backend/src/test/java/io/github/gabrielhdias/financeManager/domain/budget/BudgetIntegrationTest.java",
+      "sha256": "179566f4ce91b97faaf073668737d872d3504ae3b8bd769913b172e84a9e0d04"
+    },
+    {
+      "file": "backend/src/test/java/io/github/gabrielhdias/financeManager/domain/category/CategoryServiceTest.java",
+      "sha256": "ab3e87c2b6e136ad0c46f2d549bab53bc8b3362922e38ffb636dae8777957ebe"
+    },
+    {
+      "file": "backend/src/test/java/io/github/gabrielhdias/financeManager/domain/dashboard/DashboardServiceTest.java",
+      "sha256": "6d276f8fb70848a7419697907ab5a58a135a14ad225e4d1eb056fb921a7913ff"
+    },
+    {
+      "file": "backend/src/test/java/io/github/gabrielhdias/financeManager/domain/transaction/TransactionRepositoryTest.java",
+      "sha256": "d7503e9041b56edef8d951e3b86bf7650893f54be4327d871bfbc5201b3bb42c"
+    },
+    {
+      "file": "backend/src/test/java/io/github/gabrielhdias/financeManager/domain/transaction/TransactionServiceTest.java",
+      "sha256": "01a269dbe0bd7dfe7e26877dc1eebf5edd4be0df191d9718940c57560d4337b4"
+    },
+    {
+      "file": "backend/src/test/java/io/github/gabrielhdias/financeManager/domain/transaction/csv/TransactionCsvImportIntegrationTest.java",
+      "sha256": "b89a4a55149713e86493a4f604c5b1323095500b5f51dd8dfe84e3a814fcfcd6"
+    },
+    {
+      "file": "backend/src/test/java/io/github/gabrielhdias/financeManager/domain/transaction/csv/TransactionCsvParserTest.java",
+      "sha256": "e17390febda03273c2c615373c9c2e4549b86b4344e55143093c7f73bf0c645e"
+    },
+    {
+      "file": "backend/src/test/java/io/github/gabrielhdias/financeManager/domain/user/UserServiceTest.java",
+      "sha256": "8f488383b8489ee369bc5bca33c9f66a9f911a299bfe3faffd41619458813149"
+    },
+    {
+      "file": "backend/src/test/java/io/github/gabrielhdias/financeManager/integration/AbstractPostgreSqlIntegrationTest.java",
+      "sha256": "17f1703c8a43ee7c54396fc8b72aae59b5e21a31f862089654665c7889484b70"
+    },
+    {
+      "file": "backend/src/test/java/io/github/gabrielhdias/financeManager/security/AuthenticatedUserTest.java",
+      "sha256": "4f7d75b0e3517d4111166f21a9c822b5888e2b1c77e0231efae56567e42c980f"
+    },
+    {
+      "file": "compose.app.yml",
+      "sha256": "8d7f0bc2075c48f71bc57c3cba9c40112c127115835ecb5e9a5c536e2bdd3407"
+    },
+    {
+      "file": "compose.demo.yml",
+      "sha256": "76f05f738c14ff9631cfd5bb3a4be60bd91d385342088a5273c0413b4be09b67"
+    },
+    {
+      "file": "deploy/.env.example",
+      "sha256": "576ac2a19e6f3c79fc5676b08dc6e66d034584c9bcb60c5ba0e6944e190c6641"
+    },
+    {
+      "file": "deploy/Caddyfile",
+      "sha256": "78cc342ea399975a26d46a9f391b9e72ef226e971e55b6afe580142e177b075e"
+    },
+    {
+      "file": "docker-compose.yml",
+      "sha256": "61f958185376659d1fb0809b2d653e226b5fe5ce1f173f48f606b2b831c400dd"
+    },
+    {
+      "file": "docs/00_PROJECT_CHARTER.md",
+      "sha256": "a1771082016530c647434a9398a37b15e9de97a9f4255c93e948ae8dcff3560e"
+    },
+    {
+      "file": "docs/01_ARCHITECTURE.md",
+      "sha256": "628dcddd2d031991662c7d2d7428bed80314526bd1b910c7f9821ee74a1899d3"
+    },
+    {
+      "file": "docs/02_DECISION_LOG.md",
+      "sha256": "e563e486bb9d89cd49aea4f590d4e8924d2e511c0c43b2710d870136d18a46ee"
+    },
+    {
+      "file": "docs/03_LEARNING_JOURNAL_BACKEND.md",
+      "sha256": "cf1d7d521bf10837b9c5742c6d803728c6970840fdb46b27cdf5072580c7ca5a"
+    },
+    {
+      "file": "docs/04_LEARNING_JOURNAL_FRONTEND.md",
+      "sha256": "c679d616ed99ae32961aaaf5c13a68832d08449cf4fcd76e754e86cc2852d0ee"
+    },
+    {
+      "file": "docs/05_LEARNING_JOURNAL_DEVOPS.md",
+      "sha256": "ba89f861d7e81ffa2cc8bdefa84aae44abb1c35e8f839ab3db83eabf5251e73a"
+    },
+    {
+      "file": "docs/99_PROJECT_CONTEXT.md",
+      "sha256": "56bcadd46d38d84b5eceab7260bd3ec3b3f571a29287cbb88ed872ebe44c2253"
+    },
+    {
+      "file": "docs/backup-and-restore.md",
+      "sha256": "394b2357f1807a9710b11d386be080b5a78d093643347d93760f2de3de107476"
+    },
+    {
+      "file": "docs/dependency-pins.json",
+      "sha256": "ed69ce8c3d1c8c55b77c8ec6346b66556cc1aa2beca932e739fea84c10722c02"
+    },
+    {
+      "file": "docs/deploy-ec2.md",
+      "sha256": "96c6dfcc9f175ee84b61ea30b451038eb497da62771a5411410da5b4e55b9c54"
+    },
+    {
+      "file": "docs/security-and-contracts.md",
+      "sha256": "03fbc0a6087f93e0b6c62baca40a6187a9431ef73bb2ad507108ac6dc8a60b87"
+    },
+    {
+      "file": "docs/validation-f01-f11.md",
+      "sha256": "7e2db81c5609a7c22b18948b2e0ac6cea8fa4525f83aad8b1490d3cbeb5e6fe0"
+    },
+    {
+      "file": "frontend/.dockerignore",
+      "sha256": "bcaedc37fcbcc8998c635860e5249d00d66a8aaf6baeb8e34ab4048801c1f6da"
+    },
+    {
+      "file": "frontend/.env.example",
+      "sha256": "4766888a8cccda1dc87fffb907131613608c2487661ae3d9b03da27adce8a2e7"
+    },
+    {
+      "file": "frontend/.gitignore",
+      "sha256": "c91750782317a3c86c6f6df55823945d340289d9fec01c6da2ed53de5911c765"
+    },
+    {
+      "file": "frontend/AGENTS.md",
+      "sha256": "63f2c50380ed6303237cce215ce27af1d620d094c215e28d1b1538a3c070e3bb"
+    },
+    {
+      "file": "frontend/CLAUDE.md",
+      "sha256": "336cc4fbf19beaada7ccf9986414fa91851a8d7a07dfb3ccbe800a69eed0ab49"
+    },
+    {
+      "file": "frontend/Dockerfile",
+      "sha256": "cd242d8086a313da9b57f4b2fe7375f710b4f0d671f7b0534057de654affff59"
+    },
+    {
+      "file": "frontend/README.md",
+      "sha256": "fdcb081941d2895ae57a4933f30d54c5190630253bc6ab474db04d1ef75e273f"
+    },
+    {
+      "file": "frontend/e2e/finance.spec.ts",
+      "sha256": "a39bf5d72eef5327e95980dcf1c490260e88cda34c97bbb70e669a1d8be3361e"
+    },
+    {
+      "file": "frontend/eslint.config.mjs",
+      "sha256": "870f1adccecf3051cbcd9fd307cef51d7633cf510979c181a81f4b1797273493"
+    },
+    {
+      "file": "frontend/next.config.ts",
+      "sha256": "496898063c834c666510bdb5bb472bcf08e01ca8eef297da101ad12680c8fc93"
+    },
+    {
+      "file": "frontend/package-lock.json",
+      "sha256": "945d19dbd6696a547b6635287cd8a6e8de4dc3e9ed6179865d526c6e053c19e5"
+    },
+    {
+      "file": "frontend/package.json",
+      "sha256": "ef85531014140aa964c4916b76578f7b8ac351df2455339a2e1843a23f4bd675"
+    },
+    {
+      "file": "frontend/playwright.config.ts",
+      "sha256": "bcf0f9d216a144faeba71c837d0f0b0b29dda0c4506154e8d8a32fa1da5bda44"
+    },
+    {
+      "file": "frontend/public/file.svg",
+      "sha256": "2b67812c325c199a02536cdbeea0c593a72f707d323b72ee3e08dbab06753bd4"
+    },
+    {
+      "file": "frontend/public/globe.svg",
+      "sha256": "b614b9bf183925957661ac851498fe1d8029fd43a62fbfed86f9e2624a57e7cf"
+    },
+    {
+      "file": "frontend/public/modelo-transacoes.csv",
+      "sha256": "9a8c4675ca4ef548d6c17aea29b7be847df4ff4a4e20c9151a46480342178127"
+    },
+    {
+      "file": "frontend/public/next.svg",
+      "sha256": "55995dfad6ecb4945a1e856ddca03c5e16aa5bf13fd21b4df6a74ae79357bcfc"
+    },
+    {
+      "file": "frontend/public/vercel.svg",
+      "sha256": "f081337b2fee635b455b63275406a3e7f39d6a014e25ad90dab5a67e62a12ac4"
+    },
+    {
+      "file": "frontend/public/window.svg",
+      "sha256": "644768c4aaeb4767bce293344eeb0c125fb804a94d801440424072202d85e3a1"
+    },
+    {
+      "file": "frontend/src/app/(protected)/accounts/page.tsx",
+      "sha256": "c2e1547266216cce2f85c519be42032147a02243c8076834f4bc5e13946f0c28"
+    },
+    {
+      "file": "frontend/src/app/(protected)/budgets/page.tsx",
+      "sha256": "aad173b1fa62772e2cf2fa38e61e57408372e15c1c1a62ab9997fba2052aefc7"
+    },
+    {
+      "file": "frontend/src/app/(protected)/categories/page.tsx",
+      "sha256": "cb3bb4fd5bbdbf89ca9bfe9d1784bafd14d7cd94fedd23dec9b32f225300fb8d"
+    },
+    {
+      "file": "frontend/src/app/(protected)/dashboard/dashboard.module.css",
+      "sha256": "8913c93bd830cd8b25bf9acab9a52cc8c0cafbfdff9a625ba1ba01df8d7bb521"
+    },
+    {
+      "file": "frontend/src/app/(protected)/dashboard/page.tsx",
+      "sha256": "87437ed787cabe43ee61d3d70cf8c25124fc739378ac4247502db19fcff3a498"
+    },
+    {
+      "file": "frontend/src/app/(protected)/layout.tsx",
+      "sha256": "2a3643b5c96ab33016b347f8fc3db3f546cb77b88d82ab2776e5fc594c693709"
+    },
+    {
+      "file": "frontend/src/app/(protected)/transactions/import/page.tsx",
+      "sha256": "a8b92d137ae1a1668c59ecc519fce3865600d1faed7ff45a1a12d2334d5b6509"
+    },
+    {
+      "file": "frontend/src/app/(protected)/transactions/page.tsx",
+      "sha256": "e1d137963ec9623e181ccfe01ffc649b0762eabd848f0dea1a12b49c8eb320ba"
+    },
+    {
+      "file": "frontend/src/app/favicon.ico",
+      "sha256": "2b8ad2d33455a8f736fc3a8ebf8f0bdea8848ad4c0db48a2833bd0f9cd775932"
+    },
+    {
+      "file": "frontend/src/app/globals.css",
+      "sha256": "389c4cc280bb6df14c0b0f5973a53f607b428d5e34f19842528188e2f34372e9"
+    },
+    {
+      "file": "frontend/src/app/layout.tsx",
+      "sha256": "6094c8b8a4ec1c8abd5a6bc3a1f3030fa430f9c2089dd4b1893052f907a8f3dd"
+    },
+    {
+      "file": "frontend/src/app/login/page.tsx",
+      "sha256": "030c2cbd61f0a0ee3bbe8e38641ee38aafd9ece48ad7da6b1c5ab05112d2b869"
+    },
+    {
+      "file": "frontend/src/app/page.module.css",
+      "sha256": "e320fe53d7d59282bf0944243d48a6901a04fe7bf33e2931e58581866f4a9e1e"
+    },
+    {
+      "file": "frontend/src/app/page.tsx",
+      "sha256": "39e4147c5649e057b39350d73fd482e8c1b31c50b8da3bd182a519fd441f1785"
+    },
+    {
+      "file": "frontend/src/app/register/page.tsx",
+      "sha256": "1322bab1700a86d01c500aeeae81a1eaed9efde6b77e0521e0501f675605d4a0"
+    },
+    {
+      "file": "frontend/src/components/app-navigation.tsx",
+      "sha256": "2d8dd8178126ada580b354f7317d7eaba4edbbb01b60a1efe5ee5e9559558521"
+    },
+    {
+      "file": "frontend/src/components/dashboard/expenses-by-category-chart.module.css",
+      "sha256": "ac7b6d2bb9c4bd1e18e64d6057275ed4537ce35afc37da6aef041f5a433ddcbf"
+    },
+    {
+      "file": "frontend/src/components/dashboard/expenses-by-category-chart.tsx",
+      "sha256": "49b416bf059404a10f167b729ca1e0c7f0dc5edeb02eb846e7003e0555c569e6"
+    },
+    {
+      "file": "frontend/src/components/date-input.tsx",
+      "sha256": "a1e0f53113c56d9ac20871574ea487bed9ad90a5f0d58c32c0a9b9f8f9a68db5"
+    },
+    {
+      "file": "frontend/src/components/home-session-action.tsx",
+      "sha256": "690e6a607814698537b23e282effd745be9baa7235b0844181a068d3c333a990"
+    },
+    {
+      "file": "frontend/src/components/monthly-summary.tsx",
+      "sha256": "a6adaef905db2db6923940fa75d5c080af9226f273de6943808e2fd75c610b84"
+    },
+    {
+      "file": "frontend/src/components/resource-actions.tsx",
+      "sha256": "0c3b50bd5704139ae6bb6f65a9406b3f44321d3c18168edceaf31aa1f1de054d"
+    },
+    {
+      "file": "frontend/src/components/theme-toggle.tsx",
+      "sha256": "a613559a34a7b60e26f2c3aaf56fae4e56bc29e474c58ad625af41a937a44913"
+    },
+    {
+      "file": "frontend/src/contexts/theme-context.tsx",
+      "sha256": "a6d50cc3070f2ed7220acc5beb5a84b11b058102f4ecda312a470bb86ee47c09"
+    },
+    {
+      "file": "frontend/src/lib/api-error.ts",
+      "sha256": "e32a301ec19f2d77c80955c63310e926ce14ec97251c4c61317ee02420290f6c"
+    },
+    {
+      "file": "frontend/src/lib/api.ts",
+      "sha256": "e3378e9595bf1b529cb8d6728252f77868bd55412adbcbfe65b5cc515a14a11c"
+    },
+    {
+      "file": "frontend/src/lib/dates.ts",
+      "sha256": "285569cc5e5ea1d4a331ca17dabdf9d2f1accc8d63f1d671627a31568592cf5c"
+    },
+    {
+      "file": "frontend/src/lib/formatters.ts",
+      "sha256": "67a8798baff239c0dfd5157445cdb258619977475cdabe3ed84c794ee3f00ccc"
+    },
+    {
+      "file": "frontend/src/lib/money.ts",
+      "sha256": "5a7138a89213bae161681483c26503d9afa6053003ac703c37cae2cce699da00"
+    },
+    {
+      "file": "frontend/src/lib/monthly-summary.ts",
+      "sha256": "6e0b74964f26079391daa36f5bc3308378f06d9f91d79e3b1bfa04eba22e1ace"
+    },
+    {
+      "file": "frontend/src/lib/theme.ts",
+      "sha256": "493f0530d10b9060490eb013ee51db64efda9f6d9ca5e0c874cd818f42d4b7a3"
+    },
+    {
+      "file": "frontend/src/lib/token-storage.ts",
+      "sha256": "ef5595ce806052b616352f01ff1d5079c956ea501930f20f7420c7bce87d52c4"
+    },
+    {
+      "file": "frontend/src/lib/transaction-csv.ts",
+      "sha256": "4cbf1ac67c22290e05c61cc3bca7d5d272e4644a063312b59a4921aa942c4b4c"
+    },
+    {
+      "file": "frontend/src/lib/transaction-list.ts",
+      "sha256": "d71449560f954131b73e7682134de86495f7c9160d21954be130dfbddb1f5c66"
+    },
+    {
+      "file": "frontend/src/services/account-service.ts",
+      "sha256": "ec72ac61c16fe7fa96601969cd71fdc914715cd0cbd85968a59f24b73917e079"
+    },
+    {
+      "file": "frontend/src/services/auth-service.ts",
+      "sha256": "15aa069abb54d260b0dcbeea82fcefea594f43faf82d545698fb3210a0eaea58"
+    },
+    {
+      "file": "frontend/src/services/budget-service.ts",
+      "sha256": "3a6b79839f1937c77006ab3f80eb84daed107af2ddcef761611ec3eabe1e6da7"
+    },
+    {
+      "file": "frontend/src/services/category-service.ts",
+      "sha256": "d9f8a35fdca987e9cbaa0fd2c576635b055cf7efb0bb889fcdc9cf0248037481"
+    },
+    {
+      "file": "frontend/src/services/csv-import-service.ts",
+      "sha256": "1ff408974980a83f31187c1bb301644f9bd02179e6d682542cb37c7b9144d824"
+    },
+    {
+      "file": "frontend/src/services/dashboard-service.ts",
+      "sha256": "ad8f5173cd72bfb77cc1dca159d5eca742df7d856a38f1d50d9cb985438a55d7"
+    },
+    {
+      "file": "frontend/src/services/transaction-service.ts",
+      "sha256": "00d5584a461d711c0b960c49780c215c69803ef931d32f29dd0a05899df9b69c"
+    },
+    {
+      "file": "frontend/src/services/user-service.ts",
+      "sha256": "ced13efeba4415434c0e5e0b06a0e1ba3e06828f0e6a6b73a41bfdc5496a0e4b"
+    },
+    {
+      "file": "frontend/src/styles/tokens.css",
+      "sha256": "a526b146fecbe00d73901d0c4c97446c8072a5db9ea654d48b9f6987c6c0a074"
+    },
+    {
+      "file": "frontend/src/types/account.ts",
+      "sha256": "794329c7db368d0366a03a5fc74bcad6b82e6665c99d2935cd653e2d1212f400"
+    },
+    {
+      "file": "frontend/src/types/api-error.ts",
+      "sha256": "48dbf178a6b8903ffdc00306db5a0dcb83944565f214742e734b236ec5dc98e6"
+    },
+    {
+      "file": "frontend/src/types/auth.ts",
+      "sha256": "4350e61ecee11a2dac61769dfafd5e9b7a4b630a786bb1e4c6d8808ab0186147"
+    },
+    {
+      "file": "frontend/src/types/budget.ts",
+      "sha256": "b0e1614ce0526345a8e6e6752fca5912194260ebe72c290c55b84902d30765d8"
+    },
+    {
+      "file": "frontend/src/types/category.ts",
+      "sha256": "c264aefee61cd809ac909a7a4489e913483de9a24eeedb9fc25267a4a7efa890"
+    },
+    {
+      "file": "frontend/src/types/csv-import.ts",
+      "sha256": "da85b42f5eb65d7ad22697e1135ea9dc5825d8ffb7b20bec4a4f0349e2d9ff91"
+    },
+    {
+      "file": "frontend/src/types/dashboard.ts",
+      "sha256": "7e6aec8e41458082c29f319ad4be980010432e342434c41edde2a34d22c77869"
+    },
+    {
+      "file": "frontend/src/types/transaction.ts",
+      "sha256": "354792c4c206009a659504e4c0fdbec783973ba550c59cb4fdcd4b8bae2ded94"
+    },
+    {
+      "file": "frontend/src/types/user.ts",
+      "sha256": "2fad3d2886db2538de231d4b7e1d907cc0bccf851d7c34230a5500d5d6d96928"
+    },
+    {
+      "file": "frontend/tsconfig.json",
+      "sha256": "46de0ff208b734cfd1273dbfe1d58fb311ce36d2631f7b8829703d7866a5b56f"
+    },
+    {
+      "file": "scripts/backup.py",
+      "sha256": "c3f5ab522dcbdf2d43304fb65173bb34977e16f250e062d5db1cc5d73d454c20"
+    },
+    {
+      "file": "scripts/backup_test.py",
+      "sha256": "44f00d262603628ebe3df9079105c3ef7a651281da4d417dcae43310a49f56aa"
+    },
+    {
+      "file": "scripts/benchmark-csv.mjs",
+      "sha256": "d07f59d203f819e7ac5b60cb62665369d54e85fe965b94f6ac983529d7f79a7f"
+    },
+    {
+      "file": "scripts/benchmark-queries.sql",
+      "sha256": "c8a0b113ddeded12f24f2507ea89a5bb1a9dd8f94eaa76211ac332031f3c29cf"
+    },
+    {
+      "file": "scripts/init-env.mjs",
+      "sha256": "59f4fed9775161ad44b6249eab16c8ce2b4503278ac1efc57827f5583e837cb0"
+    },
+    {
+      "file": "scripts/init-env.test.mjs",
+      "sha256": "84db1972cbc9d3e7442128cf6fd4b041104ceec9384422a0a6e4ce64daf5bd63"
+    },
+    {
+      "file": "scripts/money.test.mjs",
+      "sha256": "937945a73a9a115c98baccb1a765517d074eebfeefd4c35e967adf0f2ff3fc21"
+    },
+    {
+      "file": "scripts/monthly-summary.test.mjs",
+      "sha256": "222e47820aa85bc93b8597729dd61ebceea404d4a36e166bcbcfbbd562037c26"
+    },
+    {
+      "file": "scripts/package-demo.sh",
+      "sha256": "0f72e33c465f56d48647a0f29b289fce428f39cc60b5a2080006c0ba6a67d836"
+    },
+    {
+      "file": "scripts/package-demo.test.mjs",
+      "sha256": "cfe390ffdd4b866c006a7f7d3470a91d02fb8786eed9d6698ee6a4f360607d5a"
+    },
+    {
+      "file": "scripts/report_test.py",
+      "sha256": "55b5d2815cc82023d0fada1ca1aa3b9c5411416280c333ef431244ba98d110b1"
+    },
+    {
+      "file": "scripts/sanitize-reports.py",
+      "sha256": "b45781caede83e2f1e1baeb9080b72ba56d3f6343ba1f38619c315144620fbc3"
+    },
+    {
+      "file": "scripts/smoke-test.mjs",
+      "sha256": "9fc07c20530e9f1dcbc2dc7976d6b7a268f41fc353feb8a924a3ec64fac97089"
+    },
+    {
+      "file": "scripts/theme.test.mjs",
+      "sha256": "fc0eea22eae0f986942d36baa9f60cdfd9ba18ea5d5b81f782079dfa6f97d3af"
+    },
+    {
+      "file": "scripts/transaction-csv.test.mjs",
+      "sha256": "e3f3967302b35e4656b25e5b4014514dd08f3f09d583552845585698ca74170e"
+    }
+  ]
+}

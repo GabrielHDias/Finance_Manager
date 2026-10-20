@@ -12,15 +12,14 @@ Esta configuração destina-se a uma demonstração de baixo tráfego, sem alta 
 No computador de desenvolvimento, na revisão que deseja entregar:
 
 ```bash
-bash scripts/package-demo.sh /tmp/finance-manager-release
+RELEASE_CHECKS_FILE=/caminho/checks-sanitizados.json bash scripts/package-demo.sh /tmp/finance-manager-release
 ```
 
 O script constrói imagens linux/amd64 e compila o frontend com
 `NEXT_PUBLIC_API_URL=/api`. Ele inclui as imagens de PostgreSQL e Caddy para
 que o servidor não precise construir nem baixar imagens. O pacote contém
 manifesto SHA-256, identificador da entrega e configurações, sem `.env` ou
-chaves privadas. A revisão curta é acompanhada do horário UTC da construção;
-confira `git status` antes de empacotar, pois alterações locais são incluídas.
+chaves privadas. O checkout deve estar limpo; alterações rastreadas ou arquivos novos fazem o empacotamento falhar antes do build. O manifesto registra SHA completo, IDs/digests, plataforma e checks da mesma revisão. O arquivo de checks deve conter `revision` (SHA completo), `approved: true` e `commands` (lista sanitizada de comandos aprovados). Não aprove checks de outra revisão.
 Não é necessário publicar imagens em um registry para esta modalidade.
 
 Transfira o conteúdo da pasta do pacote por SCP para uma pasta nova na EC2,
@@ -135,29 +134,13 @@ permanente, use domínio próprio e avalie a necessidade de um IP estável.
 
 ## Backup e recuperação
 
-Antes de atualizar, faça um backup fora do volume do banco:
-
-```bash
-umask 077
-mkdir -p backups
-sudo docker compose --env-file .env.demo -f compose.demo.yml \
-  exec -T --interactive=false db pg_dump -U finance_manager -d finance_manager -Fc \
-  > "backups/finance-manager-$(date -u +%Y%m%d%H%M%S).dump"
-```
-
-Copie o backup e `.env.demo` para um local seguro fora da EC2. Um backup no
-mesmo disco não protege contra a perda da instância. Os dumps contêm dados
-financeiros e devem permanecer privados. Para recuperar, use uma instalação
-separada e um banco vazio, importe com `pg_restore -U finance_manager -d
-finance_manager --exit-on-error` dentro do container PostgreSQL e confira os
-dados antes de substituir a instalação existente. Não restaure sobre o banco
-em uso.
+Siga o [runbook de backup criptografado e restauração separada](backup-and-restore.md). Aprove destino externo, custódia, retenção, RPO/RTO e responsável antes de operação. Dumps plaintext não devem compor o pacote de release.
 
 ## Atualizações e operação
 
 Construa e valide um novo pacote. Faça backup e preserve a entrega anterior.
-Carregue as imagens novas com `docker load`; atualize somente `BACKEND_IMAGE`
-e `FRONTEND_IMAGE` em `.env.demo` conforme o novo `images.env`. Copie as
+Carregue as imagens novas com `docker load`; atualize `BACKEND_IMAGE`, `FRONTEND_IMAGE`, `POSTGRES_IMAGE`
+e `CADDY_IMAGE` em `.env.demo` conforme o novo `images.env`. Copie as
 configurações novas após revisar as diferenças. Reaplique `up -d --wait`.
 Mantenha as credenciais originais do banco. Migrações Flyway executam na partida;
 reverter imagens pode exigir recuperar o backup se o esquema não for compatível.
@@ -172,7 +155,7 @@ sudo docker compose --env-file .env.demo -f compose.demo.yml start
 Não execute `down --volumes` no servidor: ele apaga o banco e os certificados.
 Os testes de `scripts/smoke-test.mjs` criam usuários e registros; execute-os
 somente no ambiente isolado de validação, com `SMOKE_API_URL` terminando em
-`/api`. Na EC2, prefira verificações de leitura e um cadastro manual de teste.
+`/api`. Na EC2, prefira verificações de leitura; alterações e cadastros operacionais exigem autorização própria. Readiness é `/api/health/ready`; liveness é `/api/health/live`.
 
 A EC2, EBS, IPv4 público e eventuais transferências consomem benefícios ou
 créditos conforme as condições da conta. Parar a EC2 reduz o consumo de

@@ -1,5 +1,7 @@
 "use client";
 
+import { sign } from "@/lib/money";
+
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ResourceActions from "@/components/resource-actions";
@@ -10,6 +12,7 @@ import {
   deleteAccount,
   findAllAccounts,
   getAccountBalance,
+  getAccountBalances,
   renameAccount,
 } from "@/services/account-service";
 import type { AccountResponse } from "@/types/account";
@@ -17,7 +20,7 @@ import type { AccountResponse } from "@/types/account";
 export default function AccountsPage() {
   const router = useRouter();
   const [accounts, setAccounts] = useState<AccountResponse[]>([]);
-  const [balances, setBalances] = useState<Record<number, number>>({});
+  const [balances, setBalances] = useState<Record<number, string>>({});
   const [balanceErrors, setBalanceErrors] = useState<Record<number, boolean>>({});
   const [name, setName] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -40,20 +43,14 @@ export default function AccountsPage() {
         if (cancelled) return;
         setAccounts(response);
         setLoading(false);
-        await Promise.all(response.map(async (account) => {
-          try {
-            const balance = await getAccountBalance(account.id);
-            if (cancelled) return;
-            setBalances((current) => ({ ...current, [account.id]: balance.balance }));
-          } catch (error) {
-            if (cancelled) return;
-            if (error instanceof ApiError && error.status === 401) {
-              router.replace("/login");
-              return;
-            }
-            setBalanceErrors((current) => ({ ...current, [account.id]: true }));
-          }
-        }));
+        try {
+          const values = await getAccountBalances();
+          if (!cancelled) setBalances(Object.fromEntries(values.map(item => [item.accountId, item.balance])));
+        } catch (error) {
+          if (cancelled) return;
+          if (error instanceof ApiError && error.status === 401) { router.replace("/login"); return; }
+          setBalanceErrors(Object.fromEntries(response.map(item => [item.id, true])));
+        }
       } catch (error) {
         if (cancelled) return;
         setListLoadFailed(true);
@@ -231,7 +228,7 @@ export default function AccountsPage() {
                         </button>
                       </>
                     ) : balances[item.id] !== undefined ? (
-                      <strong className={`account-balance${balances[item.id] > 0 ? " financial-value--income" : balances[item.id] < 0 ? " financial-value--expense" : ""}`}>{formatCurrency(balances[item.id])}</strong>
+                      <strong className={`account-balance${sign(balances[item.id]) > 0 ? " financial-value--income" : sign(balances[item.id]) < 0 ? " financial-value--expense" : ""}`}>{formatCurrency(balances[item.id])}</strong>
                     ) : <span>Carregando saldo...</span>}
                   </div>
                 </div>

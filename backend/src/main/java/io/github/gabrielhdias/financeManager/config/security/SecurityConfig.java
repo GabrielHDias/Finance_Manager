@@ -35,10 +35,17 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(
-        HttpSecurity http
+        HttpSecurity http,
+        tools.jackson.databind.ObjectMapper mapper,
+        @Value("${app.auth-rate-limit.login:60}") int loginLimit,
+        @Value("${app.auth-rate-limit.registration:20}") int registrationLimit,
+        @Value("${app.auth-rate-limit.window-seconds:600}") long windowSeconds,
+        @Value("${app.auth-rate-limit.capacity:10000}") int capacity
     ) throws Exception {
 
         http
+            .addFilterBefore(new AuthRateLimitFilter(mapper, java.time.Clock.systemUTC(), loginLimit,
+                registrationLimit, windowSeconds, capacity), org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
             .csrf(AbstractHttpConfigurer::disable)
 
             .cors(Customizer.withDefaults())
@@ -63,6 +70,8 @@ public class SecurityConfig {
                         "/auth/login"
                     )
                     .permitAll()
+
+                    .requestMatchers(HttpMethod.GET, "/health/live", "/health/ready").permitAll()
 
                     .requestMatchers(
                         "/v3/api-docs/**",

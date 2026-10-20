@@ -1,0 +1,30 @@
+{
+  "revision": "4f5d781e116091d42fb14d6392ec700452634191+working-tree",
+  "results": [
+    {
+      "test": "light 390: cadastro, login, CRUD, CSV, teclado e contraste",
+      "status": "passed",
+      "duration_ms": 4000
+    },
+    {
+      "test": "light 1280: cadastro, login, CRUD, CSV, teclado e contraste",
+      "status": "passed",
+      "duration_ms": 3500
+    },
+    {
+      "test": "dark 390: cadastro, login, CRUD, CSV, teclado e contraste",
+      "status": "passed",
+      "duration_ms": 3343
+    },
+    {
+      "test": "dark 1280: cadastro, login, CRUD, CSV, teclado e contraste",
+      "status": "passed",
+      "duration_ms": 3284
+    },
+    {
+      "test": "landing ignora token expirado e 401 limpa a sess\u00e3o",
+      "status": "passed",
+      "duration_ms": 247
+    }
+  ]
+}

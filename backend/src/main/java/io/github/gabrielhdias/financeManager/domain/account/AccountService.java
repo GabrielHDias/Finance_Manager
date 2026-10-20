@@ -88,6 +88,11 @@ public class AccountService {
         );
     }
 
+    @Transactional(readOnly = true)
+    public List<io.github.gabrielhdias.financeManager.api.account.dto.AccountBalanceResponse> balances(Long userId) {
+        return transactionRepository.balancesByUser(userId, TransactionType.INCOME);
+    }
+
     @Transactional
     public Account rename(
         Long userId,

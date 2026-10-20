@@ -1,0 +1,8 @@
+{
+  "encryption": "age v1.3.2",
+  "integrity": "SHA-256 verified after copy",
+  "restore": "pg_restore single transaction into empty disposable DB",
+  "validation": "entity counts, monetary sum and successful Flyway migration count match source",
+  "duration_seconds": 0.886,
+  "external_copy": "local directory simulation only; no external destination authorized or verified"
+}

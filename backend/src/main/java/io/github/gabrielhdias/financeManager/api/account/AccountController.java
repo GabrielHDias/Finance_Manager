@@ -81,6 +81,11 @@ public class AccountController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/balances")
+    public List<AccountBalanceResponse> balances() {
+        return accountService.balances(authenticatedUser.getId());
+    }
+
     @GetMapping("/{id}")
     @Operation(
         summary = "Buscar conta",

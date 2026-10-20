@@ -1,0 +1,1067 @@
+{
+  "revision": "4f5d781e116091d42fb14d6392ec700452634191+working-tree",
+  "results": [
+    {
+      "suite": "io.github.gabrielhdias.financeManager.FinanceManagerApplicationTests",
+      "test": "contextLoads",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.account.AccountControllerMvcTest",
+      "test": "shouldCreateAccountWhenAuthenticated",
+      "status": "passed",
+      "duration_seconds": 0.054
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.account.AccountControllerMvcTest",
+      "test": "shouldReturnUnauthorizedWhenRequestHasNoToken",
+      "status": "passed",
+      "duration_seconds": 0.005
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.account.AccountControllerMvcTest",
+      "test": "shouldReturnBadRequestWhenAccountNameIsBlank",
+      "status": "passed",
+      "duration_seconds": 0.008
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.account.AccountControllerMvcTest",
+      "test": "shouldReturnAccountBalanceWhenAuthenticated",
+      "status": "passed",
+      "duration_seconds": 0.011
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.account.AccountControllerTest",
+      "test": "shouldReturnAccountBalance",
+      "status": "passed",
+      "duration_seconds": 0.002
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.account.AccountControllerTest",
+      "test": "shouldRenameAccount",
+      "status": "passed",
+      "duration_seconds": 0.002
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.account.AccountControllerTest",
+      "test": "shouldCreateAccount",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.account.AccountControllerTest",
+      "test": "shouldListAccounts",
+      "status": "passed",
+      "duration_seconds": 0.002
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.account.AccountControllerTest",
+      "test": "shouldFindAccountById",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.account.AccountControllerTest",
+      "test": "shouldDeleteAccount",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.auth.AuthControllerMvcTest",
+      "test": "shouldReturnUnauthorizedWhenCredentialsAreInvalid",
+      "status": "passed",
+      "duration_seconds": 0.044
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.auth.AuthControllerMvcTest",
+      "test": "shouldLoginWithoutAuthentication",
+      "status": "passed",
+      "duration_seconds": 0.005
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.auth.AuthControllerMvcTest",
+      "test": "shouldReturnBadRequestWhenLoginRequestIsInvalid",
+      "status": "passed",
+      "duration_seconds": 0.009
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.auth.AuthControllerTest",
+      "test": "shouldLogin",
+      "status": "passed",
+      "duration_seconds": 0.002
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.budget.BudgetControllerMvcTest",
+      "test": "shouldRejectInvalidLimitAndPeriodBeforeWriting",
+      "status": "passed",
+      "duration_seconds": 0.027
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.budget.BudgetControllerMvcTest",
+      "test": "shouldProtectAllOperations",
+      "status": "passed",
+      "duration_seconds": 0.006
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.budget.BudgetControllerMvcTest",
+      "test": "shouldPassAuthenticatedOwnerAndPeriod",
+      "status": "passed",
+      "duration_seconds": 0.014
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.category.CategoryControllerMvcTest",
+      "test": "shouldReturnUnauthorizedWhenRequestHasNoToken",
+      "status": "passed",
+      "duration_seconds": 0.005
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.category.CategoryControllerMvcTest",
+      "test": "shouldCreateCategoryWhenAuthenticated",
+      "status": "passed",
+      "duration_seconds": 0.01
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.category.CategoryControllerMvcTest",
+      "test": "shouldReturnBadRequestWhenCategoryNameIsBlank",
+      "status": "passed",
+      "duration_seconds": 0.006
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.category.CategoryControllerTest",
+      "test": "shouldListCategories",
+      "status": "passed",
+      "duration_seconds": 0.089
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.category.CategoryControllerTest",
+      "test": "shouldRenameCategory",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.category.CategoryControllerTest",
+      "test": "shouldCreateCategory",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.category.CategoryControllerTest",
+      "test": "shouldDeleteCategory",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.category.CategoryControllerTest",
+      "test": "shouldFindCategoryById",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.dashboard.DashboardControllerMvcTest",
+      "test": "shouldReturnSummaryWithPeriod",
+      "status": "passed",
+      "duration_seconds": 0.009
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.dashboard.DashboardControllerMvcTest",
+      "test": "shouldReturnConflictWhenPeriodIsInvalid",
+      "status": "passed",
+      "duration_seconds": 0.008
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.dashboard.DashboardControllerMvcTest",
+      "test": "shouldReturnConflictWhenExpenseCategoryPeriodIsInvalid",
+      "status": "passed",
+      "duration_seconds": 0.006
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.dashboard.DashboardControllerMvcTest",
+      "test": "shouldReturnUnauthorizedWhenRequestHasNoToken",
+      "status": "passed",
+      "duration_seconds": 0.004
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.dashboard.DashboardControllerMvcTest",
+      "test": "shouldReturnSummaryWhenAuthenticated",
+      "status": "passed",
+      "duration_seconds": 0.005
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.dashboard.DashboardControllerMvcTest",
+      "test": "shouldReturnExpensesByCategoryWhenAuthenticated",
+      "status": "passed",
+      "duration_seconds": 0.006
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.dashboard.DashboardControllerMvcTest",
+      "test": "shouldReturnExpensesByCategoryWithPeriod",
+      "status": "passed",
+      "duration_seconds": 0.011
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.dashboard.DashboardControllerTest",
+      "test": "shouldReturnFinancialSummary",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.dashboard.DashboardControllerTest",
+      "test": "shouldReturnExpensesByCategory",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.error.ContractErrorTest",
+      "test": "databaseConstraintsAreMappedSpecificallyWithoutPrivateDetails",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.error.UniquenessRaceIntegrationTest",
+      "test": "simultaneousRenamesReturn200And409",
+      "status": "passed",
+      "duration_seconds": 0.053
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.error.UniquenessRaceIntegrationTest",
+      "test": "simultaneousRegistrationsReturn201And409",
+      "status": "passed",
+      "duration_seconds": 0.079
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.health.HealthControllerTest",
+      "test": "readinessFailsAndRecoversWithoutAffectingLiveness",
+      "status": "passed",
+      "duration_seconds": 0.112
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.transaction.MoneyContractIntegrationTest",
+      "test": "maximumAndHighTotalsRoundTripWithoutRounding",
+      "status": "passed",
+      "duration_seconds": 0.068
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.transaction.MoneyContractIntegrationTest",
+      "test": "openApiAdvertisesTheActualDecimalStringContract",
+      "status": "passed",
+      "duration_seconds": 0.287
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.transaction.TransactionControllerMvcTest",
+      "test": "shouldReturnConflictWhenPeriodIsInvalid",
+      "status": "passed",
+      "duration_seconds": 0.016
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.transaction.TransactionControllerMvcTest",
+      "test": "shouldReturnUnauthorizedWhenRequestHasNoToken",
+      "status": "passed",
+      "duration_seconds": 0.004
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.transaction.TransactionControllerMvcTest",
+      "test": "shouldRejectMalformedBodiesParametersAndAmountsWithConsistentJson",
+      "status": "passed",
+      "duration_seconds": 0.024
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.transaction.TransactionControllerMvcTest",
+      "test": "shouldRejectAmountsOutsideTheSupportedRangeSpecifically",
+      "status": "passed",
+      "duration_seconds": 0.012
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.transaction.TransactionControllerMvcTest",
+      "test": "shouldProtectPaginatedEndpoint",
+      "status": "passed",
+      "duration_seconds": 0.003
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.transaction.TransactionControllerMvcTest",
+      "test": "shouldListTransactionsWithFilters",
+      "status": "passed",
+      "duration_seconds": 0.006
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.transaction.TransactionControllerMvcTest",
+      "test": "shouldListTransactionsWithoutFilters",
+      "status": "passed",
+      "duration_seconds": 0.005
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.transaction.TransactionControllerMvcTest",
+      "test": "shouldReturnBadRequestForInvalidPageSize",
+      "status": "passed",
+      "duration_seconds": 0.007
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.transaction.TransactionControllerMvcTest",
+      "test": "shouldCreateTransactionWhenAuthenticated",
+      "status": "passed",
+      "duration_seconds": 0.007
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.transaction.TransactionControllerMvcTest",
+      "test": "shouldReturnBadRequestWhenTransactionDataIsInvalid",
+      "status": "passed",
+      "duration_seconds": 0.004
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.transaction.TransactionControllerMvcTest",
+      "test": "shouldReturnPageWithStableMetadataAndFilters",
+      "status": "passed",
+      "duration_seconds": 0.006
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.transaction.TransactionControllerTest",
+      "test": "shouldFindTransactionById",
+      "status": "passed",
+      "duration_seconds": 0.084
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.transaction.TransactionControllerTest",
+      "test": "shouldListTransactionsWithFilters",
+      "status": "passed",
+      "duration_seconds": 0.002
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.transaction.TransactionControllerTest",
+      "test": "shouldUpdateTransaction",
+      "status": "passed",
+      "duration_seconds": 0.002
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.transaction.TransactionControllerTest",
+      "test": "shouldListTransactionsWithoutFilters",
+      "status": "passed",
+      "duration_seconds": 0.003
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.transaction.TransactionControllerTest",
+      "test": "shouldDeleteTransaction",
+      "status": "passed",
+      "duration_seconds": 0.002
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.api.transaction.TransactionControllerTest",
+      "test": "shouldCreateTransaction",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.config.security.ApiAccessDeniedHandlerTest",
+      "test": "shouldReturnStandardApiErrorWhenAccessIsDenied",
+      "status": "passed",
+      "duration_seconds": 0.002
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.config.security.AuthRateLimitFilterTest",
+      "test": "boundedWindowsIgnoreForwardedHeadersAndRecover",
+      "status": "passed",
+      "duration_seconds": 0.036
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.config.security.JwtRealMvcTest",
+      "test": "invalidSubjectsAndExpirationReturnStandard401",
+      "status": "passed",
+      "duration_seconds": 0.027
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.config.security.JwtRealMvcTest",
+      "test": "missingMandatoryClaimsAreRejected",
+      "status": "passed",
+      "duration_seconds": 0.005
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.config.security.JwtRealMvcTest",
+      "test": "validTokenPassesRealFilterAndDecoder",
+      "status": "passed",
+      "duration_seconds": 0.01
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.config.security.JwtRealMvcTest",
+      "test": "wrongSignatureAndAlgorithmAreRejected",
+      "status": "passed",
+      "duration_seconds": 0.008
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.config.security.SecurityCorsMvcTest",
+      "test": "shouldRejectNonConfiguredOrigin",
+      "status": "passed",
+      "duration_seconds": 0.005
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.config.security.SecurityCorsMvcTest",
+      "test": "shouldAllowConfiguredOrigin",
+      "status": "passed",
+      "duration_seconds": 0.004
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.config.security.SecurityErrorResponseMvcTest",
+      "test": "shouldReturnStandardApiErrorWhenAuthenticationIsMissing",
+      "status": "passed",
+      "duration_seconds": 0.012
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.account.AccountServiceTest",
+      "test": "shouldNotDeleteAccountWithTransactions",
+      "status": "passed",
+      "duration_seconds": 0.103
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.account.AccountServiceTest",
+      "test": "shouldCalculateAccountBalance",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.account.AccountServiceTest",
+      "test": "shouldRenameAccount",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.account.AccountServiceTest",
+      "test": "shouldListAccountsByUser",
+      "status": "passed",
+      "duration_seconds": 0.002
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.account.AccountServiceTest",
+      "test": "shouldNotCalculateBalanceWhenAccountDoesNotBelongToUser",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.account.AccountServiceTest",
+      "test": "shouldFindAccountByIdAndUser",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.account.AccountServiceTest",
+      "test": "shouldCreateAccountWhenNameIsAvailable",
+      "status": "passed",
+      "duration_seconds": 0.002
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.account.AccountServiceTest",
+      "test": "shouldNotFindAccountWhenAccountDoesNotExistForUser",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.account.AccountServiceTest",
+      "test": "shouldDeleteAccountWithoutTransactions",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.account.AccountServiceTest",
+      "test": "shouldNotRenameAccountWhenNameAlreadyExists",
+      "status": "passed",
+      "duration_seconds": 0.002
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.account.AccountServiceTest",
+      "test": "shouldNotCreateAccountWhenNameAlreadyExists",
+      "status": "passed",
+      "duration_seconds": 0.002
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.account.AccountServiceTest",
+      "test": "shouldNotCreateAccountWhenUserDoesNotExist",
+      "status": "passed",
+      "duration_seconds": 0.002
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.auth.AuthServiceTest",
+      "test": "shouldThrowInvalidCredentialsWhenPasswordIsIncorrect",
+      "status": "passed",
+      "duration_seconds": 0.737
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.auth.AuthServiceTest",
+      "test": "shouldNormalizeEmailBeforeLogin",
+      "status": "passed",
+      "duration_seconds": 0.045
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.auth.AuthServiceTest",
+      "test": "shouldThrowInvalidCredentialsWhenUserDoesNotExist",
+      "status": "passed",
+      "duration_seconds": 0.004
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.auth.AuthServiceTest",
+      "test": "shouldLoginWhenCredentialsAreValid",
+      "status": "passed",
+      "duration_seconds": 0.004
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.budget.BudgetIntegrationTest",
+      "test": "shouldRejectForeignCategoriesAndBudgetDeletion",
+      "status": "passed",
+      "duration_seconds": 0.198
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.budget.BudgetIntegrationTest",
+      "test": "shouldValidatePeriodAndLimit",
+      "status": "passed",
+      "duration_seconds": 0.007
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.budget.BudgetIntegrationTest",
+      "test": "shouldKeepMonthlyLimitsIndependentAndIncludeAllOwnedAccounts",
+      "status": "passed",
+      "duration_seconds": 0.065
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.budget.BudgetIntegrationTest",
+      "test": "shouldProtectCategoryUntilItsBudgetsAreRemoved",
+      "status": "passed",
+      "duration_seconds": 0.055
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.budget.BudgetIntegrationTest",
+      "test": "shouldCountOnlyOwnedMonthlyExpensesAndUpdateWithoutDuplicates",
+      "status": "passed",
+      "duration_seconds": 0.077
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.budget.BudgetIntegrationTest",
+      "test": "shouldDeleteBudgetWithoutDeletingTransactionsAndReflectEditedExpenses",
+      "status": "passed",
+      "duration_seconds": 0.054
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.budget.BudgetIntegrationTest",
+      "test": "shouldIncludeLeapDayWithoutIncludingMarch",
+      "status": "passed",
+      "duration_seconds": 0.029
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.category.CategoryServiceTest",
+      "test": "shouldNotDeleteCategoryWithTransactions",
+      "status": "passed",
+      "duration_seconds": 0.094
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.category.CategoryServiceTest",
+      "test": "shouldRenameCategory",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.category.CategoryServiceTest",
+      "test": "shouldNotCreateCategoryWhenUserDoesNotExist",
+      "status": "passed",
+      "duration_seconds": 0.002
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.category.CategoryServiceTest",
+      "test": "shouldNotRenameCategoryWhenNameAlreadyExists",
+      "status": "passed",
+      "duration_seconds": 0.002
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.category.CategoryServiceTest",
+      "test": "shouldNotFindCategoryWhenCategoryDoesNotExistForUser",
+      "status": "passed",
+      "duration_seconds": 0.002
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.category.CategoryServiceTest",
+      "test": "shouldFindCategoryByIdAndUser",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.category.CategoryServiceTest",
+      "test": "shouldListCategoriesByUser",
+      "status": "passed",
+      "duration_seconds": 0.002
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.category.CategoryServiceTest",
+      "test": "shouldNotCreateCategoryWhenNameAlreadyExists",
+      "status": "passed",
+      "duration_seconds": 0.002
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.category.CategoryServiceTest",
+      "test": "shouldCreateCategoryWhenNameIsAvailable",
+      "status": "passed",
+      "duration_seconds": 0.002
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.category.CategoryServiceTest",
+      "test": "shouldDeleteCategoryWithoutTransactions",
+      "status": "passed",
+      "duration_seconds": 0.002
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.dashboard.DashboardServiceTest",
+      "test": "shouldReturnZeroSummaryWhenUserHasNoTransactions",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.dashboard.DashboardServiceTest",
+      "test": "shouldReturnExpensesGroupedByCategory",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.dashboard.DashboardServiceTest",
+      "test": "shouldNotGetExpensesByCategoryWhenPeriodIsInvalid",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.dashboard.DashboardServiceTest",
+      "test": "shouldCalculateFinancialSummary",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.dashboard.DashboardServiceTest",
+      "test": "shouldNotCalculateSummaryWhenStartDateIsAfterEndDate",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionRepositoryTest",
+      "test": "shouldSumDecimalExpensesOnInclusivePeriodBoundaries",
+      "status": "passed",
+      "duration_seconds": 0.017
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionRepositoryTest",
+      "test": "shouldGroupExpensesByCategoryWithinPeriod",
+      "status": "passed",
+      "duration_seconds": 0.018
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionRepositoryTest",
+      "test": "shouldSumIncomeByUserAndPeriod",
+      "status": "passed",
+      "duration_seconds": 0.02
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionRepositoryTest",
+      "test": "shouldOnlyGroupExpensesFromRequestedUser",
+      "status": "passed",
+      "duration_seconds": 0.016
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionRepositoryTest",
+      "test": "shouldCalculateBalanceFromIncomeAndExpenses",
+      "status": "passed",
+      "duration_seconds": 0.016
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionRepositoryTest",
+      "test": "shouldReturnZeroWhenUserHasNoTransactionsOfRequestedType",
+      "status": "passed",
+      "duration_seconds": 0.009
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionRepositoryTest",
+      "test": "shouldFilterTransactionsByType",
+      "status": "passed",
+      "duration_seconds": 0.016
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionRepositoryTest",
+      "test": "shouldReturnZeroWhenAccountHasNoTransactions",
+      "status": "passed",
+      "duration_seconds": 0.008
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionRepositoryTest",
+      "test": "shouldFilterTransactionsByAccount",
+      "status": "passed",
+      "duration_seconds": 0.011
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionRepositoryTest",
+      "test": "shouldFilterTransactionsByCategory",
+      "status": "passed",
+      "duration_seconds": 0.013
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionRepositoryTest",
+      "test": "shouldOnlyReturnTransactionsFromRequestedUser",
+      "status": "passed",
+      "duration_seconds": 0.018
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionRepositoryTest",
+      "test": "shouldGroupExpensesByCategoryAndOrderByHighestAmount",
+      "status": "passed",
+      "duration_seconds": 0.016
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionRepositoryTest",
+      "test": "shouldReturnEmptyPageBeyondLastAndKeepCorrectTotal",
+      "status": "passed",
+      "duration_seconds": 0.017
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionRepositoryTest",
+      "test": "shouldReturnNoCategoriesWhenPeriodHasNoExpenses",
+      "status": "passed",
+      "duration_seconds": 0.01
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionRepositoryTest",
+      "test": "shouldFilterTransactionsByPeriod",
+      "status": "passed",
+      "duration_seconds": 0.015
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionRepositoryTest",
+      "test": "shouldIgnoreIncomeWhenGroupingExpensesByCategory",
+      "status": "passed",
+      "duration_seconds": 0.01
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionRepositoryTest",
+      "test": "batchedBalancesIncludeEmptyAccountsAndIsolateOwnersAtMaximumPrecision",
+      "status": "passed",
+      "duration_seconds": 0.017
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionRepositoryTest",
+      "test": "shouldPageFilteredRowsAndCountsWithoutLeakingOtherUsers",
+      "status": "passed",
+      "duration_seconds": 0.031
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionRepositoryTest",
+      "test": "shouldSumExpensesByUserWithoutPeriod",
+      "status": "passed",
+      "duration_seconds": 0.012
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionServiceTest",
+      "test": "shouldNotFilterTransactionsWhenStartDateIsAfterEndDate",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionServiceTest",
+      "test": "shouldFilterTransactionsWhenAllOptionalFiltersAreNull",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionServiceTest",
+      "test": "shouldCreateTransactionWhenAccountAndCategoryBelongToUser",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionServiceTest",
+      "test": "shouldNotCreateTransactionWhenCategoryDoesNotBelongToUser",
+      "status": "passed",
+      "duration_seconds": 0.002
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionServiceTest",
+      "test": "shouldRefuseOversizedExportWithoutReturningTruncatedData",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionServiceTest",
+      "test": "shouldFindTransactionByIdAndUser",
+      "status": "passed",
+      "duration_seconds": 0.002
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionServiceTest",
+      "test": "shouldDeleteTransactionWhenItBelongsToUser",
+      "status": "passed",
+      "duration_seconds": 0.002
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionServiceTest",
+      "test": "shouldNotFindTransactionWhenTransactionDoesNotBelongToUser",
+      "status": "passed",
+      "duration_seconds": 0.002
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionServiceTest",
+      "test": "shouldValidatePeriodForPagination",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionServiceTest",
+      "test": "shouldUpdateTransaction",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionServiceTest",
+      "test": "shouldFilterTransactionsByUser",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionServiceTest",
+      "test": "shouldRejectInvalidPaginationBeforeQuerying",
+      "status": "passed",
+      "duration_seconds": 0.0
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionServiceTest",
+      "test": "shouldNotCreateTransactionWhenAccountDoesNotBelongToUser",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionServiceTest",
+      "test": "shouldNotDeleteTransactionWhenItDoesNotBelongToUser",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionServiceTest",
+      "test": "shouldNotUpdateTransactionWhenNewCategoryDoesNotBelongToUser",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionServiceTest",
+      "test": "shouldListTransactionsByUser",
+      "status": "passed",
+      "duration_seconds": 0.0
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.TransactionServiceTest",
+      "test": "shouldNotUpdateTransactionWhenNewAccountDoesNotBelongToUser",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.csv.TransactionCsvImportIntegrationTest",
+      "test": "previewDoesNotWriteAndRepeatedConfirmationsAreIdempotent",
+      "status": "passed",
+      "duration_seconds": 0.101
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.csv.TransactionCsvImportIntegrationTest",
+      "test": "matchesManuallyCreatedTransactionsAndRechecksAfterPreview",
+      "status": "passed",
+      "duration_seconds": 0.05
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.csv.TransactionCsvImportIntegrationTest",
+      "test": "invalidRowsOrChangedFileCannotProducePartialImports",
+      "status": "passed",
+      "duration_seconds": 0.042
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.csv.TransactionCsvImportIntegrationTest",
+      "test": "acceptsMultipartAndRequiresAuthenticationAndRequiredParts",
+      "status": "passed",
+      "duration_seconds": 0.135
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.csv.TransactionCsvImportIntegrationTest",
+      "test": "resourcesAndHashesAreScopedToTheirOwnerAndSelection",
+      "status": "passed",
+      "duration_seconds": 0.054
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.csv.TransactionCsvImportIntegrationTest",
+      "test": "concurrentConfirmationsDoNotDuplicateRows",
+      "status": "passed",
+      "duration_seconds": 0.035
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.csv.TransactionCsvParserTest",
+      "test": "readsCommaSeparatedReorderedCaseInsensitiveHeaders",
+      "status": "passed",
+      "duration_seconds": 0.011
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.csv.TransactionCsvParserTest",
+      "test": "collectsAllErrorsWithoutDiscardingValidRows",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.csv.TransactionCsvParserTest",
+      "test": "readsBomQuotedFieldsBrazilianValuesAndPhysicalLineNumbers",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.csv.TransactionCsvParserTest",
+      "test": "rejectsEmptyMalformedOrIncompatibleFiles(String)[1]",
+      "status": "passed",
+      "duration_seconds": 0.003
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.csv.TransactionCsvParserTest",
+      "test": "rejectsEmptyMalformedOrIncompatibleFiles(String)[2]",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.csv.TransactionCsvParserTest",
+      "test": "rejectsEmptyMalformedOrIncompatibleFiles(String)[3]",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.csv.TransactionCsvParserTest",
+      "test": "rejectsEmptyMalformedOrIncompatibleFiles(String)[4]",
+      "status": "passed",
+      "duration_seconds": 0.0
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.csv.TransactionCsvParserTest",
+      "test": "rejectsEmptyMalformedOrIncompatibleFiles(String)[5]",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.csv.TransactionCsvParserTest",
+      "test": "rejectsInvalidEncodingAndOversizedFiles",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.csv.TransactionCsvParserTest",
+      "test": "rejectsAmbiguousOrInvalidAmounts(String)[1]",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.csv.TransactionCsvParserTest",
+      "test": "rejectsAmbiguousOrInvalidAmounts(String)[2]",
+      "status": "passed",
+      "duration_seconds": 0.0
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.csv.TransactionCsvParserTest",
+      "test": "rejectsAmbiguousOrInvalidAmounts(String)[3]",
+      "status": "passed",
+      "duration_seconds": 0.0
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.csv.TransactionCsvParserTest",
+      "test": "rejectsAmbiguousOrInvalidAmounts(String)[4]",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.csv.TransactionCsvParserTest",
+      "test": "rejectsAmbiguousOrInvalidAmounts(String)[5]",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.csv.TransactionCsvParserTest",
+      "test": "rejectsAmbiguousOrInvalidAmounts(String)[6]",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.csv.TransactionCsvParserTest",
+      "test": "rejectsAmbiguousOrInvalidAmounts(String)[7]",
+      "status": "passed",
+      "duration_seconds": 0.002
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.transaction.csv.TransactionCsvParserTest",
+      "test": "acceptsOneThousandRowsButRejectsAnExtraRow",
+      "status": "passed",
+      "duration_seconds": 0.041
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.user.UserServiceTest",
+      "test": "shouldRejectPasswordsExceedingBcryptByteLimit",
+      "status": "passed",
+      "duration_seconds": 0.003
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.user.UserServiceTest",
+      "test": "shouldRegisterUserWithEncodedPassword",
+      "status": "passed",
+      "duration_seconds": 0.003
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.user.UserServiceTest",
+      "test": "shouldNotRegisterUserWhenPasswordIsBlank",
+      "status": "passed",
+      "duration_seconds": 0.002
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.user.UserServiceTest",
+      "test": "shouldFindUserByEmail",
+      "status": "passed",
+      "duration_seconds": 0.002
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.user.UserServiceTest",
+      "test": "shouldThrowExceptionWhenUserIsNotFoundByEmail",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.user.UserServiceTest",
+      "test": "shouldAcceptPasswordsAtBcryptByteLimitWithoutTruncation",
+      "status": "passed",
+      "duration_seconds": 0.336
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.user.UserServiceTest",
+      "test": "shouldNormalizeEmailWhenRegisteringUser",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.user.UserServiceTest",
+      "test": "shouldNormalizeEmailWhenFindingUser",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.domain.user.UserServiceTest",
+      "test": "shouldNotRegisterUserWhenEmailAlreadyExists",
+      "status": "passed",
+      "duration_seconds": 0.002
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.security.AuthenticatedUserTest",
+      "test": "shouldThrowExceptionWhenThereIsNoAuthentication",
+      "status": "passed",
+      "duration_seconds": 0.002
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.security.AuthenticatedUserTest",
+      "test": "shouldThrowExceptionWhenPrincipalIsNotJwt",
+      "status": "passed",
+      "duration_seconds": 0.001
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.security.AuthenticatedUserTest",
+      "test": "shouldReturnAuthenticatedUserIdFromJwtSubject",
+      "status": "passed",
+      "duration_seconds": 0.0
+    },
+    {
+      "suite": "io.github.gabrielhdias.financeManager.security.AuthenticatedUserTest",
+      "test": "shouldThrowExceptionWhenAuthenticationIsNotAuthenticated",
+      "status": "passed",
+      "duration_seconds": 0.0
+    }
+  ]
+}

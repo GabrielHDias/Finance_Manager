@@ -66,6 +66,28 @@ public interface TransactionRepository
         @Param("categoryId") Long categoryId
     );
 
+    @Query("""
+            SELECT t
+            FROM Transaction t
+            JOIN FETCH t.account
+            JOIN FETCH t.category
+            WHERE t.account.user.id = :userId
+              AND t.date >= COALESCE(:startDate, t.date)
+              AND t.date <= COALESCE(:endDate, t.date)
+              AND t.type = COALESCE(:type, t.type)
+              AND t.account.id = COALESCE(:accountId, t.account.id)
+              AND t.category.id = COALESCE(:categoryId, t.category.id)
+            ORDER BY t.date DESC, t.id DESC
+            """)
+    List<Transaction> findLimitedByFilters(
+        @Param("userId") Long userId,
+        @Param("startDate") LocalDate startDate,
+        @Param("endDate") LocalDate endDate,
+        @Param("type") TransactionType type,
+        @Param("accountId") Long accountId,
+        @Param("categoryId") Long categoryId, Pageable pageable
+    );
+
     @Query(value = """
             SELECT t FROM Transaction t
             JOIN FETCH t.account
@@ -150,4 +172,12 @@ public interface TransactionRepository
         @Param("accountId") Long accountId,
         @Param("incomeType") TransactionType incomeType
     );
+    @Query("""
+        SELECT new io.github.gabrielhdias.financeManager.api.account.dto.AccountBalanceResponse(
+            a.id, COALESCE(SUM(CASE WHEN t.type = :incomeType THEN t.amount ELSE -t.amount END), 0))
+        FROM Account a LEFT JOIN Transaction t ON t.account = a
+        WHERE a.user.id = :userId GROUP BY a.id ORDER BY a.id
+        """)
+    List<io.github.gabrielhdias.financeManager.api.account.dto.AccountBalanceResponse> balancesByUser(
+        @Param("userId") Long userId, @Param("incomeType") TransactionType incomeType);
 }

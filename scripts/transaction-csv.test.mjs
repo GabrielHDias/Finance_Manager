@@ -9,7 +9,7 @@ import ts from '../frontend/node_modules/typescript/lib/typescript.js';
 // Run the actual TypeScript serializer with the existing compiler, without a test dependency.
 const temp = mkdtempSync(join(tmpdir(), 'finance-csv-test-'));
 after(() => rmSync(temp, { recursive: true, force: true }));
-for (const name of ['dates', 'transaction-csv']) {
+for (const name of ['money', 'dates', 'transaction-csv']) {
   const source = readFileSync(new URL(`../frontend/src/lib/${name}.ts`, import.meta.url), 'utf8');
   const { outputText } = ts.transpileModule(source, {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2021 },
@@ -18,13 +18,13 @@ for (const name of ['dates', 'transaction-csv']) {
 }
 const { serializeTransactionCsv } = createRequire(import.meta.url)(join(temp, 'transaction-csv.js'));
 const row = {
-  id: 1, date: '2026-10-19', description: 'Salário', amount: 1234.5, type: 'INCOME',
+  id: 1, date: '2026-10-19', description: 'Salário', amount: "1234.50", type: 'INCOME',
   accountId: 1, accountName: 'Conta principal', categoryId: 1, categoryName: 'Trabalho',
 };
 
 test('exports Brazilian dates, decimals, types, names and UTF-8 BOM with CRLF', () => {
   assert.equal(serializeTransactionCsv([row]), '\uFEFFdata;descricao;valor;tipo;conta;categoria\r\n"19/10/2026";"Salário";"1234,50";"RECEITA";"Conta principal";"Trabalho"\r\n');
-  assert.match(serializeTransactionCsv([{ ...row, amount: 0.01, type: 'EXPENSE' }]), /"0,01";"DESPESA"/);
+  assert.match(serializeTransactionCsv([{ ...row, amount: "0.01", type: 'EXPENSE' }]), /"0,01";"DESPESA"/);
 });
 
 test('quotes separators, embedded quotes and multiline descriptions without losing data', () => {

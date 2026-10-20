@@ -2,7 +2,7 @@ export type TransactionType = "INCOME" | "EXPENSE";
 
 export interface CreateTransactionRequest {
   description: string;
-  amount: number;
+  amount: string;
   date: string;
   type: TransactionType;
   accountId: number;
@@ -12,7 +12,7 @@ export interface CreateTransactionRequest {
 export interface TransactionResponse {
   id: number;
   description: string;
-  amount: number;
+  amount: string;
   date: string;
   type: TransactionType;
   accountId: number;
