@@ -9,23 +9,18 @@ import { formatCurrency } from "@/lib/formatters";
 import { formatDate, parseDisplayDate } from "@/lib/dates";
 import styles from "./dashboard.module.css";
 import DateInput from "@/components/date-input";
-import ExpensesByCategoryChart from "@/components/dashboard/expenses-by-category-chart";
+import FinancialChartPanel from "@/components/dashboard/financial-chart-panel";
 import { monthPeriod } from "@/lib/monthly-summary";
 import MonthlySummary from "@/components/monthly-summary";
-import {
-  getDashboardSummary,
-  getExpensesByCategory,
-} from "@/services/dashboard-service";
+import { getDashboardSummary } from "@/services/dashboard-service";
 import type {
   DashboardPeriod,
   DashboardSummaryResponse,
-  ExpenseByCategoryResponse,
 } from "@/types/dashboard";
 
 interface DashboardData {
   period: DashboardPeriod;
   summary: DashboardSummaryResponse;
-  expenses: ExpenseByCategoryResponse[];
 }
 
 function formatPeriod(period: DashboardPeriod): string {
@@ -53,12 +48,9 @@ export default function DashboardPage() {
       const now = new Date();
       const selectedPeriod = period ?? monthPeriod(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`);
       try {
-        const [summary, expenses] = await Promise.all([
-          getDashboardSummary(selectedPeriod),
-          getExpensesByCategory(selectedPeriod),
-        ]);
+        const summary = await getDashboardSummary(selectedPeriod);
         if (cancelled) return;
-        setDashboard({ period: selectedPeriod, summary, expenses });
+        setDashboard({ period: selectedPeriod, summary });
       } catch (error) {
         if (cancelled) return;
         if (error instanceof ApiError && error.status === 401) {
@@ -81,7 +73,6 @@ export default function DashboardPage() {
     if (loading) return;
     setValidationMessage("");
     setErrorMessage("");
-    setDashboard(null);
     setLoading(true);
     setRevision(value => value + 1);
     setPeriod(nextPeriod === null ? null : { ...nextPeriod });
@@ -94,15 +85,20 @@ export default function DashboardPage() {
     const endValue = String(data.get("endDate") || "");
     const startDate = startValue ? parseDisplayDate(startValue) : undefined;
     const endDate = endValue ? parseDisplayDate(endValue) : undefined;
-    if (startDate === null || endDate === null) {
-      setValidationMessage("Informe datas válidas no formato DD/MM/YYYY.");
+    if (!startDate || !endDate) {
+      setValidationMessage("Informe as duas datas válidas no formato DD/MM/YYYY.");
       return;
     }
     if (startDate && endDate && startDate > endDate) {
       setValidationMessage("A data inicial deve ser anterior ou igual à data final.");
       return;
     }
-    applyPeriod({ startDate: startDate || undefined, endDate: endDate || undefined });
+    const yearSpan = Number(endDate.slice(0, 4)) - Number(startDate.slice(0, 4));
+    if (yearSpan > 10 || (yearSpan === 10 && endDate.slice(4) > startDate.slice(4))) {
+      setValidationMessage("Selecione um período de no máximo 10 anos.");
+      return;
+    }
+    applyPeriod({ startDate, endDate });
   }
 
   return (
@@ -110,18 +106,23 @@ export default function DashboardPage() {
       <h1>Dashboard</h1>
       <section className={`card ${styles.filters}`}>
         <h2>Período</h2>
-        <p>O mês atual é exibido inicialmente. Selecione as datas desejadas ou deixe-as em branco para consultar todo o período.</p>
-        <form key={dashboard ? "ready" : "loading"} className="transaction-form" onSubmit={handleSubmit} onReset={() => applyPeriod({})}>
+        <p>O mês atual é exibido inicialmente. Informe as duas datas (até 10 anos; por dia, até 366 dias). Trocar o agrupamento preserva o período.</p>
+        <form key={`${dashboard?.period.startDate}-${dashboard?.period.endDate}`} className="transaction-form" onSubmit={handleSubmit} onReset={() => { const now = new Date(); applyPeriod(monthPeriod(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`)); }}>
           <div>
             <label htmlFor="dashboard-start">Data inicial</label>
-            <DateInput id="dashboard-start" name="startDate" defaultValue={dashboard?.period.startDate ? formatDate(dashboard.period.startDate) : ""} disabled={loading} />
+            <DateInput id="dashboard-start" name="startDate" defaultValue={dashboard?.period.startDate ? formatDate(dashboard.period.startDate) : ""} required disabled={loading} />
           </div>
           <div>
             <label htmlFor="dashboard-end">Data final</label>
-            <DateInput id="dashboard-end" name="endDate" defaultValue={dashboard?.period.endDate ? formatDate(dashboard.period.endDate) : ""} disabled={loading} />
+            <DateInput id="dashboard-end" name="endDate" defaultValue={dashboard?.period.endDate ? formatDate(dashboard.period.endDate) : ""} required disabled={loading} />
           </div>
           <button type="submit" disabled={loading}>Aplicar período</button>
-          <button className="button--secondary" type="reset" disabled={loading}>Limpar período</button>
+          <button className="button--secondary" type="reset" disabled={loading}>Mês atual</button>
+          <button className="button--secondary" type="button" disabled={loading} onClick={() => {
+            const now = new Date();
+            const start = new Date(now.getFullYear(), now.getMonth() - 11, 1);
+            applyPeriod({ startDate: `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, "0")}-01`, endDate: monthPeriod(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`).endDate });
+          }}>Últimos 12 meses</button>
         </form>
         {validationMessage && <p className="error-message" role="alert">{validationMessage}</p>}
       </section>
@@ -148,13 +149,10 @@ export default function DashboardPage() {
                 </div>
               </div>
             </section>
-            <section className="card">
-              <h2>Despesas por categoria</h2>
-              <ExpensesByCategoryChart expenses={dashboard.expenses} />
-            </section>
           </>
         )}
       </div>
+      {dashboard && <FinancialChartPanel startDate={(period ?? dashboard.period).startDate!} endDate={(period ?? dashboard.period).endDate!} />}
       <MonthlySummary />
     </main>
   );

@@ -3,6 +3,8 @@ import type {
   DashboardPeriod,
   DashboardSummaryResponse,
   ExpenseByCategoryResponse,
+  ChartFilters,
+  TransactionChartResponse,
 } from "@/types/dashboard";
 
 function periodQuery(period: DashboardPeriod): string {
@@ -22,4 +24,12 @@ export async function getExpensesByCategory(
   period: DashboardPeriod = {},
 ): Promise<ExpenseByCategoryResponse[]> {
   return apiRequest<ExpenseByCategoryResponse[]>(`/dashboard/expenses-by-category${periodQuery(period)}`);
+}
+
+export async function getTransactionsSummary(
+  filters: ChartFilters,
+  signal?: AbortSignal,
+): Promise<TransactionChartResponse> {
+  const query = new URLSearchParams({ ...filters });
+  return apiRequest(`/dashboard/transactions-summary?${query}`, { signal });
 }

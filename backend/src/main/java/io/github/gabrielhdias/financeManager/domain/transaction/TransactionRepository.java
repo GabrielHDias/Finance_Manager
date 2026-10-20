@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import io.github.gabrielhdias.financeManager.domain.dashboard.PeriodTotal;
+import io.github.gabrielhdias.financeManager.domain.dashboard.MonthTotal;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -14,6 +16,30 @@ import java.util.Optional;
 
 public interface TransactionRepository
     extends JpaRepository<Transaction, Long> {
+
+    @Query("""
+        SELECT new io.github.gabrielhdias.financeManager.domain.dashboard.PeriodTotal(t.date, SUM(t.amount))
+        FROM Transaction t
+        WHERE t.account.user.id = :userId AND t.type = :type
+          AND t.date >= :startDate AND t.date <= :endDate
+        GROUP BY t.date ORDER BY t.date
+        """)
+    List<PeriodTotal> sumByDay(
+        @Param("userId") Long userId, @Param("type") TransactionType type,
+        @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+
+    @Query("""
+        SELECT new io.github.gabrielhdias.financeManager.domain.dashboard.MonthTotal(
+            extract(year from t.date), extract(month from t.date), SUM(t.amount))
+        FROM Transaction t
+        WHERE t.account.user.id = :userId AND t.type = :type
+          AND t.date >= :startDate AND t.date <= :endDate
+        GROUP BY extract(year from t.date), extract(month from t.date)
+        ORDER BY extract(year from t.date), extract(month from t.date)
+        """)
+    List<MonthTotal> sumByMonth(
+        @Param("userId") Long userId, @Param("type") TransactionType type,
+        @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
     @Query("""
             SELECT t

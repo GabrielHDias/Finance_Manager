@@ -1,0 +1,11 @@
+{
+  "command": "./node_modules/.bin/playwright test e2e/dashboard-charts.spec.ts",
+  "stats": {
+    "startTime": "2026-10-20T23:10:26.108Z",
+    "duration": 11098.215,
+    "expected": 8,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}
