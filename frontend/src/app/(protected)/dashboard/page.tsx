@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ApiError } from "@/lib/api-error";
 import { formatCurrency } from "@/lib/formatters";
 import { formatDate, parseDisplayDate } from "@/lib/dates";
+import styles from "./dashboard.module.css";
 import DateInput from "@/components/date-input";
 import ExpensesByCategoryChart from "@/components/dashboard/expenses-by-category-chart";
 import { monthPeriod } from "@/lib/monthly-summary";
@@ -103,9 +104,9 @@ export default function DashboardPage() {
   }
 
   return (
-    <main>
+    <main className={styles.dashboard}>
       <h1>Dashboard</h1>
-      <section className="card">
+      <section className={`card ${styles.filters}`}>
         <h2>Período</h2>
         <p>O mês atual é exibido inicialmente. Selecione as datas desejadas ou deixe-as em branco para consultar todo o período.</p>
         <form key={dashboard ? "ready" : "loading"} className="transaction-form" onSubmit={handleSubmit} onReset={() => applyPeriod({})}>
@@ -122,7 +123,7 @@ export default function DashboardPage() {
         </form>
         {validationMessage && <p className="error-message" role="alert">{validationMessage}</p>}
       </section>
-      <div aria-busy={loading}>
+      <div className={styles.results} aria-busy={loading}>
         {loading ? <p role="status">Carregando dashboard...</p> : errorMessage ? (
           <div><p className="error-message" role="alert">{errorMessage}</p><button type="button" onClick={() => applyPeriod(period)}>Tentar novamente</button></div>
         ) : dashboard && (
