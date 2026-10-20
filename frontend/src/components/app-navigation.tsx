@@ -1,5 +1,6 @@
 "use client";
 
+import ThemeToggle from "@/components/theme-toggle";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { removeAccessToken } from "@/lib/token-storage";
@@ -53,9 +54,10 @@ export default function AppNavigation() {
         </Link>
       </div>
 
+      <div className="navigation-actions"><ThemeToggle />
       <button className="button--secondary" type="button" onClick={handleLogout}>
         Sair
-      </button>
+      </button></div>
     </nav>
   );
 }

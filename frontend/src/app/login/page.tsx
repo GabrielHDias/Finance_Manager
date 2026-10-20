@@ -1,5 +1,6 @@
 "use client";
 
+import ThemeToggle from "@/components/theme-toggle";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ApiError } from "@/lib/api-error";
@@ -45,7 +46,7 @@ export default function LoginPage() {
 
   return (
     <main className="auth-card">
-      <p className="auth-brand">Finance Manager</p>
+      <div className="auth-heading"><p className="auth-brand">Finance Manager</p><ThemeToggle /></div>
       <h1>Entrar</h1>
 
       <form onSubmit={handleSubmit}>

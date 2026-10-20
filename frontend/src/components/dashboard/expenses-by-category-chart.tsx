@@ -5,7 +5,7 @@ import { formatCurrency } from "@/lib/formatters";
 import type { ExpenseByCategoryResponse } from "@/types/dashboard";
 import styles from "./expenses-by-category-chart.module.css";
 
-const colors = ["#2563eb", "#0f766e", "#7c3aed", "#b45309", "#be185d", "#475569", "#0369a1", "#4d7c0f"];
+const colors = Array.from({ length: 8 }, (_, index) => `var(--chart-${index})`);
 const percent = new Intl.NumberFormat("pt-BR", { style: "percent", maximumFractionDigits: 1 });
 
 export default function ExpensesByCategoryChart({ expenses }: { expenses: ExpenseByCategoryResponse[] }) {
@@ -25,8 +25,8 @@ export default function ExpensesByCategoryChart({ expenses }: { expenses: Expens
       <div className={styles.chart}>
         <ResponsiveContainer width="100%" height={280} minWidth={0}>
           <PieChart accessibilityLayer aria-label="Distribuição das despesas por categoria. Valores detalhados na lista a seguir.">
-            <Pie data={data} dataKey="cents" nameKey="categoryName" innerRadius="58%" outerRadius="88%" isAnimationActive={false} />
-            <Tooltip formatter={(value, name) => `${name}: ${formatCurrency(Number(value) / 100)} (${percent.format(Number(value) / totalCents)})`} />
+            <Pie data={data} dataKey="cents" nameKey="categoryName" innerRadius="58%" outerRadius="88%" stroke="var(--color-surface)" isAnimationActive={false} />
+            <Tooltip contentStyle={{ backgroundColor: "var(--color-surface)", borderColor: "var(--color-border)", color: "var(--color-text)", borderRadius: "var(--radius-control)" }} itemStyle={{ color: "var(--color-text)" }} formatter={(value) => `${formatCurrency(Number(value) / 100)} (${percent.format(Number(value) / totalCents)})`} />
           </PieChart>
         </ResponsiveContainer>
         <p className={styles.total}>Total de despesas <strong>{formatCurrency(totalCents / 100)}</strong></p>

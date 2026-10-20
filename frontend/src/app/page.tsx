@@ -1,3 +1,4 @@
+import ThemeToggle from "@/components/theme-toggle";
 import Link from "next/link";
 import HomeSessionAction from "@/components/home-session-action";
 import styles from "./page.module.css";
@@ -27,6 +28,7 @@ export default function HomePage() {
         </Link>
         <nav className={styles.navigation} aria-label="Navegação principal">
           <a className={styles.navLink} href="#funcionalidades">Funcionalidades</a>
+          <ThemeToggle />
           <HomeSessionAction className={styles.primaryLink} />
         </nav>
       </header>

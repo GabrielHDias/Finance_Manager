@@ -224,7 +224,7 @@ button {
   border: 1px solid transparent;
   border-radius: var(--radius-control);
   background-color: var(--color-primary);
-  color: var(--color-surface);
+  color: var(--color-on-primary);
   font-weight: 600;
   cursor: pointer;
 }
@@ -246,7 +246,7 @@ button.button--secondary:hover:not(:disabled) {
 
 button.button--danger {
   background-color: var(--color-expense);
-  color: var(--color-surface);
+  color: var(--color-on-danger);
 }
 
 button.button--danger:hover:not(:disabled) {
@@ -690,3 +690,15 @@ button:disabled {
     padding: var(--space-6);
   }
 }
+
+/* Theme controls share the same behavior on public and authenticated pages. */
+.navigation-actions, .auth-heading { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-3); }
+.auth-heading { justify-content: space-between; margin-bottom: var(--space-4); }
+.auth-heading .auth-brand { margin: 0; }
+.theme-toggle { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); flex-shrink: 0; }
+.theme-toggle svg { flex-shrink: 0; }
+.theme-toggle__sun { display: none; }
+:root[data-theme="dark"] .theme-toggle__sun { display: block; }
+:root[data-theme="dark"] .theme-toggle__moon { display: none; }
+body { transition: background-color 180ms ease, color 180ms ease; }
+@media (prefers-reduced-motion: reduce) { body { transition: none; } }
