@@ -6,6 +6,8 @@ import { ApiError } from "@/lib/api-error";
 import { formatCurrency } from "@/lib/formatters";
 import { formatDate, parseDisplayDate } from "@/lib/dates";
 import DateInput from "@/components/date-input";
+import ExpensesByCategoryChart from "@/components/dashboard/expenses-by-category-chart";
+import { monthPeriod } from "@/lib/monthly-summary";
 import MonthlySummary from "@/components/monthly-summary";
 import {
   getDashboardSummary,
@@ -34,8 +36,9 @@ function formatPeriod(period: DashboardPeriod): string {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [period, setPeriod] = useState<DashboardPeriod>({});
+  const [period, setPeriod] = useState<DashboardPeriod | null>(null);
   const [dashboard, setDashboard] = useState<DashboardData | null>(null);
+  const [revision, setRevision] = useState(0);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const [validationMessage, setValidationMessage] = useState("");
@@ -44,13 +47,15 @@ export default function DashboardPage() {
     let cancelled = false;
 
     async function loadDashboard() {
+      const now = new Date();
+      const selectedPeriod = period ?? monthPeriod(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`);
       try {
         const [summary, expenses] = await Promise.all([
-          getDashboardSummary(period),
-          getExpensesByCategory(period),
+          getDashboardSummary(selectedPeriod),
+          getExpensesByCategory(selectedPeriod),
         ]);
         if (cancelled) return;
-        setDashboard({ period, summary, expenses });
+        setDashboard({ period: selectedPeriod, summary, expenses });
       } catch (error) {
         if (cancelled) return;
         if (error instanceof ApiError && error.status === 401) {
@@ -59,7 +64,7 @@ export default function DashboardPage() {
         }
         setErrorMessage(error instanceof ApiError
           ? error.message
-          : "Não foi possível carregar o dashboard. Reaplique o período para tentar novamente.");
+          : "Não foi possível carregar o dashboard. Tente novamente.");
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -67,15 +72,16 @@ export default function DashboardPage() {
 
     loadDashboard();
     return () => { cancelled = true; };
-  }, [period, router]);
+  }, [period, revision, router]);
 
-  function applyPeriod(nextPeriod: DashboardPeriod) {
+  function applyPeriod(nextPeriod: DashboardPeriod | null) {
     if (loading) return;
     setValidationMessage("");
     setErrorMessage("");
     setDashboard(null);
     setLoading(true);
-    setPeriod(nextPeriod);
+    setRevision(value => value + 1);
+    setPeriod(nextPeriod === null ? null : { ...nextPeriod });
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -101,15 +107,15 @@ export default function DashboardPage() {
       <h1>Dashboard</h1>
       <section className="card">
         <h2>Período</h2>
-        <p>Deixe as datas em branco para consultar todo o período.</p>
-        <form className="transaction-form" onSubmit={handleSubmit} onReset={() => applyPeriod({})}>
+        <p>O mês atual é exibido inicialmente. Selecione as datas desejadas ou deixe-as em branco para consultar todo o período.</p>
+        <form key={dashboard ? "ready" : "loading"} className="transaction-form" onSubmit={handleSubmit} onReset={() => applyPeriod({})}>
           <div>
             <label htmlFor="dashboard-start">Data inicial</label>
-            <DateInput id="dashboard-start" name="startDate" disabled={loading} />
+            <DateInput id="dashboard-start" name="startDate" defaultValue={dashboard?.period.startDate ? formatDate(dashboard.period.startDate) : ""} disabled={loading} />
           </div>
           <div>
             <label htmlFor="dashboard-end">Data final</label>
-            <DateInput id="dashboard-end" name="endDate" disabled={loading} />
+            <DateInput id="dashboard-end" name="endDate" defaultValue={dashboard?.period.endDate ? formatDate(dashboard.period.endDate) : ""} disabled={loading} />
           </div>
           <button type="submit" disabled={loading}>Aplicar período</button>
           <button className="button--secondary" type="reset" disabled={loading}>Limpar período</button>
@@ -118,7 +124,7 @@ export default function DashboardPage() {
       </section>
       <div aria-busy={loading}>
         {loading ? <p role="status">Carregando dashboard...</p> : errorMessage ? (
-          <p className="error-message" role="alert">{errorMessage}</p>
+          <div><p className="error-message" role="alert">{errorMessage}</p><button type="button" onClick={() => applyPeriod(period)}>Tentar novamente</button></div>
         ) : dashboard && (
           <>
             <section className="card">
@@ -141,18 +147,7 @@ export default function DashboardPage() {
             </section>
             <section className="card">
               <h2>Despesas por categoria</h2>
-              {dashboard.expenses.length === 0 ? (
-                <p>Nenhuma despesa encontrada no período selecionado.</p>
-              ) : (
-                <ul className="data-list">
-                  {dashboard.expenses.map((expense) => (
-                    <li key={expense.categoryId}>
-                      <span>{expense.categoryName}</span>
-                      <strong>{formatCurrency(expense.amount)}</strong>
-                    </li>
-                  ))}
-                </ul>
-              )}
+              <ExpensesByCategoryChart expenses={dashboard.expenses} />
             </section>
           </>
         )}

@@ -725,6 +725,32 @@ class TransactionRepositoryTest
     }
 
     @Test
+    void shouldSumDecimalExpensesOnInclusivePeriodBoundaries() {
+        TestData data = createTestData("expense-cents@email.com");
+        persistTransaction("Primeiro dia", "0.10", LocalDate.of(2026, 10, 1),
+            TransactionType.EXPENSE, data.account(), data.category());
+        persistTransaction("Último dia", "0.20", LocalDate.of(2026, 10, 31),
+            TransactionType.EXPENSE, data.account(), data.category());
+        entityManager.flush();
+        List<CategoryExpenseSummary> result = transactionRepository.sumExpensesByCategory(
+            data.user().getId(), TransactionType.EXPENSE,
+            LocalDate.of(2026, 10, 1), LocalDate.of(2026, 10, 31));
+        assertEquals(1, result.size());
+        assertEquals(new BigDecimal("0.30"), result.getFirst().amount());
+    }
+
+    @Test
+    void shouldReturnNoCategoriesWhenPeriodHasNoExpenses() {
+        TestData data = createTestData("expense-empty@email.com");
+        persistTransaction("Outro mês", "10.00", LocalDate.of(2026, 9, 30),
+            TransactionType.EXPENSE, data.account(), data.category());
+        entityManager.flush();
+        assertEquals(List.of(), transactionRepository.sumExpensesByCategory(
+            data.user().getId(), TransactionType.EXPENSE,
+            LocalDate.of(2026, 10, 1), LocalDate.of(2026, 10, 31)));
+    }
+
+    @Test
     void shouldPageFilteredRowsAndCountsWithoutLeakingOtherUsers() {
         TestData owner = createTestData("page-owner@email.com");
         TestData foreign = createTestData("page-foreign@email.com");
