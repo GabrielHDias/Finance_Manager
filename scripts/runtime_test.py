@@ -75,6 +75,14 @@ class RuntimeTest(unittest.TestCase):
         self.assertFalse(paths[0].exists())
         self.assertEqual(os.environ.get('DOCKER_CONFIG'),original)
 
+    def test_registry_accepts_opaque_tokens_with_punctuation_without_shell_evaluation(self):
+        token='opaque.token-with+punctuation/=_'+'x'*40
+        with patch.object(deploy.sys,'stdin',io.StringIO(token+'\n')), patch.object(deploy.subprocess,'run') as run:
+            with deploy.registry_login('operator'):
+                self.assertEqual(run.call_args.kwargs['input'],token+'\n')
+                self.assertNotIn(token,' '.join(run.call_args.args[0]))
+                self.assertFalse(run.call_args.kwargs.get('shell',False))
+
     def test_failed_registry_login_still_removes_private_directory(self):
         paths=[]
         def fail(*args,**kwargs):

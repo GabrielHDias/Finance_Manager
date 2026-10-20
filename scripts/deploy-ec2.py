@@ -262,8 +262,12 @@ def registry_login(user):
     if not re.fullmatch(r'[a-zA-Z0-9_.\[\]-]+', user):
         raise DeployError('Usuário do registry inválido')
     token = sys.stdin.readline(16385).strip()
-    if not re.fullmatch(r'[a-zA-Z0-9_]{20,16384}', token):
-        raise DeployError('Token temporário do registry inválido')
+    if not token:
+        raise DeployError('Token temporário do registry não recebido por stdin')
+    # GitHub credentials are opaque: punctuation/JWT separators are valid password bytes.
+    # The token is passed only over stdin, never evaluated as shell or put in arguments.
+    if not re.fullmatch(r'[\x21-\x7e]{20,16384}', token):
+        raise DeployError('Token temporário do registry fora dos limites de tamanho/ASCII')
     original = os.environ.get('DOCKER_CONFIG')
     try:
         with tempfile.TemporaryDirectory(prefix='fm-registry-') as directory:
