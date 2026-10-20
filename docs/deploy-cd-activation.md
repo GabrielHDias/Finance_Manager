@@ -40,3 +40,29 @@ reconciliar a saúde/versão, instalar o script, cadastrar uma chave exclusiva,
 configurar acesso GHCR de leitura e validar as condições do [runbook](deploy-cd.md).
 Somente habilitar `PROD_CD_ENABLED` depois dessas etapas e acompanhar o primeiro
 deploy. A autorização para avançar não comprova que a infraestrutura esteja pronta.
+
+## Continuação após ajuste de rede
+
+- O usuário confirmou o IP da instância e ajustou o acesso SSH. A conexão com o
+  `.pem` administrativo passou, sem desabilitar verificação da chave do host.
+- A instalação real é `/home/ubuntu/finance-manager-demo`, projeto
+  `finance-manager-demo`, com os quatro serviços saudáveis pelos checks antigos.
+- A revisão instalada foi identificada como
+  `2068eb335e4adcb82dd7d0532143ed186a661550`. Migrations V1/V2 estão aplicadas e
+  seus arquivos não diferem dos da main inspecionada. A instalação legada usa
+  `/accounts` retornando 401 como check de API; não possui os novos endpoints
+  de saúde. A adoção precisa tratar explicitamente essa versão legada.
+- O banco não publica portas. O volume efetivo é
+  `finance-manager-demo_postgres_data`; volumes de certificados Caddy também
+  foram identificados. Nenhum container foi recriado ou banco alterado.
+- Não há instance profile IAM, SSM está inativo e não há login GHCR de root no
+  host. O usuário escolheu AWS OIDC para autorizar temporariamente o IP de cada
+  runner, mantendo a porta SSH restrita.
+- Foi aberta uma sessão AWS no navegador integrado pelo próprio usuário.
+  Consultas de leitura confirmaram a conta e a ausência do provider GitHub e da
+  role proposta. Não foram exportadas credenciais AWS.
+- A implementação de OIDC está sendo preparada em `codex/deploy-oidc`, com
+  gerador de trust/policy, regras temporárias identificadas por execução e
+  limpeza de regras expiradas. Ver [guia OIDC](deploy-oidc.md).
+- Os 34 testes Python e a validação actionlint dos dois workflows passaram
+  localmente. A criação do IAM e a ativação de CD ainda precisam ser concluídas.

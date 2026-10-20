@@ -188,6 +188,7 @@ jobs:
       cancel-in-progress: false
     permissions:
       contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -201,6 +202,34 @@ jobs:
           set -euo pipefail
           head=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq '.object.sha')
           test "$head" = "$RELEASE_SHA"
+      - name: Validar configuração de acesso OIDC
+        env:
+          AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
+          DEPLOY_SECURITY_GROUP_ID: ${{ vars.DEPLOY_SECURITY_GROUP_ID }}
+          DEPLOY_PORT: ${{ vars.DEPLOY_PORT || '22' }}
+        run: |
+          set -euo pipefail
+          [[ "$AWS_ACCOUNT_ID" =~ ^[0-9]{12}$ ]]
+          [[ "$AWS_ROLE_ARN" == "arn:aws:iam::$AWS_ACCOUNT_ID:role/"* ]]
+          [[ "$AWS_REGION" =~ ^[a-z]{2}-[a-z]+-[1-9]$ ]]
+          [[ "$DEPLOY_SECURITY_GROUP_ID" =~ ^sg-[0-9a-f]{8,17}$ ]]
+          test "$DEPLOY_PORT" = 22
+      - name: Autenticar na AWS via OIDC
+        id: aws
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+          allowed-account-ids: ${{ vars.AWS_ACCOUNT_ID }}
+          role-session-name: fm-${{ github.run_id }}-${{ github.run_attempt }}
+          role-duration-seconds: 3600
+      - name: Liberar SSH somente para o IPv4 deste runner
+        id: network
+        env:
+          DEPLOY_SECURITY_GROUP_ID: ${{ vars.DEPLOY_SECURITY_GROUP_ID }}
+        run: python3 scripts/deploy-network.py open
       - name: Atualizar EC2 e validar saúde com rollback protegido
         env:
           DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
@@ -214,6 +243,11 @@ jobs:
           BACKEND_IMAGE: ${{ needs.publish.outputs.backend }}
           FRONTEND_IMAGE: ${{ needs.publish.outputs.frontend }}
         run: python3 scripts/deploy-ssh.py
+      - name: Revogar a regra SSH temporária desta execução
+        if: always() && steps.aws.outcome == 'success' && steps.network.outcome != 'skipped'
+        env:
+          DEPLOY_SECURITY_GROUP_ID: ${{ vars.DEPLOY_SECURITY_GROUP_ID }}
+        run: python3 scripts/deploy-network.py close
       - name: Registrar resultado
         if: always()
         env:

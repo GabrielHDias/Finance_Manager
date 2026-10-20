@@ -30,6 +30,8 @@ Mudanças nesses arquivos precisam de revisão e aplicação operacional separad
 o CD entrega somente as imagens. Os checks da CI exercitam a aplicação local;
 a validação HTTPS do CD cobre a configuração efetivamente instalada.
 
+O acesso do runner à porta SSH agora será temporário via [AWS OIDC](deploy-oidc.md), conforme escolha do usuário. Esse guia inclui IAM, variáveis adicionais, limites da policy e limpeza de regras órfãs.
+
 ## Preparação da EC2 (manual, somente após autorização)
 
 Antes de executar qualquer comando de adoção, conferir na instalação existente:
