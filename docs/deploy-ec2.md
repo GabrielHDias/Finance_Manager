@@ -104,6 +104,35 @@ o endereço utilizado no navegador. Não use HTTP público para inserir senhas.
 O IPv4 atribuído automaticamente pode mudar após parar e iniciar a EC2.
 Um Elastic IP pode estabilizar o endereço, mas deve ter seu custo avaliado.
 
+## Endereço gratuito para a demonstração
+
+Quando não houver domínio próprio, é possível utilizar o DNS público do
+[sslip.io / nip.io](https://nip.io/). Por exemplo, se o IPv4 público da EC2 fosse
+`203.0.113.10`, o nome `finance-manager.203-0-113-10.sslip.io` resolveria para
+esse IP. Substitua pelo IPv4 real; esse endereço de exemplo não deve ser usado
+para publicar o serviço.
+
+Configure as mesmas cinco variáveis da seção HTTPS, usando o nome escolhido
+em `SITE_ADDRESS` e sua URL HTTPS em `APP_ORIGIN`. Confirme que o nome resolve
+para a EC2 antes de reaplicar o Compose. O Caddy obtém o certificado e a
+conexão passa diretamente para a EC2; esse serviço fornece apenas o DNS.
+Não é necessário alterar o build do frontend, que continua usando `/api`.
+
+Antes de publicar, faça backup do banco e uma cópia privada de `.env.demo`.
+Confirme as regras TCP 80/443 do security group, mantenha o SSH restrito ao IP
+do administrador e confira o certificado HTTPS no acesso externo. O banco e
+as portas internas da aplicação devem continuar sem publicação.
+
+A publicação permite que visitantes criem contas. Os dados existentes continuam
+exigindo autenticação e são filtrados pelo usuário. Cadastros e tráfego podem
+consumir recursos da EC2; esta entrega continua sendo uma demonstração de baixo
+tráfego.
+
+Esse nome depende da disponibilidade de um DNS de terceiros e do IPv4 embutido.
+Se o IP mudar após parar/iniciar a EC2, atualize o nome, `SITE_ADDRESS` e
+`APP_ORIGIN`, reaplique o Compose e compartilhe a nova URL. Para um endereço
+permanente, use domínio próprio e avalie a necessidade de um IP estável.
+
 ## Backup e recuperação
 
 Antes de atualizar, faça um backup fora do volume do banco:
