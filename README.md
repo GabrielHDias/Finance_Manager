@@ -217,9 +217,10 @@ O workflow `.github/workflows/ci.yml` é acionado em pushes, pull requests e exe
 
 1. **Backend:** Java 21, Maven Wrapper, testes e empacotamento; relatórios de testes ficam disponíveis como artefato.
 2. **Frontend:** Node.js 24, instalação pelo lockfile, testes do inicializador, da exportação CSV e da comparação mensal, lint, TypeScript e build.
-3. **Containers:** construção dos dois serviços, espera por saúde, validação integrada e remoção do banco temporário.
+3. **Segredos:** Gitleaks com versão/checksum fixados, autoteste sintético e varredura do histórico alcançável; veja [prevenção e histórico](docs/public-exposure.md).
+4. **Containers:** construção dos dois serviços, espera por saúde, validação integrada e remoção do banco temporário.
 
-Os jobs de backend e frontend executam em paralelo; o teste dos containers começa após ambos passarem. O CI gera credenciais apenas para seu ambiente temporário e não exige segredos de produção. Após os checks, o mesmo workflow pode publicar imagens no GHCR e atualizar a EC2. O CD fica desabilitado até autorização e configuração explícita; veja o [runbook de CD](docs/deploy-cd.md).
+Os jobs de backend, frontend e segredos executam em paralelo; o teste dos containers começa após os três passarem. O CI gera credenciais apenas para seu ambiente temporário e não exige segredos de produção. Após os checks, o mesmo workflow pode publicar imagens no GHCR e atualizar a EC2. O CD fica desabilitado até autorização e configuração explícita; veja o [runbook de CD](docs/deploy-cd.md).
 
 ## Demonstração na EC2
 
