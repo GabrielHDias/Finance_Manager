@@ -1,0 +1,42 @@
+{
+  "date": "2026-10-21",
+  "timezone": "America/Sao_Paulo",
+  "base_revision": "96ce9121d21dba5ebcfc6143665e14330a2dbb36",
+  "scope": "Local working tree changes; no remote or production operations",
+  "gitleaks": {
+    "version": "8.30.1",
+    "linux_x64_archive_sha256": "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb",
+    "archive_checksum_verified": true,
+    "reachable_commits_in_checkout": 66,
+    "commits_reported_by_scanner": 64,
+    "history_findings_after_specific_allowlists": 0,
+    "working_tree_export_findings": 0,
+    "selftest": "passed",
+    "selftest_cases": [
+      "Exact JWT fixture and exact comment are allowed in their respective files",
+      "Each exception content is detected outside its allowed path",
+      "A new key is detected in the JWT test path",
+      "A key appended to the allowed comment is detected",
+      "A deleted synthetic key is detected in disposable Git history",
+      "The disposable current tree is clean after key removal"
+    ],
+    "temporary_fixtures_removed": true
+  },
+  "actionlint": {"version": "1.7.12", "workflows_checked": 2, "result": "passed"},
+  "shell_syntax_and_workflow_invariants": "passed",
+  "gitignore": {"operational_paths_blocked": 16, "source_fixture_example_paths_preserved": 6},
+  "python_unittest": {"tests": 42, "result": "passed", "command": "python3 -m unittest discover -s scripts -p '*_test.py'"},
+  "git_diff_check": "passed",
+  "history_metadata": {
+    "automatic_machine_identity_confirmed_in": ["a0b4b01", "64ecbe6"],
+    "personal_metadata_reproduced_in_report": false,
+    "rewritten": false
+  },
+  "limitations": [
+    "GitHub-hosted CI was not run; local equivalent scanner and workflow checks only",
+    "Application Maven/frontend/container suites were not rerun for documentation and CI-only changes",
+    "Secret scanning does not detect all personal data or guarantee absence of secrets",
+    "Required branch check configuration needs separate administrator action",
+    "Historical personal and operational data remains accessible in prior Git objects and copies"
+  ]
+}

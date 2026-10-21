@@ -64,7 +64,7 @@ Evidências: [resumo técnico](validation/dashboard-chart-filters/checks.json), 
 
 ## Validação manual
 
-A instância de revisão usa `http://127.0.0.1:3000/login`, API local na porta 8080 e um PostgreSQL descartável chamado `finance-chart-review-db` na porta 55440. Não usa o banco local preexistente nem produção. As credenciais fictícias da conta com dados de exemplo estão em `/tmp/finance-chart-review-login.json` na máquina de execução. A instância e o arquivo são temporários.
+Para reproduzir a revisão, use frontend e API locais com PostgreSQL descartável e dados sintéticos. Crie uma conta de teste no próprio ambiente; não publique credenciais nem o caminho de arquivos de acesso da sessão. As evidências abaixo descrevem o ensaio realizado, sem prometer uma instância de revisão permanente.
 
 1. Faça login e selecione 01/10/2026 a 31/10/2026, aplicando o período. A conta de revisão possui despesas de **R$ 2.401,25** e receitas de **R$ 4.500,00** em outubro.
 2. Em categoria, alterne despesas/receitas e pizza/coluna; confira os percentuais e os tooltips. Linha deve permanecer indisponível.

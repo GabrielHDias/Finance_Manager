@@ -14,6 +14,35 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
+  secrets:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Instalar Gitleaks 8.30.1 com checksum fixado
+        shell: bash
+        run: |
+          set -euo pipefail
+          directory=$(mktemp -d)
+          trap 'rm -rf "$directory"' EXIT
+          curl --fail --silent --show-error --location --proto '=https' --tlsv1.2 \
+            https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz \
+            --output "$directory/gitleaks.tar.gz"
+          printf '%s  %s\n' 551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb "$directory/gitleaks.tar.gz" | sha256sum --check --strict
+          tar -xzf "$directory/gitleaks.tar.gz" -C "$directory" gitleaks
+          mkdir -p "$RUNNER_TEMP/security-bin"
+          install -m 755 "$directory/gitleaks" "$RUNNER_TEMP/security-bin/gitleaks"
+          echo "$RUNNER_TEMP/security-bin" >> "$GITHUB_PATH"
+      - name: Verificar detecção e limites das exceções com dados sintéticos
+        run: python3 scripts/security-scan-selftest.py
+      - name: Varrer histórico alcançável
+        run: gitleaks git --config .gitleaks.toml --redact=100 --no-banner --log-opts=--all .
+
   backend:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
@@ -73,7 +102,7 @@ jobs:
         run: npm run check
 
   containers:
-    needs: [backend, frontend]
+    needs: [backend, frontend, secrets]
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:

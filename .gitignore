@@ -34,3 +34,26 @@ __pycache__/
 
 # Estado operacional privado do CD na EC2
 .deploy/
+
+# Chaves e keystores operacionais (fixtures exigem exceção por arquivo revisado)
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+id_rsa
+id_ecdsa
+id_ed25519
+*.agekey
+
+# Dumps PostgreSQL, inclusive pares criptografados/metadados gerados por backup.py
+*.dump
+*.dump.*
+*.backup
+*.backup.*
+*.sql.gz
+*.sql.bz2
+*.sql.xz
+*.sql.age
+backups/

@@ -1,0 +1,21 @@
+title = "Finance Manager secret scanning"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "generic-api-key"
+
+[[rules.allowlists]]
+description = "JWT determinístico exclusivo do teste MVC; Base64 de 0123456789abcdef repetido duas vezes. Nunca usar em runtime."
+condition = "AND"
+paths = ['''^backend/src/test/java/io/github/gabrielhdias/financeManager/config/security/JwtRealMvcTest\.java$''']
+regexTarget = "secret"
+regexes = ['''^(MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=|0123456789abcdef0123456789abcdef)$''']
+
+[[rules.allowlists]]
+description = "Comentário sobre formato opaco de tokens; não é atribuição nem credencial."
+condition = "AND"
+paths = ['''^scripts/deploy-ec2\.py$''']
+regexTarget = "line"
+regexes = ['''^\s*# GitHub credentials are opaque: punctuation/JWT separators are valid password bytes\.$''']
