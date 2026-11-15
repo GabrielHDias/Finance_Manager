@@ -62,9 +62,13 @@ class CategoryControllerMvcTest {
         when(category.getName())
             .thenReturn("Alimentação");
 
+        when(category.getType())
+            .thenReturn(io.github.gabrielhdias.financeManager.domain.category.CategoryType.EXPENSE);
+
         when(categoryService.create(
             userId,
-            "Alimentação"
+            "Alimentação",
+            null
         )).thenReturn(category);
 
         mockMvc.perform(

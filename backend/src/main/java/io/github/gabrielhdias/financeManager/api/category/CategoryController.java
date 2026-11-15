@@ -49,7 +49,8 @@ public class CategoryController {
 
         Category category = categoryService.create(
             userId,
-            request.name()
+            request.name(),
+            request.type()
         );
 
         return ResponseEntity
@@ -93,10 +94,11 @@ public class CategoryController {
     ) {
         Long userId = authenticatedUser.getId();
 
-        Category category = categoryService.rename(
+        Category category = categoryService.update(
             userId,
             id,
-            request.name()
+            request.name(),
+            request.type()
         );
 
         return ResponseEntity.ok(

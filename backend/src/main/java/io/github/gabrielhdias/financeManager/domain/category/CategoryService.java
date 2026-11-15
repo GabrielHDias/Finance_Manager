@@ -33,6 +33,11 @@ public class CategoryService {
 
     @Transactional
     public Category create(Long userId, String name) {
+        return create(userId, name, null);
+    }
+
+    @Transactional
+    public Category create(Long userId, String name, CategoryType type) {
         User user = findUserById(userId);
 
         String normalizedName = name.trim();
@@ -43,7 +48,7 @@ public class CategoryService {
             );
         }
 
-        Category category = new Category(name, user);
+        Category category = new Category(name, type == null ? CategoryType.EXPENSE : type, user);
 
         return categoryRepository.save(category);
     }
@@ -79,6 +84,25 @@ public class CategoryService {
 
         category.rename(newName);
 
+        return category;
+    }
+
+    @Transactional
+    public Category update(Long userId, Long categoryId, String newName, CategoryType type) {
+        Category category = rename(userId, categoryId, newName);
+        if (type != null && type != category.getType()) {
+            if (transactionRepository.existsByCategoryId(categoryId)) {
+                throw new BusinessRuleException(
+                    "Não é possível alterar o tipo enquanto a categoria tiver transações"
+                );
+            }
+            if (type == CategoryType.INCOME && budgetRepository.existsByCategoryId(categoryId)) {
+                throw new BusinessRuleException(
+                    "Remova os orçamentos antes de transformar a categoria em receita"
+                );
+            }
+            category.changeType(type);
+        }
         return category;
     }
 

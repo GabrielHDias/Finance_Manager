@@ -11,4 +11,8 @@ public record CsvImportRow(
     public CsvImportRow duplicate(String reason) {
         return new CsvImportRow(line, date, description, amount, type, Status.DUPLICATE, List.of(reason));
     }
+
+    public CsvImportRow invalid(String reason) {
+        return new CsvImportRow(line, date, description, amount, type, Status.INVALID, List.of(reason));
+    }
 }

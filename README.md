@@ -175,6 +175,10 @@ Cada resposta inclui `id`, `categoryId`, `categoryName`, `periodStart`, `limitAm
 
 Em **Contas financeiras**, o campo **Saldo inicial** entra na criação e na edição. Ele compõe o saldo da conta junto com as transações e não gera um lançamento. Zero e valores negativos são válidos (por exemplo, um cartão ou um limite já usado). Se a API receber a conta sem esse campo, o saldo inicial fica `0.00` e uma edição que omita o campo preserva o valor atual. O saldo exibido é saldo inicial + receitas − despesas.
 
+## Tipo da categoria
+
+Cada categoria é de **receita** ou **despesa**. Uma transação só pode usar uma categoria do mesmo tipo. Orçamento mensal só existe em categoria de despesa. Categorias antigas sem movimentação, ou com despesa ou orçamento, permanecem como despesa. Categorias usadas só como receita passam a ser receita. Se a mesma categoria tinha os dois tipos, as receitas migram para uma categoria nova chamada `{nome} (receita)`. Omitir o tipo na criação assume despesa, para não quebrar clientes anteriores. Mudar o tipo é recusado enquanto houver transações; virar receita também exige remover os orçamentos.
+
 ## Paginação de transações
 
 A lista carrega 10 transações por página, com opções de 25 ou 50. **Página anterior** e **Próxima página** mantêm os filtros aplicados; a tela informa o intervalo de registros e o total de páginas. Aplicar ou limpar filtros e trocar o tamanho retornam à primeira página.

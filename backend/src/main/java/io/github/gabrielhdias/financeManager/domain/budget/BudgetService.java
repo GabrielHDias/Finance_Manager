@@ -1,6 +1,9 @@
 package io.github.gabrielhdias.financeManager.domain.budget;
 
+import io.github.gabrielhdias.financeManager.domain.category.Category;
 import io.github.gabrielhdias.financeManager.domain.category.CategoryRepository;
+import io.github.gabrielhdias.financeManager.domain.category.CategoryType;
+import io.github.gabrielhdias.financeManager.domain.exception.BusinessRuleException;
 import io.github.gabrielhdias.financeManager.domain.exception.ResourceNotFoundException;
 import io.github.gabrielhdias.financeManager.domain.transaction.TransactionRepository;
 import io.github.gabrielhdias.financeManager.domain.transaction.TransactionType;
@@ -50,8 +53,11 @@ public class BudgetService {
         if (amount == null || amount.signum() <= 0 || amount.scale() > 2 || amount.precision() - amount.scale() > 17) {
             throw new IllegalArgumentException("Informe um limite positivo com até duas casas decimais.");
         }
-        categories.findByIdAndUserId(categoryId, userId)
+        Category category = categories.findByIdAndUserId(categoryId, userId)
             .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada"));
+        if (category.getType() != CategoryType.EXPENSE) {
+            throw new BusinessRuleException("Orçamento só pode ser definido para categorias de despesa.");
+        }
         budgets.saveLimit(categoryId, period.atDay(1), amount);
         return list(userId, year, month).stream().filter(row -> row.categoryId().equals(categoryId)).findFirst().orElseThrow();
     }

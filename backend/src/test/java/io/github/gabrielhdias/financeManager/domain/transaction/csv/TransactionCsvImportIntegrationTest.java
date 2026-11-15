@@ -36,7 +36,7 @@ class TransactionCsvImportIntegrationTest extends AbstractPostgreSqlIntegrationT
     @Autowired TransactionRepository transactions;
     @Autowired MockMvc mvc;
 
-    private static final byte[] FILE = bytes("data;descricao;valor;tipo\n2026-10-01;Salário;1000;RECEITA\n02/10/2026;Mercado;100,50;DESPESA\n2026-10-02;Mercado;100.50;EXPENSE");
+    private static final byte[] FILE = bytes("data;descricao;valor;tipo\n2026-10-01;Mercado grande;1000;DESPESA\n02/10/2026;Mercado;100,50;DESPESA\n2026-10-02;Mercado;100.50;EXPENSE");
     private static byte[] bytes(String text) { return text.getBytes(StandardCharsets.UTF_8); }
 
     private Fixture fixture() {
@@ -58,7 +58,7 @@ class TransactionCsvImportIntegrationTest extends AbstractPostgreSqlIntegrationT
         assertEquals(new CsvImportResult(2, 1), confirm(f, FILE, preview.hash()));
         assertEquals(new CsvImportResult(0, 3), confirm(f, FILE, preview.hash()));
         assertEquals(3, preview(f, FILE).duplicates());
-        assertEquals(new BigDecimal("899.50"), transactions.calculateBalanceByAccountId(f.account(), TransactionType.INCOME));
+        assertEquals(new BigDecimal("-1100.50"), transactions.calculateBalanceByAccountId(f.account(), TransactionType.INCOME));
     }
 
     @Test

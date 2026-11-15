@@ -10,12 +10,13 @@ import {
   findAllCategories,
   renameCategory,
 } from "@/services/category-service";
-import type { CategoryResponse } from "@/types/category";
+import type { CategoryResponse, CategoryType } from "@/types/category";
 
 export default function CategoriesPage() {
   const router = useRouter();
   const [categories, setCategories] = useState<CategoryResponse[]>([]);
   const [name, setName] = useState("");
+  const [type, setType] = useState<CategoryType>("EXPENSE");
   const [editingId, setEditingId] = useState<number | null>(null);
   const [pendingDelete, setPendingDelete] = useState<number | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
@@ -63,11 +64,13 @@ export default function CategoriesPage() {
   function resetForm() {
     setEditingId(null);
     setName("");
+    setType("EXPENSE");
   }
 
   function startEditing(item: CategoryResponse) {
     setEditingId(item.id);
     setName(item.name);
+    setType(item.type);
     setPendingDelete(null);
     setDeleteError("");
     setErrorMessage("");
@@ -89,9 +92,10 @@ export default function CategoriesPage() {
     setSuccessMessage("");
     try {
       const wasEditing = editingId !== null;
+      const request = { name: trimmedName, type };
       const saved = wasEditing
-        ? await renameCategory(editingId, { name: trimmedName })
-        : await createCategory({ name: trimmedName });
+        ? await renameCategory(editingId, request)
+        : await createCategory(request);
       setCategories((current) => wasEditing
         ? current.map((item) => item.id === saved.id ? saved : item)
         : [...current, saved]);
@@ -144,6 +148,13 @@ export default function CategoriesPage() {
               required
             />
           </div>
+          <div>
+            <label htmlFor="category-type">Tipo</label>
+            <select id="category-type" value={type} onChange={(event) => setType(event.target.value as CategoryType)} disabled={busy}>
+              <option value="EXPENSE">Despesa</option>
+              <option value="INCOME">Receita</option>
+            </select>
+          </div>
           <button type="submit" disabled={busy}>
             {submitting ? "Salvando..." : editingId === null ? "Criar categoria" : "Salvar alterações"}
           </button>
@@ -173,6 +184,7 @@ export default function CategoriesPage() {
               <li key={item.id}>
                 <div className="resource-row">
                   <strong className="resource-name">{item.name}</strong>
+                  <span>{item.type === "INCOME" ? "Receita" : "Despesa"}</span>
                 </div>
                 <ResourceActions
                   kind="categoria"

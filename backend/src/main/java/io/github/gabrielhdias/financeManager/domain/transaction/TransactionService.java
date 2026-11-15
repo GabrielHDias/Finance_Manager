@@ -51,6 +51,11 @@ public class TransactionService {
             categoryId,
             userId
         );
+        if (!category.getType().name().equals(type.name())) {
+            throw new BusinessRuleException(
+                "A categoria precisa ser do mesmo tipo da transação"
+            );
+        }
 
         Transaction transaction = new Transaction(
             description,
@@ -143,6 +148,11 @@ public class TransactionService {
             categoryId,
             userId
         );
+        if (!category.getType().name().equals(type.name())) {
+            throw new BusinessRuleException(
+                "A categoria precisa ser do mesmo tipo da transação"
+            );
+        }
 
         transaction.updateDescription(description);
         transaction.updateAmount(amount);

@@ -70,9 +70,10 @@ await request('POST', '/auth/login', { email, password: 'incorrect-password' }, 
 token = (await request('POST', '/auth/login', { email: email.toUpperCase(), password }, 200, false)).accessToken;
 assert.ok(token);
 const account = await request('POST', '/accounts', { name: 'Conta de validação' }, 201);
-const category = await request('POST', '/categories', { name: 'Categoria de validação' }, 201);
+const incomeCategory = await request('POST', '/categories', { name: 'Receitas de validação', type: 'INCOME' }, 201);
+const category = await request('POST', '/categories', { name: 'Categoria de validação', type: 'EXPENSE' }, 201);
 const common = { accountId: account.id, categoryId: category.id };
-const income = await request('POST', '/transactions', { ...common, description: 'Receita de validação', amount: "1000.00", type: 'INCOME', date: '2026-10-01' }, 201);
+const income = await request('POST', '/transactions', { accountId: account.id, categoryId: incomeCategory.id, description: 'Receita de validação', amount: "1000.00", type: 'INCOME', date: '2026-10-01' }, 201);
 const expense = await request('POST', '/transactions', { ...common, description: 'Despesa de validação', amount: "100.00", type: 'EXPENSE', date: '2026-10-15' }, 201);
 const firstPage = await request('GET', '/transactions/page?page=0&size=1');
 assert.equal(firstPage.totalElements, 2);
@@ -184,7 +185,7 @@ token = ownerToken;
 
 // CSV preview must not write; invalid or changed inputs must not partially import.
 const header = 'data;descricao;valor;tipo\n';
-const csv = header + '2026-10-03;CSV receita;500;RECEITA\n04/10/2026;CSV despesa;25,00;DESPESA\n2026-10-04;CSV despesa;25.0;EXPENSE';
+const csv = header + '2026-10-03;CSV despesa alta;500;DESPESA\n04/10/2026;CSV despesa;25,00;DESPESA\n2026-10-04;CSV despesa;25.0;EXPENSE';
 await csvRequest('preview', csv, account.id, category.id, undefined, 401, false);
 const csvPreview = await csvRequest('preview', csv, account.id, category.id);
 assert.equal(csvPreview.ready, 2);
@@ -199,11 +200,11 @@ await csvRequest('confirm', csv + '\n2026-10-19;Mudou;1;RECEITA', account.id, ca
 assert.equal((await request('GET', '/transactions')).length, 2);
 assert.deepEqual(await csvRequest('confirm', csv, account.id, category.id, csvPreview.hash), { imported: 2, skipped: 1 });
 assert.deepEqual(await csvRequest('confirm', csv, account.id, category.id, csvPreview.hash), { imported: 0, skipped: 3 });
-assert.equal((await request('GET', `/accounts/${account.id}/balance`)).balance, "1325.00");
+assert.equal((await request('GET', `/accounts/${account.id}/balance`)).balance, "325.00");
 const manualDuplicate = await csvRequest('preview', header + '2026-11-01;Despesa editada;150;DESPESA', account.id, category.id);
 assert.equal(manualDuplicate.duplicates, 1);
 assert.equal(manualDuplicate.ready, 0);
-const concurrentCsv = header + '2026-10-19;CSV concorrente;10;RECEITA';
+const concurrentCsv = header + '2026-10-19;CSV concorrente;10;DESPESA';
 const concurrentPreview = await csvRequest('preview', concurrentCsv, account.id, category.id);
 const simultaneous = await Promise.all([
   csvRequest('confirm', concurrentCsv, account.id, category.id, concurrentPreview.hash),
@@ -225,6 +226,7 @@ assert.deepEqual(await request('GET', '/budgets?year=2026&month=10'), []);
 await request('DELETE', `/transactions/${expense.id}`, undefined, 204);
 assert.equal((await request('GET', `/accounts/${account.id}/balance`)).balance, "1000.00");
 await request('DELETE', `/transactions/${income.id}`, undefined, 204);
+await request('DELETE', `/categories/${incomeCategory.id}`, undefined, 204);
 await request('DELETE', `/categories/${category.id}`, undefined, 204);
 await request('DELETE', `/accounts/${account.id}`, undefined, 204);
 await request('GET', `/accounts/${account.id}`, undefined, 404);

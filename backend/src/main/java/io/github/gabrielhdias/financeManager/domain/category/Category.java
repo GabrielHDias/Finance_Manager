@@ -16,6 +16,10 @@ public class Category {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false)
+    private CategoryType type;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -24,7 +28,12 @@ public class Category {
     }
 
     public Category(String name, User user) {
+        this(name, CategoryType.EXPENSE, user);
+    }
+
+    public Category(String name, CategoryType type, User user) {
         this.name = validateName(name);
+        this.type = Objects.requireNonNull(type, "O tipo da categoria não pode ser nulo");
         this.user = Objects.requireNonNull(
             user,
             "O usuário da categoria não pode ser nulo"
@@ -39,12 +48,20 @@ public class Category {
         return name;
     }
 
+    public CategoryType getType() {
+        return type;
+    }
+
     public User getUser() {
         return user;
     }
 
     public void rename(String name) {
         this.name = validateName(name);
+    }
+
+    public void changeType(CategoryType type) {
+        this.type = Objects.requireNonNull(type, "O tipo da categoria não pode ser nulo");
     }
 
     private String validateName(String name) {
