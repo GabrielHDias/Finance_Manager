@@ -9,4 +9,4 @@ export interface BudgetSummary {
 }
 
 export interface BudgetPeriod { year: number; month: number }
-export interface SaveBudgetRequest extends BudgetPeriod { categoryId: number; limitAmount: string }
+export interface SaveBudgetRequest extends BudgetPeriod { categoryId: number; limitAmount: string; repeatsMonthly?: boolean }

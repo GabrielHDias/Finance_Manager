@@ -175,6 +175,12 @@ Cada resposta inclui `id`, `categoryId`, `categoryName`, `periodStart`, `limitAm
 
 Em **Contas financeiras**, o campo **Saldo inicial** entra na criação e na edição. Ele compõe o saldo da conta junto com as transações e não gera um lançamento. Zero e valores negativos são válidos (por exemplo, um cartão ou um limite já usado). Se a API receber a conta sem esse campo, o saldo inicial fica `0.00` e uma edição que omita o campo preserva o valor atual. O saldo exibido é saldo inicial + receitas − despesas.
 
+## Recorrências e orçamento que se repete
+
+Em **Recorrências**, uma receita ou despesa mensal ou semanal gera lançamentos reais quando você abre transações, orçamentos ou o dashboard. A data de “hoje” usa o fuso America/Sao_Paulo. Gerar de novo não duplica. Apagar um lançamento gerado não o recria. Interromper a regra preserva o que já foi lançado e não cria os próximos.
+
+No orçamento, **Repetir nos meses seguintes** copia o limite ao consultar um mês futuro. Excluir o orçamento de um mês impede que aquele mês e os seguintes sejam preenchidos de novo por essa série.
+
 ## Etiquetas
 
 Em **Etiquetas**, crie nomes curtos e associe até 10 deles a cada transação, na inclusão, na edição e, se quiser, na importação CSV. A coluna opcional `etiquetas` usa `|` e só aceita etiquetas já cadastradas. A lista, o filtro, a exportação e o gráfico **por etiqueta** usam essa dimensão junto com a categoria. Uma transação com várias etiquetas aparece em cada fatia; o total do gráfico não soma o mesmo valor duas vezes. Excluir a etiqueta tira o vínculo e mantém a transação. Transações sem etiqueta aparecem como “Sem etiqueta” no gráfico.

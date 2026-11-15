@@ -32,13 +32,16 @@ public class DashboardController {
 
     private final DashboardService dashboardService;
     private final AuthenticatedUser authenticatedUser;
+    private final io.github.gabrielhdias.financeManager.domain.recurring.RecurringGenerationService recurringGenerationService;
 
     public DashboardController(
         DashboardService dashboardService,
-        AuthenticatedUser authenticatedUser
+        AuthenticatedUser authenticatedUser,
+        io.github.gabrielhdias.financeManager.domain.recurring.RecurringGenerationService recurringGenerationService
     ) {
         this.dashboardService = dashboardService;
         this.authenticatedUser = authenticatedUser;
+        this.recurringGenerationService = recurringGenerationService;
     }
 
     @GetMapping("/transactions-summary")
@@ -48,6 +51,7 @@ public class DashboardController {
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
     ) {
+        recurringGenerationService.generate(authenticatedUser.getId());
         var summary = dashboardService.getTransactionsSummary(authenticatedUser.getId(), type, groupBy, startDate, endDate);
         return ResponseEntity.ok(TransactionChartResponse.from(summary));
     }
@@ -66,6 +70,7 @@ public class DashboardController {
         Long tagId
     ) {
         Long userId = authenticatedUser.getId();
+        recurringGenerationService.generate(userId);
 
         FinancialSummary summary =
             dashboardService.getSummary(

@@ -36,7 +36,7 @@ public class BudgetController {
 
     @PutMapping
     public BudgetSummary save(@Valid @RequestBody BudgetRequest request) {
-        return service.save(user.getId(), request.categoryId(), request.year(), request.month(), request.limitAmount());
+        return service.save(user.getId(), request.categoryId(), request.year(), request.month(), request.limitAmount(), Boolean.TRUE.equals(request.repeatsMonthly()));
     }
 
     @DeleteMapping("/{id}")
@@ -50,6 +50,7 @@ public class BudgetController {
         @Min(1) @Max(9999) int year,
         @Min(1) @Max(12) int month,
         @NotNull(message = "Informe o limite") @Positive(message = "O limite deve ser positivo")
-        @Digits(integer = 17, fraction = 2, message = "Use até duas casas decimais") @JsonFormat(shape = JsonFormat.Shape.STRING) @JsonSerialize(using = MoneySerializer.class) @Schema(type = "string", implementation = String.class, example = "0.30") BigDecimal limitAmount
+        @Digits(integer = 17, fraction = 2, message = "Use até duas casas decimais") @JsonFormat(shape = JsonFormat.Shape.STRING) @JsonSerialize(using = MoneySerializer.class) @Schema(type = "string", implementation = String.class, example = "0.30") BigDecimal limitAmount,
+        Boolean repeatsMonthly
     ) {}
 }

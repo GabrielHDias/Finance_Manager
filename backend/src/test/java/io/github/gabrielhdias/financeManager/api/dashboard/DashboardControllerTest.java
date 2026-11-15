@@ -32,6 +32,9 @@ class DashboardControllerTest {
     @Mock
     private AuthenticatedUser authenticatedUser;
 
+    @Mock
+    private io.github.gabrielhdias.financeManager.domain.recurring.RecurringGenerationService recurringGenerationService;
+
     @InjectMocks
     private DashboardController dashboardController;
 
