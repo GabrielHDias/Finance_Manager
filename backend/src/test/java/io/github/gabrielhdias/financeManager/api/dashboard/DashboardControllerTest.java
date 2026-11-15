@@ -58,13 +58,15 @@ class DashboardControllerTest {
         when(dashboardService.getSummary(
             userId,
             startDate,
-            endDate
+            endDate,
+            null
         )).thenReturn(summary);
 
         ResponseEntity<DashboardSummaryResponse> response =
             dashboardController.getSummary(
                 startDate,
-                endDate
+                endDate,
+                null
             );
 
         assertEquals(
@@ -96,7 +98,8 @@ class DashboardControllerTest {
             .getSummary(
                 userId,
                 startDate,
-                endDate
+                endDate,
+                null
             );
     }
 

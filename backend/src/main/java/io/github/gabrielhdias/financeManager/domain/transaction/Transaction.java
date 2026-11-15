@@ -2,11 +2,14 @@ package io.github.gabrielhdias.financeManager.domain.transaction;
 
 import io.github.gabrielhdias.financeManager.domain.account.Account;
 import io.github.gabrielhdias.financeManager.domain.category.Category;
+import io.github.gabrielhdias.financeManager.domain.tag.Tag;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.LinkedHashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "transactions")
@@ -40,6 +43,15 @@ public class Transaction {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "destination_account_id")
     private Account destinationAccount;
+
+    @ManyToMany
+    @JoinTable(
+        name = "transaction_tags",
+        joinColumns = @JoinColumn(name = "transaction_id"),
+        inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    @OrderBy("name ASC")
+    private Set<Tag> tags = new LinkedHashSet<>();
 
     protected Transaction() {
     }
@@ -121,6 +133,10 @@ public class Transaction {
 
     public Account getDestinationAccount() {
         return destinationAccount;
+    }
+
+    public Set<Tag> getTags() {
+        return tags;
     }
 
     public void updateDescription(String description) {

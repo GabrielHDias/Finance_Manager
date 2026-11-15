@@ -61,7 +61,8 @@ class TransactionControllerTest {
             request.type(),
             request.accountId(),
             request.categoryId(),
-            request.destinationAccountId()
+            request.destinationAccountId(),
+            request.tagIds()
         )).thenReturn(transaction);
 
         ResponseEntity<TransactionResponse> response =
@@ -87,7 +88,8 @@ class TransactionControllerTest {
             request.type(),
             request.accountId(),
             request.categoryId(),
-            request.destinationAccountId()
+            request.destinationAccountId(),
+            request.tagIds()
         );
     }
 
@@ -106,6 +108,7 @@ class TransactionControllerTest {
             null,
             null,
             null,
+            null,
             null
         )).thenReturn(
             List.of(transaction)
@@ -113,6 +116,7 @@ class TransactionControllerTest {
 
         ResponseEntity<List<TransactionResponse>> response =
             transactionController.list(
+                null,
                 null,
                 null,
                 null,
@@ -131,6 +135,7 @@ class TransactionControllerTest {
         verify(transactionService)
             .filterByUser(
                 userId,
+                null,
                 null,
                 null,
                 null,
@@ -160,7 +165,8 @@ class TransactionControllerTest {
             endDate,
             TransactionType.EXPENSE,
             10L,
-            20L
+            20L,
+            null
         )).thenReturn(
             List.of(transaction)
         );
@@ -171,7 +177,8 @@ class TransactionControllerTest {
                 endDate,
                 TransactionType.EXPENSE,
                 10L,
-                20L
+                20L,
+                null
             );
 
         assertEquals(
@@ -189,7 +196,8 @@ class TransactionControllerTest {
                 endDate,
                 TransactionType.EXPENSE,
                 10L,
-                20L
+                20L,
+                null
             );
     }
 
@@ -255,7 +263,8 @@ class TransactionControllerTest {
             request.type(),
             request.accountId(),
             request.categoryId(),
-            request.destinationAccountId()
+            request.destinationAccountId(),
+            request.tagIds()
         )).thenReturn(transaction);
 
         ResponseEntity<TransactionResponse> response =
@@ -281,7 +290,8 @@ class TransactionControllerTest {
                 request.type(),
                 request.accountId(),
                 request.categoryId(),
-                request.destinationAccountId()
+                request.destinationAccountId(),
+                request.tagIds()
             );
     }
 

@@ -15,7 +15,8 @@ export function matchesTransactionFilters(
     (!filters.endDate || transaction.date <= filters.endDate) &&
     (!filters.type || transaction.type === filters.type) &&
     (filters.accountId === undefined || transaction.accountId === filters.accountId || transaction.destinationAccountId === filters.accountId) &&
-    (filters.categoryId === undefined || transaction.categoryId === filters.categoryId)
+    (filters.categoryId === undefined || transaction.categoryId === filters.categoryId) &&
+    (filters.tagId === undefined || transaction.tags.some(tag => tag.id === filters.tagId))
   );
 }
 

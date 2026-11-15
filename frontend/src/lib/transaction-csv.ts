@@ -16,9 +16,10 @@ export function serializeTransactionCsv(transactions: readonly TransactionRespon
     transaction.type === "INCOME" ? "RECEITA" : transaction.type === "EXPENSE" ? "DESPESA" : "TRANSFERENCIA",
     transaction.type === "TRANSFER" ? `${transaction.accountName} → ${transaction.destinationAccountName ?? ""}` : transaction.accountName,
     transaction.categoryName ?? "",
+    (transaction.tags ?? []).map(tag => tag.name).join("|"),
   ].map(csvCell).join(";"));
 
-  return `\uFEFFdata;descricao;valor;tipo;conta;categoria\r\n${rows.join("\r\n")}${rows.length ? "\r\n" : ""}`;
+  return `\uFEFFdata;descricao;valor;tipo;conta;categoria;etiquetas\r\n${rows.join("\r\n")}${rows.length ? "\r\n" : ""}`;
 }
 
 export function downloadTransactionCsv(transactions: readonly TransactionResponse[]): void {

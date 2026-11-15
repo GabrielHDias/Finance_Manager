@@ -15,7 +15,7 @@ export interface DashboardPeriod {
 }
 
 export type ChartType = "PIE" | "LINE" | "BAR";
-export type ChartGrouping = "DAY" | "MONTH" | "CATEGORY";
+export type ChartGrouping = "DAY" | "MONTH" | "CATEGORY" | "TAG";
 export type FinancialType = "INCOME" | "EXPENSE";
 export interface ChartFilters {
   type: FinancialType;

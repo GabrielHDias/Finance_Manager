@@ -34,12 +34,15 @@ class TransactionServiceTest {
     @Mock
     private CategoryRepository categoryRepository;
 
+    @Mock
+    private io.github.gabrielhdias.financeManager.domain.tag.TagRepository tagRepository;
+
     @InjectMocks
     private TransactionService transactionService;
 
     @Test
     void shouldRefuseOversizedExportWithoutReturningTruncatedData() {
-        when(transactionRepository.findLimitedByFilters(any(), any(), any(), any(), any(), any(), any()))
+        when(transactionRepository.findLimitedByFilters(any(), any(), any(), any(), any(), any(), any(), any()))
             .thenReturn(java.util.Collections.nCopies(10001, createTransaction()));
         assertThrows(BusinessRuleException.class, () -> transactionService.filterByUser(1L,null,null,null,null,null));
     }
@@ -231,6 +234,7 @@ class TransactionServiceTest {
             TransactionType.EXPENSE,
             accountId,
             categoryId,
+            null,
             org.springframework.data.domain.PageRequest.of(0, 10001)
         )).thenReturn(transactions);
 
@@ -254,7 +258,8 @@ class TransactionServiceTest {
                 TransactionType.EXPENSE,
                 accountId,
                 categoryId,
-                org.springframework.data.domain.PageRequest.of(0, 10001)
+                null,
+            org.springframework.data.domain.PageRequest.of(0, 10001)
             );
     }
 
@@ -267,6 +272,7 @@ class TransactionServiceTest {
 
         when(transactionRepository.findLimitedByFilters(
             userId,
+            null,
             null,
             null,
             null,
@@ -295,7 +301,8 @@ class TransactionServiceTest {
                 null,
                 null,
                 null,
-                org.springframework.data.domain.PageRequest.of(0, 10001)
+                null,
+            org.springframework.data.domain.PageRequest.of(0, 10001)
             );
     }
 

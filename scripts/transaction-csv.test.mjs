@@ -23,7 +23,7 @@ const row = {
 };
 
 test('exports Brazilian dates, decimals, types, names and UTF-8 BOM with CRLF', () => {
-  assert.equal(serializeTransactionCsv([row]), '\uFEFFdata;descricao;valor;tipo;conta;categoria\r\n"19/10/2026";"Salário";"1234,50";"RECEITA";"Conta principal";"Trabalho"\r\n');
+  assert.equal(serializeTransactionCsv([row]), '\uFEFFdata;descricao;valor;tipo;conta;categoria;etiquetas\r\n"19/10/2026";"Salário";"1234,50";"RECEITA";"Conta principal";"Trabalho";""\r\n');
   assert.match(serializeTransactionCsv([{ ...row, amount: "0.01", type: 'EXPENSE' }]), /"0,01";"DESPESA"/);
 });
 
@@ -50,5 +50,5 @@ test('preserves ordinary text, row order and input data', () => {
 });
 
 test('empty result has only the header and no phantom transaction', () => {
-  assert.equal(serializeTransactionCsv([]), '\uFEFFdata;descricao;valor;tipo;conta;categoria\r\n');
+  assert.equal(serializeTransactionCsv([]), '\uFEFFdata;descricao;valor;tipo;conta;categoria;etiquetas\r\n');
 });

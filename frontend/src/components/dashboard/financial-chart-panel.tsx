@@ -22,9 +22,10 @@ export default function FinancialChartPanel({ startDate, endDate }: { startDate:
   const validation = groupBy === "DAY" && days > 366 ? "O agrupamento diário permite no máximo 366 dias. Reduza o período ou escolha outro agrupamento." : "";
   const loading = !validation && !current;
   const months = (Number(endDate.slice(0, 4)) - Number(startDate.slice(0, 4))) * 12 + Number(endDate.slice(5, 7)) - Number(startDate.slice(5, 7)) + 1;
-  const pieDisabled = groupBy !== "CATEGORY" && (groupBy === "DAY" ? days > 8 : months > 8);
-  const effectiveChart = chart === "LINE" && groupBy === "CATEGORY" ? "BAR" : chart === "PIE" && pieDisabled ? "BAR" : chart;
-  const title = `${type === "INCOME" ? "Receitas" : "Despesas"} por ${groupBy === "DAY" ? "dia" : groupBy === "MONTH" ? "mês" : "categoria"}`;
+  const categorical = groupBy === "CATEGORY" || groupBy === "TAG";
+  const pieDisabled = !categorical && (groupBy === "DAY" ? days > 8 : months > 8);
+  const effectiveChart = chart === "LINE" && categorical ? "BAR" : chart === "PIE" && pieDisabled ? "BAR" : chart;
+  const title = `${type === "INCOME" ? "Receitas" : "Despesas"} por ${groupBy === "DAY" ? "dia" : groupBy === "MONTH" ? "mês" : groupBy === "TAG" ? "etiqueta" : "categoria"}`;
 
   useEffect(() => {
     if (validation) return;
@@ -42,14 +43,14 @@ export default function FinancialChartPanel({ startDate, endDate }: { startDate:
 
   function changeGroup(value: ChartGrouping) {
     setGroupBy(value);
-    if (value === "CATEGORY" && chart === "LINE") setChart("BAR");
+    if (value === "CATEGORY" || value === "TAG") { if (chart === "LINE") setChart("BAR"); }
     if (value !== "CATEGORY" && chart === "PIE") setChart("LINE");
   }
 
   return <section className="card" aria-labelledby="financial-chart-title">
     <h2 id="financial-chart-title">{title}</h2>
     <ChartFilters type={type} groupBy={groupBy} chart={effectiveChart} pieDisabled={pieDisabled} onType={setType} onGroup={changeGroup} onChart={setChart} />
-    <p id="chart-compatibility">{groupBy === "CATEGORY" ? "Categorias permitem pizza ou coluna. Linha está indisponível porque as categorias não formam uma série temporal." : "Séries temporais priorizam linha ou coluna. Pizza está disponível para até 8 períodos. Dias e meses sem movimentação aparecem com zero."}</p>
+    <p id="chart-compatibility">{categorical ? "Categorias e etiquetas permitem pizza ou coluna. Linha está indisponível porque não formam uma série temporal. Uma transação com várias etiquetas entra em cada uma; o total acima não duplica o valor." : "Séries temporais priorizam linha ou coluna. Pizza está disponível para até 8 períodos. Dias e meses sem movimentação aparecem com zero."}</p>
     {chart !== effectiveChart && <p role="status">Gráfico ajustado para coluna para manter a legibilidade; os demais filtros foram preservados.</p>}
     <div aria-busy={loading} aria-live="polite">
       {validation ? <p className="error-message" role="alert">{validation}</p> : loading ? <p role="status">Carregando gráfico...</p> : current?.error ? <><p className="error-message" role="alert">{current.error}</p><button type="button" onClick={() => setRevision(value => value + 1)}>Tentar novamente</button></> : current?.data && <>

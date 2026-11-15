@@ -8,6 +8,7 @@ export interface CreateTransactionRequest {
   accountId: number;
   categoryId?: number;
   destinationAccountId?: number;
+  tagIds?: number[];
 }
 
 export interface TransactionResponse {
@@ -22,6 +23,7 @@ export interface TransactionResponse {
   categoryName: string | null;
   destinationAccountId: number | null;
   destinationAccountName: string | null;
+  tags: { id: number; name: string }[];
 }
 
 export interface TransactionFilters {
@@ -30,6 +32,7 @@ export interface TransactionFilters {
   type?: TransactionType;
   accountId?: number;
   categoryId?: number;
+  tagId?: number;
 }
 
 export interface TransactionPage {

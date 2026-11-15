@@ -33,28 +33,27 @@ public class DashboardService {
         LocalDate startDate,
         LocalDate endDate
     ) {
+        return getSummary(userId, startDate, endDate, null);
+    }
+
+    @Transactional(readOnly = true)
+    public FinancialSummary getSummary(
+        Long userId,
+        LocalDate startDate,
+        LocalDate endDate,
+        Long tagId
+    ) {
         validatePeriod(
             startDate,
             endDate
         );
 
-        BigDecimal totalIncome =
-            transactionRepository
-                .sumAmountByUserAndTypeAndPeriod(
-                    userId,
-                    TransactionType.INCOME,
-                    startDate,
-                    endDate
-                );
-
-        BigDecimal totalExpense =
-            transactionRepository
-                .sumAmountByUserAndTypeAndPeriod(
-                    userId,
-                    TransactionType.EXPENSE,
-                    startDate,
-                    endDate
-                );
+        BigDecimal totalIncome = tagId == null
+            ? transactionRepository.sumAmountByUserAndTypeAndPeriod(userId, TransactionType.INCOME, startDate, endDate)
+            : transactionRepository.sumAmountForTag(userId, TransactionType.INCOME, tagId, startDate, endDate);
+        BigDecimal totalExpense = tagId == null
+            ? transactionRepository.sumAmountByUserAndTypeAndPeriod(userId, TransactionType.EXPENSE, startDate, endDate)
+            : transactionRepository.sumAmountForTag(userId, TransactionType.EXPENSE, tagId, startDate, endDate);
 
         BigDecimal balance =
             totalIncome.subtract(totalExpense);
@@ -100,6 +99,18 @@ public class DashboardService {
         long days = ChronoUnit.DAYS.between(startDate, endDate) + 1;
         if ((groupBy == ChartGrouping.DAY && days > 366) || endDate.isAfter(startDate.plusYears(10))) {
             throw new IllegalArgumentException("Selecione no máximo 366 dias no agrupamento diário ou 10 anos nos demais.");
+        }
+
+        if (groupBy == ChartGrouping.TAG) {
+            var tagged = new java.util.ArrayList<TransactionChartSummary.Item>();
+            transactionRepository.sumByTag(userId, type, startDate, endDate).forEach(row ->
+                tagged.add(new TransactionChartSummary.Item(row.categoryId().toString(), row.categoryName(), row.amount())));
+            BigDecimal unlabeled = transactionRepository.sumWithoutTags(userId, type, startDate, endDate);
+            if (unlabeled.signum() > 0) {
+                tagged.add(new TransactionChartSummary.Item("none", "Sem etiqueta", unlabeled));
+            }
+            BigDecimal total = transactionRepository.sumAmountByUserAndTypeAndPeriod(userId, type, startDate, endDate);
+            return new TransactionChartSummary(type, groupBy, total, List.copyOf(tagged));
         }
 
         List<TransactionChartSummary.Item> items;

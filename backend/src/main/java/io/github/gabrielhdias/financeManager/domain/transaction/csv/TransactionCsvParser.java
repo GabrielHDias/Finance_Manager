@@ -27,6 +27,7 @@ public class TransactionCsvParser {
     public static final int MAX_BYTES = 1024 * 1024;
     public static final int MAX_ROWS = 1000;
     private static final Set<String> HEADERS = Set.of("data", "descricao", "valor", "tipo");
+    private static final String TAGS = "etiquetas";
     private static final DateTimeFormatter BRAZILIAN_DATE = DateTimeFormatter
         .ofPattern("dd/MM/uuuu").withResolverStyle(ResolverStyle.STRICT);
 
@@ -50,8 +51,10 @@ public class TransactionCsvParser {
         try (CSVParser parser = CSVParser.parse(content, format)) {
             List<String> headers = parser.getHeaderNames().stream()
                 .map(name -> name.toLowerCase(Locale.ROOT)).toList();
-            if (headers.size() != 4 || !new HashSet<>(headers).equals(HEADERS)) {
-                throw new IllegalArgumentException("Use os cabeçalhos data, descricao, valor e tipo, sem colunas extras.");
+            Set<String> present = new HashSet<>(headers);
+            if (!present.containsAll(HEADERS) || !HEADERS.containsAll(present.stream().filter(name -> !name.equals(TAGS)).toList())
+                || headers.stream().filter(name -> !name.isBlank()).distinct().count() != headers.stream().filter(name -> !name.isBlank()).count()) {
+                throw new IllegalArgumentException("Use os cabeçalhos data, descricao, valor e tipo. A coluna etiquetas é opcional.");
             }
             List<CsvImportRow> rows = new ArrayList<>();
             int cursor = 0;
@@ -75,7 +78,7 @@ public class TransactionCsvParser {
 
     private CsvImportRow parseRow(CSVRecord record, List<String> headers, int line) {
         List<String> errors = new ArrayList<>();
-        if (record.size() != 4) errors.add("A linha deve conter exatamente quatro colunas.");
+        if (record.size() != headers.size()) errors.add("A linha deve conter as colunas do cabeçalho.");
         String date = cell(record, headers.indexOf("data"));
         String description = cell(record, headers.indexOf("descricao"));
         String amount = cell(record, headers.indexOf("valor"));
@@ -101,8 +104,12 @@ public class TransactionCsvParser {
             case "DESPESA", "EXPENSE" -> "EXPENSE";
             default -> { errors.add("O tipo deve ser RECEITA ou DESPESA."); yield type; }
         };
+        int tagsIndex = headers.indexOf(TAGS);
+        List<String> tagNames = tagsIndex < 0 ? List.of() : java.util.Arrays.stream(cell(record, tagsIndex).split("\\|"))
+            .map(String::trim).filter(name -> !name.isEmpty()).distinct().toList();
+        if (tagNames.stream().anyMatch(name -> name.length() > 40)) errors.add("Cada etiqueta deve possuir no máximo 40 caracteres.");
         return new CsvImportRow(line, date, description, amount, type,
-            errors.isEmpty() ? CsvImportRow.Status.READY : CsvImportRow.Status.INVALID, List.copyOf(errors));
+            errors.isEmpty() ? CsvImportRow.Status.READY : CsvImportRow.Status.INVALID, List.copyOf(errors), tagNames);
     }
 
     private String cell(CSVRecord record, int index) {

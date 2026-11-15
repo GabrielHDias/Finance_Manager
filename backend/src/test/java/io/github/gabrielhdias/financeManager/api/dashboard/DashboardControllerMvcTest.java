@@ -123,6 +123,7 @@ class DashboardControllerMvcTest {
         when(dashboardService.getSummary(
             userId,
             null,
+            null,
             null
         )).thenReturn(summary);
 
@@ -166,7 +167,8 @@ class DashboardControllerMvcTest {
         when(dashboardService.getSummary(
             userId,
             startDate,
-            endDate
+            endDate,
+            null
         )).thenReturn(summary);
 
         mockMvc.perform(
@@ -210,7 +212,8 @@ class DashboardControllerMvcTest {
         when(dashboardService.getSummary(
             userId,
             startDate,
-            endDate
+            endDate,
+            null
         )).thenThrow(
             new BusinessRuleException(
                 "A data inicial não pode ser posterior à data final"

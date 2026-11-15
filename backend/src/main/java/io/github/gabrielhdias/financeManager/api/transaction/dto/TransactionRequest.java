@@ -13,6 +13,7 @@ import tools.jackson.databind.annotation.JsonSerialize;
 import io.github.gabrielhdias.financeManager.api.money.MoneySerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
+import java.util.List;
 
 public record TransactionRequest(
 
@@ -46,7 +47,9 @@ public record TransactionRequest(
     Long categoryId,
 
     @Positive(message = "O identificador da conta de destino deve ser maior que zero")
-    Long destinationAccountId
+    Long destinationAccountId,
+
+    List<Long> tagIds
 ) {
     public TransactionRequest(
         String description,
@@ -56,6 +59,6 @@ public record TransactionRequest(
         Long accountId,
         Long categoryId
     ) {
-        this(description, amount, date, type, accountId, categoryId, null);
+        this(description, amount, date, type, accountId, categoryId, null, null);
     }
 }
