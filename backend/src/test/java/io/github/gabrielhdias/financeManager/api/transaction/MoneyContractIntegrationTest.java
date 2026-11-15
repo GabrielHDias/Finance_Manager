@@ -2,6 +2,7 @@ package io.github.gabrielhdias.financeManager.api.transaction;
 import io.github.gabrielhdias.financeManager.domain.user.User;
 import io.github.gabrielhdias.financeManager.domain.account.Account;
 import io.github.gabrielhdias.financeManager.domain.category.Category;
+import io.github.gabrielhdias.financeManager.domain.category.CategoryType;
 import io.github.gabrielhdias.financeManager.integration.AbstractPostgreSqlIntegrationTest;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
@@ -29,7 +30,7 @@ class MoneyContractIntegrationTest extends AbstractPostgreSqlIntegrationTest {
     }
     @Test void maximumAndHighTotalsRoundTripWithoutRounding() throws Exception {
         User owner = new User("Money", "money-contract@example.test", "fixture-hash"); em.persist(owner);
-        Account account = new Account("Money",owner); Category category = new Category("Money",owner);
+        Account account = new Account("Money",owner); Category category = new Category("Money", CategoryType.INCOME, owner);
         em.persist(account); em.persist(category); em.flush();
         for (int i=0;i<2;i++) {
             mvc.perform(post("/transactions").with(jwt().jwt(token -> token.subject(owner.getId().toString())))
