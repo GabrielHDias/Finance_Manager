@@ -1,6 +1,6 @@
 "use client";
 
-import { sign } from "@/lib/money";
+import { sign, validBalance, decimal, cents } from "@/lib/money";
 
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -23,6 +23,7 @@ export default function AccountsPage() {
   const [balances, setBalances] = useState<Record<number, string>>({});
   const [balanceErrors, setBalanceErrors] = useState<Record<number, boolean>>({});
   const [name, setName] = useState("");
+  const [openingBalance, setOpeningBalance] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
   const [pendingDelete, setPendingDelete] = useState<number | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
@@ -79,11 +80,13 @@ export default function AccountsPage() {
   function resetForm() {
     setEditingId(null);
     setName("");
+    setOpeningBalance("");
   }
 
   function startEditing(item: AccountResponse) {
     setEditingId(item.id);
     setName(item.name);
+    setOpeningBalance(item.openingBalance);
     setPendingDelete(null);
     setDeleteError("");
     setErrorMessage("");
@@ -99,15 +102,21 @@ export default function AccountsPage() {
       setErrorMessage("Informe o nome da conta.");
       return;
     }
+    const balanceValue = openingBalance.trim() === "" ? "0.00" : openingBalance.trim();
+    if (!validBalance(balanceValue)) {
+      setErrorMessage("Informe um saldo inicial com até 17 dígitos inteiros e 2 casas decimais. Zero e valores negativos são aceitos.");
+      return;
+    }
 
     setSubmitting(true);
     setErrorMessage("");
     setSuccessMessage("");
     try {
       const wasEditing = editingId !== null;
+      const request = { name: trimmedName, openingBalance: decimal(cents(balanceValue)) };
       const saved = wasEditing
-        ? await renameAccount(editingId, { name: trimmedName })
-        : await createAccount({ name: trimmedName });
+        ? await renameAccount(editingId, request)
+        : await createAccount(request);
       setAccounts((current) => wasEditing
         ? current.map((item) => item.id === saved.id ? saved : item)
         : [...current, saved]);
@@ -185,6 +194,19 @@ export default function AccountsPage() {
               required
             />
           </div>
+          <div>
+            <label htmlFor="account-opening-balance">Saldo inicial</label>
+            <input
+              id="account-opening-balance"
+              className="amount-input"
+              name="openingBalance"
+              inputMode="decimal"
+              value={openingBalance}
+              onChange={(event) => setOpeningBalance(event.target.value)}
+              placeholder="0.00"
+              disabled={busy}
+            />
+          </div>
           <button type="submit" disabled={busy}>
             {submitting ? "Salvando..." : editingId === null ? "Criar conta" : "Salvar alterações"}
           </button>
@@ -214,6 +236,7 @@ export default function AccountsPage() {
               <li key={item.id}>
                 <div className="resource-row">
                   <strong className="resource-name">{item.name}</strong>
+                  <span>Saldo inicial: {formatCurrency(item.openingBalance)}</span>
                   <div aria-live="polite">
                     {balanceErrors[item.id] ? (
                       <>

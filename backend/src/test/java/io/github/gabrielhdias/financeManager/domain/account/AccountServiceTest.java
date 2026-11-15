@@ -265,6 +265,54 @@ class AccountServiceTest {
     }
 
     @Test
+    void shouldIncludeOpeningBalanceInAccountBalance() {
+        Long userId = 1L;
+        Long accountId = 10L;
+        User user = new User("Gabriel", "gabriel@email.com", "$2a$10$encodedPassword");
+        Account account = new Account("Nubank", new BigDecimal("100.50"), user);
+
+        when(accountRepository.findByIdAndUserId(accountId, userId))
+            .thenReturn(Optional.of(account));
+        when(transactionRepository.calculateBalanceByAccountId(accountId, TransactionType.INCOME))
+            .thenReturn(new BigDecimal("40.25"));
+
+        assertEquals(new BigDecimal("140.75"), accountService.calculateBalance(userId, accountId));
+    }
+
+    @Test
+    void shouldRejectOpeningBalanceWithTooManyDecimalPlaces() {
+        Long userId = 1L;
+        User user = new User("Gabriel", "gabriel@email.com", "$2a$10$encodedPassword");
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(accountRepository.existsByUserIdAndName(userId, "Nubank")).thenReturn(false);
+
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> accountService.create(userId, "Nubank", new BigDecimal("1.234"))
+        );
+
+        assertEquals(
+            "O saldo inicial deve ter no máximo 17 dígitos inteiros e 2 casas decimais",
+            exception.getMessage()
+        );
+        verify(accountRepository, never()).save(any(Account.class));
+    }
+
+    @Test
+    void shouldUpdateOpeningBalanceWithoutRenamingWhenNameStays() {
+        Long userId = 1L;
+        Long accountId = 10L;
+        User user = new User("Gabriel", "gabriel@email.com", "$2a$10$encodedPassword");
+        Account account = new Account("Nubank", user);
+        when(accountRepository.findByIdAndUserId(accountId, userId)).thenReturn(Optional.of(account));
+
+        Account result = accountService.update(userId, accountId, "Nubank", new BigDecimal("-20"));
+
+        assertEquals(new BigDecimal("-20.00"), result.getOpeningBalance());
+        assertEquals("Nubank", result.getName());
+    }
+
+    @Test
     void shouldNotCalculateBalanceWhenAccountDoesNotBelongToUser() {
         Long userId = 1L;
         Long accountId = 10L;

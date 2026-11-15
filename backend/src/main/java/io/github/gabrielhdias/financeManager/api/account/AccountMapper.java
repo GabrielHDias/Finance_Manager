@@ -11,7 +11,8 @@ public final class AccountMapper {
     public static AccountResponse toResponse(Account account) {
         return new AccountResponse(
             account.getId(),
-            account.getName()
+            account.getName(),
+            account.getOpeningBalance()
         );
     }
 }

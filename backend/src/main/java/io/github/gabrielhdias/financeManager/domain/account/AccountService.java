@@ -35,6 +35,15 @@ public class AccountService {
         Long userId,
         String name
     ) {
+        return create(userId, name, null);
+    }
+
+    @Transactional
+    public Account create(
+        Long userId,
+        String name,
+        BigDecimal openingBalance
+    ) {
         User user = findUserById(userId);
 
         String normalizedName = name.trim();
@@ -50,6 +59,7 @@ public class AccountService {
 
         Account account = new Account(
             normalizedName,
+            openingBalance == null ? BigDecimal.ZERO : openingBalance,
             user
         );
 
@@ -77,14 +87,16 @@ public class AccountService {
         Long userId,
         Long accountId
     ) {
-        findAccountByIdAndUserId(
+        Account account = findAccountByIdAndUserId(
             accountId,
             userId
         );
 
-        return transactionRepository.calculateBalanceByAccountId(
-            accountId,
-            TransactionType.INCOME
+        return account.getOpeningBalance().add(
+            transactionRepository.calculateBalanceByAccountId(
+                accountId,
+                TransactionType.INCOME
+            )
         );
     }
 
@@ -118,6 +130,20 @@ public class AccountService {
 
         account.rename(normalizedName);
 
+        return account;
+    }
+
+    @Transactional
+    public Account update(
+        Long userId,
+        Long accountId,
+        String name,
+        BigDecimal openingBalance
+    ) {
+        Account account = rename(userId, accountId, name);
+        if (openingBalance != null) {
+            account.updateOpeningBalance(openingBalance);
+        }
         return account;
     }
 

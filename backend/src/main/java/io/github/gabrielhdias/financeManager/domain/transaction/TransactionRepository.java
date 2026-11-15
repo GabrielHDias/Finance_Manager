@@ -200,9 +200,9 @@ public interface TransactionRepository
     );
     @Query("""
         SELECT new io.github.gabrielhdias.financeManager.api.account.dto.AccountBalanceResponse(
-            a.id, COALESCE(SUM(CASE WHEN t.type = :incomeType THEN t.amount ELSE -t.amount END), 0))
+            a.id, a.openingBalance + COALESCE(SUM(CASE WHEN t.type = :incomeType THEN t.amount ELSE -t.amount END), 0))
         FROM Account a LEFT JOIN Transaction t ON t.account = a
-        WHERE a.user.id = :userId GROUP BY a.id ORDER BY a.id
+        WHERE a.user.id = :userId GROUP BY a.id, a.openingBalance ORDER BY a.id
         """)
     List<io.github.gabrielhdias.financeManager.api.account.dto.AccountBalanceResponse> balancesByUser(
         @Param("userId") Long userId, @Param("incomeType") TransactionType incomeType);
