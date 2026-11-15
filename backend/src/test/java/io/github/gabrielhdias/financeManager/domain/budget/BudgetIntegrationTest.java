@@ -2,6 +2,7 @@ package io.github.gabrielhdias.financeManager.domain.budget;
 
 import io.github.gabrielhdias.financeManager.domain.account.Account;
 import io.github.gabrielhdias.financeManager.domain.category.Category;
+import io.github.gabrielhdias.financeManager.domain.category.CategoryType;
 import io.github.gabrielhdias.financeManager.domain.category.CategoryService;
 import io.github.gabrielhdias.financeManager.domain.exception.BusinessRuleException;
 import io.github.gabrielhdias.financeManager.domain.exception.ResourceNotFoundException;
@@ -44,7 +45,10 @@ class BudgetIntegrationTest extends AbstractPostgreSqlIntegrationTest {
         Fixture owner = fixture("budget-owner@example.test");
         Fixture foreign = fixture("budget-foreign@example.test");
         transaction(owner, LocalDate.of(2026, 10, 1), TransactionType.EXPENSE, "60.00");
-        transaction(owner, LocalDate.of(2026, 10, 31), TransactionType.INCOME, "999.00");
+        Category income = new Category("Receita", CategoryType.INCOME, owner.user());
+        em.persist(income);
+        em.flush();
+        transactions.create(owner.user().getId(), "Receita", new BigDecimal("999.00"), LocalDate.of(2026, 10, 31), TransactionType.INCOME, owner.account().getId(), income.getId());
         transaction(owner, LocalDate.of(2026, 9, 30), TransactionType.EXPENSE, "90.00");
         transaction(foreign, LocalDate.of(2026, 10, 1), TransactionType.EXPENSE, "900.00");
         BudgetSummary first = budgets.save(owner.user().getId(), owner.category().getId(), 2026, 10, new BigDecimal("100.00"));

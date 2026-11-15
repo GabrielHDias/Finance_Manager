@@ -1,5 +1,6 @@
 package io.github.gabrielhdias.financeManager.api.category.dto;
 
+import io.github.gabrielhdias.financeManager.domain.category.CategoryType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -10,6 +11,11 @@ public record CategoryRequest(
         max = 100,
         message = "O nome da categoria deve possuir no máximo 100 caracteres"
     )
-    String name
+    String name,
+
+    CategoryType type
 ) {
+    public CategoryRequest(String name) {
+        this(name, null);
+    }
 }

@@ -361,4 +361,36 @@ class CategoryServiceTest {
         verify(categoryRepository, never())
             .delete(any(Category.class));
     }
+
+    @Test
+    void shouldDefaultNewCategoryToExpense() {
+        Long userId = 1L;
+        User user = new User("Gabriel", "gabriel@email.com", "$2a$10$encodedPassword");
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(categoryRepository.existsByUserIdAndName(userId, "Lazer")).thenReturn(false);
+        when(categoryRepository.save(any(Category.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Category result = categoryService.create(userId, "Lazer", null);
+
+        assertEquals(CategoryType.EXPENSE, result.getType());
+    }
+
+    @Test
+    void shouldNotTurnCategoryIntoIncomeWhileBudgetsExist() {
+        Long userId = 1L;
+        Long categoryId = 10L;
+        User user = new User("Gabriel", "gabriel@email.com", "$2a$10$encodedPassword");
+        Category category = new Category("Alimentação", user);
+        when(categoryRepository.findByIdAndUserId(categoryId, userId)).thenReturn(Optional.of(category));
+        when(transactionRepository.existsByCategoryId(categoryId)).thenReturn(false);
+        when(budgetRepository.existsByCategoryId(categoryId)).thenReturn(true);
+
+        BusinessRuleException exception = assertThrows(
+            BusinessRuleException.class,
+            () -> categoryService.update(userId, categoryId, "Alimentação", CategoryType.INCOME)
+        );
+
+        assertEquals("Remova os orçamentos antes de transformar a categoria em receita", exception.getMessage());
+        assertEquals(CategoryType.EXPENSE, category.getType());
+    }
 }

@@ -94,7 +94,10 @@ public class TransactionCsvImportService {
                 invalid++;
             } else {
                 Key key = new Key(LocalDate.parse(row.date()), row.description(), row.amount(), row.type());
-                if (existing.contains(key)) {
+                if (!category.getType().name().equals(row.type())) {
+                    rows.add(row.invalid("A categoria selecionada é de " + (category.getType().name().equals("INCOME") ? "receita" : "despesa") + "."));
+                    invalid++;
+                } else if (existing.contains(key)) {
                     rows.add(row.duplicate("Já existe uma transação idêntica nesta conta e categoria."));
                     duplicates++;
                 } else if (!inFile.add(key)) {

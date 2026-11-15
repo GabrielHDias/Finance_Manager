@@ -50,7 +50,8 @@ class CategoryControllerTest {
 
         when(categoryService.create(
             userId,
-            "Alimentação"
+            "Alimentação",
+            null
         )).thenReturn(category);
 
         ResponseEntity<CategoryResponse> response =
@@ -75,7 +76,8 @@ class CategoryControllerTest {
 
         verify(categoryService).create(
             userId,
-            "Alimentação"
+            "Alimentação",
+            null
         );
     }
 
@@ -202,10 +204,11 @@ class CategoryControllerTest {
         when(category.getName())
             .thenReturn("Mercado");
 
-        when(categoryService.rename(
+        when(categoryService.update(
             userId,
             categoryId,
-            "Mercado"
+            "Mercado",
+            null
         )).thenReturn(category);
 
         ResponseEntity<CategoryResponse> response =
@@ -231,10 +234,11 @@ class CategoryControllerTest {
             response.getBody().name()
         );
 
-        verify(categoryService).rename(
+        verify(categoryService).update(
             userId,
             categoryId,
-            "Mercado"
+            "Mercado",
+            null
         );
     }
 

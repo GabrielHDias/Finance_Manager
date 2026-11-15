@@ -129,18 +129,18 @@ export default function BudgetsPage() {
           <section className="card">
             <h2>Definir limite — {monthLabel(reference)}</h2>
             <p>De {formatDate(range.startDate)} a {formatDate(range.endDate)}. Salvar uma categoria já cadastrada atualiza o limite deste mês.</p>
-            {data.categories.length === 0 && <p>Cadastre uma categoria antes de definir um orçamento.</p>}
+            {data.categories.filter(category => category.type === "EXPENSE").length === 0 && <p>Cadastre uma categoria de despesa antes de definir um orçamento.</p>}
             <form className="transaction-form" onSubmit={submit}>
               <div><label htmlFor="budget-category">Categoria</label>
                 <select id="budget-category" value={categoryId} onChange={event => setCategoryId(event.target.value)} disabled={busy} required>
                   <option value="">Selecione uma categoria</option>
-                  {data.categories.map(category => <option key={category.id} value={category.id}>{category.name}</option>)}
+                  {data.categories.filter(category => category.type === "EXPENSE").map(category => <option key={category.id} value={category.id}>{category.name}</option>)}
                 </select>
               </div>
               <div><label htmlFor="budget-limit">Limite mensal</label>
                 <input id="budget-limit" className="amount-input" type="number" min="0.01" step="0.01" value={limit} onChange={event => setLimit(event.target.value)} required disabled={busy} />
               </div>
-              <button type="submit" disabled={busy || data.categories.length === 0}>{working ? "Salvando..." : "Salvar limite"}</button>
+              <button type="submit" disabled={busy || data.categories.filter(category => category.type === "EXPENSE").length === 0}>{working ? "Salvando..." : "Salvar limite"}</button>
             </form>
           </section>
           <section className="card">

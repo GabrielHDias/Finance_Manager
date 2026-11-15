@@ -291,9 +291,11 @@ export default function TransactionsPage() {
             name="type"
             disabled={busy}
             value={type}
-            onChange={(event) =>
-              setType(event.target.value as TransactionType)
-            }
+            onChange={(event) => {
+              const next = event.target.value as TransactionType;
+              setType(next);
+              setCategoryId((current) => categories.some((category) => String(category.id) === current && category.type === next) ? current : "");
+            }}
           >
             <option value="EXPENSE">Despesa</option>
             <option value="INCOME">Receita</option>
@@ -334,7 +336,7 @@ export default function TransactionsPage() {
           >
             <option value="">Selecione uma categoria</option>
 
-            {categories.map((category) => (
+            {categories.filter((category) => category.type === type).map((category) => (
               <option key={category.id} value={category.id}>
                 {category.name}
               </option>
@@ -373,7 +375,7 @@ export default function TransactionsPage() {
             <label htmlFor="filter-category">Categoria da transação</label>
             <select id="filter-category" name="categoryId" disabled={busy}>
               <option value="">Todas as categorias</option>
-              {categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
+              {categories.map((category) => <option key={category.id} value={category.id}>{category.name} ({category.type === "INCOME" ? "receita" : "despesa"})</option>)}
             </select>
           </div>
           <button type="submit" disabled={busy}>Aplicar filtros</button>
