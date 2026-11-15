@@ -49,10 +49,13 @@ public class DashboardController {
         @RequestParam TransactionType type,
         @RequestParam ChartGrouping groupBy,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+        @RequestParam(required = false) Long tagId
     ) {
         recurringGenerationService.generate(authenticatedUser.getId());
-        var summary = dashboardService.getTransactionsSummary(authenticatedUser.getId(), type, groupBy, startDate, endDate);
+        var summary = tagId == null
+            ? dashboardService.getTransactionsSummary(authenticatedUser.getId(), type, groupBy, startDate, endDate)
+            : dashboardService.getTransactionsSummary(authenticatedUser.getId(), type, groupBy, startDate, endDate, tagId);
         return ResponseEntity.ok(TransactionChartResponse.from(summary));
     }
 

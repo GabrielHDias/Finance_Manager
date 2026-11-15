@@ -11,6 +11,7 @@ function periodQuery(period: DashboardPeriod): string {
   const query = new URLSearchParams();
   if (period.startDate) query.set("startDate", period.startDate);
   if (period.endDate) query.set("endDate", period.endDate);
+  if (period.tagId) query.set("tagId", String(period.tagId));
   return query.size ? `?${query}` : "";
 }
 
@@ -30,6 +31,12 @@ export async function getTransactionsSummary(
   filters: ChartFilters,
   signal?: AbortSignal,
 ): Promise<TransactionChartResponse> {
-  const query = new URLSearchParams({ ...filters });
+  const query = new URLSearchParams({
+    type: filters.type,
+    groupBy: filters.groupBy,
+    startDate: filters.startDate,
+    endDate: filters.endDate,
+  });
+  if (filters.tagId) query.set("tagId", String(filters.tagId));
   return apiRequest(`/dashboard/transactions-summary?${query}`, { signal });
 }

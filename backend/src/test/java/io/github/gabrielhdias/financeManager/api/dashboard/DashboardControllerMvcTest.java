@@ -98,6 +98,28 @@ class DashboardControllerMvcTest {
     }
 
     @Test
+    void chartForwardsTheSelectedTag() throws Exception {
+        var start = LocalDate.of(2026, 11, 1);
+        var end = LocalDate.of(2026, 11, 30);
+        when(authenticatedUser.getId()).thenReturn(7L);
+        when(dashboardService.getTransactionsSummary(7L,
+            io.github.gabrielhdias.financeManager.domain.transaction.TransactionType.EXPENSE,
+            io.github.gabrielhdias.financeManager.domain.dashboard.ChartGrouping.CATEGORY, start, end, 4L))
+            .thenReturn(new io.github.gabrielhdias.financeManager.domain.dashboard.TransactionChartSummary(
+                io.github.gabrielhdias.financeManager.domain.transaction.TransactionType.EXPENSE,
+                io.github.gabrielhdias.financeManager.domain.dashboard.ChartGrouping.CATEGORY,
+                new BigDecimal("10.00"), List.of()));
+        mockMvc.perform(get("/dashboard/transactions-summary").param("type", "EXPENSE").param("groupBy", "CATEGORY")
+                .param("startDate", start.toString()).param("endDate", end.toString()).param("tagId", "4")
+                .with(jwt().jwt(jwt -> jwt.subject("7"))))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.total").value("10.00"));
+        org.mockito.Mockito.verify(dashboardService).getTransactionsSummary(7L,
+            io.github.gabrielhdias.financeManager.domain.transaction.TransactionType.EXPENSE,
+            io.github.gabrielhdias.financeManager.domain.dashboard.ChartGrouping.CATEGORY, start, end, 4L);
+    }
+
+    @Test
     void shouldReturnUnauthorizedWhenRequestHasNoToken()
         throws Exception {
 

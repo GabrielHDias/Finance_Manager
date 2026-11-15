@@ -87,6 +87,12 @@ public class DashboardService {
     @Transactional(readOnly = true)
     public TransactionChartSummary getTransactionsSummary(Long userId, TransactionType type,
             ChartGrouping groupBy, LocalDate startDate, LocalDate endDate) {
+        return getTransactionsSummary(userId, type, groupBy, startDate, endDate, null);
+    }
+
+    @Transactional(readOnly = true)
+    public TransactionChartSummary getTransactionsSummary(Long userId, TransactionType type,
+            ChartGrouping groupBy, LocalDate startDate, LocalDate endDate, Long tagId) {
         if (type == null || groupBy == null || startDate == null || endDate == null) {
             throw new IllegalArgumentException("Informe movimentação, agrupamento e as duas datas.");
         }
@@ -103,30 +109,42 @@ public class DashboardService {
 
         if (groupBy == ChartGrouping.TAG) {
             var tagged = new java.util.ArrayList<TransactionChartSummary.Item>();
-            transactionRepository.sumByTag(userId, type, startDate, endDate).forEach(row ->
-                tagged.add(new TransactionChartSummary.Item(row.categoryId().toString(), row.categoryName(), row.amount())));
-            BigDecimal unlabeled = transactionRepository.sumWithoutTags(userId, type, startDate, endDate);
-            if (unlabeled.signum() > 0) {
-                tagged.add(new TransactionChartSummary.Item("none", "Sem etiqueta", unlabeled));
+            var rows = tagId == null
+                ? transactionRepository.sumByTag(userId, type, startDate, endDate)
+                : transactionRepository.sumByTagFiltered(userId, type, startDate, endDate, tagId);
+            rows.forEach(row -> tagged.add(new TransactionChartSummary.Item(
+                row.categoryId().toString(), row.categoryName(), row.amount())));
+            if (tagId == null) {
+                BigDecimal unlabeled = transactionRepository.sumWithoutTags(userId, type, startDate, endDate);
+                if (unlabeled.signum() > 0) {
+                    tagged.add(new TransactionChartSummary.Item("none", "Sem etiqueta", unlabeled));
+                }
             }
-            BigDecimal total = transactionRepository.sumAmountByUserAndTypeAndPeriod(userId, type, startDate, endDate);
+            BigDecimal total = tagId == null
+                ? transactionRepository.sumAmountByUserAndTypeAndPeriod(userId, type, startDate, endDate)
+                : transactionRepository.sumAmountForTag(userId, type, tagId, startDate, endDate);
             return new TransactionChartSummary(type, groupBy, total, List.copyOf(tagged));
         }
 
         List<TransactionChartSummary.Item> items;
         if (groupBy == ChartGrouping.CATEGORY) {
-            // Reuse the existing query: it already accepts either financial type and groups by ID.
-            items = transactionRepository.sumExpensesByCategory(userId, type, startDate, endDate)
-                .stream().map(row -> new TransactionChartSummary.Item(row.categoryId().toString(),
-                    row.categoryName(), row.amount())).toList();
+            var rows = tagId == null
+                ? transactionRepository.sumExpensesByCategory(userId, type, startDate, endDate)
+                : transactionRepository.sumByCategoryForTag(userId, type, startDate, endDate, tagId);
+            items = rows.stream().map(row -> new TransactionChartSummary.Item(row.categoryId().toString(),
+                row.categoryName(), row.amount())).toList();
         } else {
             var totals = new HashMap<String, BigDecimal>();
             if (groupBy == ChartGrouping.DAY) {
-                transactionRepository.sumByDay(userId, type, startDate, endDate)
-                    .forEach(row -> totals.put(row.date().toString(), row.amount()));
+                var rows = tagId == null
+                    ? transactionRepository.sumByDay(userId, type, startDate, endDate)
+                    : transactionRepository.sumByDayForTag(userId, type, startDate, endDate, tagId);
+                rows.forEach(row -> totals.put(row.date().toString(), row.amount()));
             } else {
-                transactionRepository.sumByMonth(userId, type, startDate, endDate)
-                    .forEach(row -> totals.put(YearMonth.of(row.year(), row.month()).toString(), row.amount()));
+                var rows = tagId == null
+                    ? transactionRepository.sumByMonth(userId, type, startDate, endDate)
+                    : transactionRepository.sumByMonthForTag(userId, type, startDate, endDate, tagId);
+                rows.forEach(row -> totals.put(YearMonth.of(row.year(), row.month()).toString(), row.amount()));
             }
             var filled = new ArrayList<TransactionChartSummary.Item>();
             var formatter = DateTimeFormatter.ofPattern(

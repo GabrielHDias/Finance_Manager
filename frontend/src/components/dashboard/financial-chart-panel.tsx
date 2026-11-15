@@ -9,14 +9,14 @@ import ChartFilters from "./chart-filters";
 import ChartSummary from "./chart-summary";
 import FinancialChart from "./financial-chart";
 
-export default function FinancialChartPanel({ startDate, endDate }: { startDate: string; endDate: string }) {
+export default function FinancialChartPanel({ startDate, endDate, tagId }: { startDate: string; endDate: string; tagId?: number }) {
   const router = useRouter();
   const [type, setType] = useState<FinancialType>("EXPENSE");
   const [groupBy, setGroupBy] = useState<ChartGrouping>("CATEGORY");
   const [chart, setChart] = useState<ChartType>("PIE");
   const [revision, setRevision] = useState(0);
   const [result, setResult] = useState<{ key: string; data?: TransactionChartResponse; error?: string }>();
-  const key = JSON.stringify([type, groupBy, startDate, endDate, revision]);
+  const key = JSON.stringify([type, groupBy, startDate, endDate, tagId ?? null, revision]);
   const current = result?.key === key ? result : undefined;
   const days = (Date.parse(endDate) - Date.parse(startDate)) / 86400000 + 1;
   const validation = groupBy === "DAY" && days > 366 ? "O agrupamento diário permite no máximo 366 dias. Reduza o período ou escolha outro agrupamento." : "";
@@ -31,7 +31,7 @@ export default function FinancialChartPanel({ startDate, endDate }: { startDate:
     if (validation) return;
     const controller = new AbortController();
     let active = true;
-    getTransactionsSummary({ type, groupBy, startDate, endDate }, controller.signal).then(data => {
+    getTransactionsSummary({ type, groupBy, startDate, endDate, ...(tagId ? { tagId } : {}) }, controller.signal).then(data => {
       if (active) setResult({ key, data });
     }).catch(error => {
       if (!active) return;
@@ -39,7 +39,7 @@ export default function FinancialChartPanel({ startDate, endDate }: { startDate:
       setResult({ key, error: error instanceof ApiError ? error.message : "Não foi possível carregar o gráfico. Tente novamente." });
     });
     return () => { active = false; controller.abort(); };
-  }, [type, groupBy, startDate, endDate, key, validation, router]);
+  }, [type, groupBy, startDate, endDate, tagId, key, validation, router]);
 
   function changeGroup(value: ChartGrouping) {
     setGroupBy(value);

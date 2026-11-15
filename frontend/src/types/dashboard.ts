@@ -12,6 +12,7 @@ export interface ExpenseByCategoryResponse {
 export interface DashboardPeriod {
   startDate?: string;
   endDate?: string;
+  tagId?: number;
 }
 
 export type ChartType = "PIE" | "LINE" | "BAR";
@@ -22,6 +23,7 @@ export interface ChartFilters {
   groupBy: ChartGrouping;
   startDate: string;
   endDate: string;
+  tagId?: number;
 }
 export interface TransactionChartResponse {
   type: FinancialType;
