@@ -52,7 +52,8 @@ class AccountControllerTest {
 
         when(accountService.create(
             userId,
-            "Nubank"
+            "Nubank",
+            null
         )).thenReturn(account);
 
         ResponseEntity<AccountResponse> response =
@@ -77,7 +78,8 @@ class AccountControllerTest {
 
         verify(accountService).create(
             userId,
-            "Nubank"
+            "Nubank",
+            null
         );
     }
 
@@ -246,10 +248,11 @@ class AccountControllerTest {
         when(account.getName())
             .thenReturn("Conta Principal");
 
-        when(accountService.rename(
+        when(accountService.update(
             userId,
             accountId,
-            "Conta Principal"
+            "Conta Principal",
+            null
         )).thenReturn(account);
 
         ResponseEntity<AccountResponse> response =
@@ -275,10 +278,11 @@ class AccountControllerTest {
             response.getBody().name()
         );
 
-        verify(accountService).rename(
+        verify(accountService).update(
             userId,
             accountId,
-            "Conta Principal"
+            "Conta Principal",
+            null
         );
     }
 

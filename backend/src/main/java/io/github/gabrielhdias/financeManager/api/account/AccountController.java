@@ -56,7 +56,8 @@ public class AccountController {
 
         Account account = accountService.create(
             userId,
-            request.name()
+            request.name(),
+            request.openingBalance()
         );
 
         return ResponseEntity
@@ -141,10 +142,11 @@ public class AccountController {
     ) {
         Long userId = authenticatedUser.getId();
 
-        Account account = accountService.rename(
+        Account account = accountService.update(
             userId,
             id,
-            request.name()
+            request.name(),
+            request.openingBalance()
         );
 
         return ResponseEntity.ok(

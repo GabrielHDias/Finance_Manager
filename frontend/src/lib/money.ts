@@ -13,6 +13,9 @@ export function decimal(value: bigint): string {
 export function validInput(value: string): boolean {
   return /^\d{1,17}(?:\.\d{1,2})?$/.test(value) && cents(value) > BigInt(0);
 }
+export function validBalance(value: string): boolean {
+  return /^-?\d{1,17}(?:\.\d{1,2})?$/.test(value);
+}
 // Only a bounded dimensionless ratio is converted for charts/progress bars.
 export function ratio(value: string, total: string): number {
   const denominator = cents(total);

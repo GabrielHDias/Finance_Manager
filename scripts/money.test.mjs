@@ -12,7 +12,7 @@ for (const name of ['money','dates','formatters','transaction-csv']) {
   writeFileSync(join(temp,`${name}.js`),ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2021}}).outputText);
 }
 const require = createRequire(import.meta.url);
-const {cents,decimal,validInput} = require(join(temp,'money.js'));
+const {cents,decimal,validInput,validBalance} = require(join(temp,'money.js'));
 const {formatCurrency} = require(join(temp,'formatters.js'));
 const {serializeTransactionCsv} = require(join(temp,'transaction-csv.js'));
 test('exact sums, negative differences, totals above input range and limit rejection',()=>{
@@ -20,6 +20,9 @@ test('exact sums, negative differences, totals above input range and limit rejec
  assert.equal(decimal(cents('0.10')-cents('0.20')),'-0.10');
  assert.equal(decimal(cents('99999999999999999.99')*BigInt(2)),'199999999999999999.98');
  for(const value of ['0','-1','100000000000000000.00','1.001','NaN','1e3']) assert.equal(validInput(value),false);
+ assert.equal(validBalance('0'),true);
+ assert.equal(validBalance('-10.50'),true);
+ assert.equal(validBalance('1.001'),false);
  assert.equal(validInput('99999999999999999.99'),true);
 });
 test('JSON, currency and CSV preserve the maximum exactly',()=>{

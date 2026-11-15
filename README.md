@@ -171,6 +171,10 @@ API autenticada:
 
 Cada resposta inclui `id`, `categoryId`, `categoryName`, `periodStart`, `limitAmount`, `spent` e `remaining`. O ano deve estar entre 1 e 9999, o mês entre 1 e 12 e o limite deve ser positivo, com até duas casas decimais. `remaining` negativo indica excesso. A migração Flyway V2 cria a tabela de limites e a restrição de um orçamento por categoria/mês, preservando os dados existentes.
 
+## Saldo inicial das contas
+
+Em **Contas financeiras**, o campo **Saldo inicial** entra na criação e na edição. Ele compõe o saldo da conta junto com as transações e não gera um lançamento. Zero e valores negativos são válidos (por exemplo, um cartão ou um limite já usado). Se a API receber a conta sem esse campo, o saldo inicial fica `0.00` e uma edição que omita o campo preserva o valor atual. O saldo exibido é saldo inicial + receitas − despesas.
+
 ## Paginação de transações
 
 A lista carrega 10 transações por página, com opções de 25 ou 50. **Página anterior** e **Próxima página** mantêm os filtros aplicados; a tela informa o intervalo de registros e o total de páginas. Aplicar ou limpar filtros e trocar o tamanho retornam à primeira página.

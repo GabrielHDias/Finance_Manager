@@ -64,9 +64,13 @@ class AccountControllerMvcTest {
         when(account.getName())
             .thenReturn("Nubank");
 
+        when(account.getOpeningBalance())
+            .thenReturn(new BigDecimal("0.00"));
+
         when(accountService.create(
             userId,
-            "Nubank"
+            "Nubank",
+            null
         )).thenReturn(account);
 
         mockMvc.perform(
