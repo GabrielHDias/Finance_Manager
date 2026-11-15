@@ -278,4 +278,57 @@ public interface TransactionRepository
     java.math.BigDecimal sumAmountForTag(
         @Param("userId") Long userId, @Param("type") TransactionType type, @Param("tagId") Long tagId,
         @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+
+    @Query("""
+        SELECT new io.github.gabrielhdias.financeManager.domain.dashboard.PeriodTotal(t.date, SUM(t.amount))
+        FROM Transaction t
+        WHERE t.account.user.id = :userId AND t.type = :type
+          AND t.date >= :startDate AND t.date <= :endDate
+          AND :tagId IN (SELECT tg.id FROM t.tags tg)
+        GROUP BY t.date ORDER BY t.date
+        """)
+    List<io.github.gabrielhdias.financeManager.domain.dashboard.PeriodTotal> sumByDayForTag(
+        @Param("userId") Long userId, @Param("type") TransactionType type,
+        @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate, @Param("tagId") Long tagId);
+
+    @Query("""
+        SELECT new io.github.gabrielhdias.financeManager.domain.dashboard.MonthTotal(
+            extract(year from t.date), extract(month from t.date), SUM(t.amount))
+        FROM Transaction t
+        WHERE t.account.user.id = :userId AND t.type = :type
+          AND t.date >= :startDate AND t.date <= :endDate
+          AND :tagId IN (SELECT tg.id FROM t.tags tg)
+        GROUP BY extract(year from t.date), extract(month from t.date)
+        ORDER BY extract(year from t.date), extract(month from t.date)
+        """)
+    List<io.github.gabrielhdias.financeManager.domain.dashboard.MonthTotal> sumByMonthForTag(
+        @Param("userId") Long userId, @Param("type") TransactionType type,
+        @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate, @Param("tagId") Long tagId);
+
+    @Query("""
+        SELECT new io.github.gabrielhdias.financeManager.domain.dashboard.CategoryExpenseSummary(
+            t.category.id, t.category.name, SUM(t.amount))
+        FROM Transaction t
+        WHERE t.account.user.id = :userId AND t.type = :type
+          AND t.date >= COALESCE(:startDate, t.date) AND t.date <= COALESCE(:endDate, t.date)
+          AND :tagId IN (SELECT tg.id FROM t.tags tg)
+        GROUP BY t.category.id, t.category.name
+        ORDER BY SUM(t.amount) DESC
+        """)
+    List<io.github.gabrielhdias.financeManager.domain.dashboard.CategoryExpenseSummary> sumByCategoryForTag(
+        @Param("userId") Long userId, @Param("type") TransactionType type,
+        @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate, @Param("tagId") Long tagId);
+
+    @Query("""
+        SELECT new io.github.gabrielhdias.financeManager.domain.dashboard.CategoryExpenseSummary(tag.id, tag.name, SUM(t.amount))
+        FROM Transaction t JOIN t.tags tag
+        WHERE t.account.user.id = :userId AND t.type = :type
+          AND t.date >= COALESCE(:startDate, t.date) AND t.date <= COALESCE(:endDate, t.date)
+          AND :tagId IN (SELECT tg.id FROM t.tags tg)
+        GROUP BY tag.id, tag.name
+        ORDER BY SUM(t.amount) DESC
+        """)
+    List<io.github.gabrielhdias.financeManager.domain.dashboard.CategoryExpenseSummary> sumByTagFiltered(
+        @Param("userId") Long userId, @Param("type") TransactionType type,
+        @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate, @Param("tagId") Long tagId);
 }

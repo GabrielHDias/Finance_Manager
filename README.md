@@ -187,7 +187,7 @@ No orçamento, **Repetir nos meses seguintes** copia o limite ao consultar um m�
 
 ## Etiquetas
 
-Em **Etiquetas**, crie nomes curtos e associe até 10 deles a cada transação, na inclusão, na edição e, se quiser, na importação CSV. A coluna opcional `etiquetas` usa `|` e só aceita etiquetas já cadastradas. A lista, o filtro, a exportação e o gráfico **por etiqueta** usam essa dimensão junto com a categoria. Uma transação com várias etiquetas aparece em cada fatia; o total do gráfico não soma o mesmo valor duas vezes. Excluir a etiqueta tira o vínculo e mantém a transação. Transações sem etiqueta aparecem como “Sem etiqueta” no gráfico.
+Em **Etiquetas**, crie nomes curtos e associe até 10 deles a cada transação, na inclusão, na edição e, se quiser, na importação CSV. A coluna opcional `etiquetas` usa `|` e só aceita etiquetas já cadastradas. A lista, o filtro e a exportação usam essa dimensão junto com a categoria. No dashboard, o seletor **Etiqueta** começa em **Todas as etiquetas**; ao escolher uma, os cartões, a comparação mensal e o gráfico passam a considerar só as transações com essa etiqueta. O gráfico também pode agrupar por etiqueta. Uma transação com várias etiquetas aparece em cada fatia; o total do gráfico não soma o mesmo valor duas vezes. Excluir a etiqueta tira o vínculo e mantém a transação. Transações sem etiqueta aparecem como “Sem etiqueta” no gráfico.
 
 ## Transferências entre contas
 

@@ -23,7 +23,7 @@ const metrics = [
   { key: "balance", label: "Saldo do mês" },
 ] as const;
 
-export default function MonthlySummary() {
+export default function MonthlySummary({ tagId }: { tagId?: number }) {
   const router = useRouter();
   const [request, setRequest] = useState<{ reference?: string; revision: number }>({ revision: 0 });
   const [data, setData] = useState<MonthlyData | null>(null);
@@ -42,8 +42,8 @@ export default function MonthlySummary() {
         const reference = request.reference ?? `${String(now.getFullYear()).padStart(4, "0")}-${String(now.getMonth() + 1).padStart(2, "0")}`;
         const periods = monthlyPeriods(reference);
         const [current, previous] = await Promise.all([
-          getDashboardSummary(periods.current),
-          getDashboardSummary(periods.previous),
+          getDashboardSummary({ ...periods.current, tagId }),
+          getDashboardSummary({ ...periods.previous, tagId }),
         ]);
         if (!cancelled) setData({ periods, current, previous });
       } catch (failure) {
@@ -59,7 +59,7 @@ export default function MonthlySummary() {
     }
     load();
     return () => { cancelled = true; };
-  }, [request, router]);
+  }, [request, router, tagId]);
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -88,7 +88,7 @@ export default function MonthlySummary() {
   return (
     <section className="card monthly-summary" aria-labelledby="monthly-title">
       <h2 id="monthly-title">Resumo mensal</h2>
-      <p>Compare um mês com o anterior. Esta seleção é independente do filtro de período acima.</p>
+      <p>Compare um mês com o anterior. O mês é independente do período acima; a etiqueta selecionada no dashboard entra nos dois meses.</p>
       <form className="transaction-form" onSubmit={submit}>
         <div>
           <label htmlFor="monthly-month">Mês de referência</label>
@@ -132,7 +132,7 @@ export default function MonthlySummary() {
             </div>
             {sign(data.current.totalIncome) === 0 && sign(data.current.totalExpense) === 0 && <p>Nenhuma movimentação no mês selecionado.</p>}
             {sign(data.previous.totalIncome) === 0 && sign(data.previous.totalExpense) === 0 && <p>O mês anterior não possui movimentações.</p>}
-            <p className="monthly-summary__note">Os totais incluem todas as transações datadas em cada mês. Saldo do mês = receitas − despesas; não é o saldo acumulado das contas.</p>
+            <p className="monthly-summary__note">Os totais incluem as transações datadas em cada mês{tagId ? " que possuem a etiqueta selecionada" : ""}. Saldo do mês = receitas − despesas; não é o saldo acumulado das contas.</p>
           </>
         )}
       </div>

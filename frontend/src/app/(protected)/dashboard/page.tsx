@@ -13,6 +13,8 @@ import FinancialChartPanel from "@/components/dashboard/financial-chart-panel";
 import { monthPeriod } from "@/lib/monthly-summary";
 import MonthlySummary from "@/components/monthly-summary";
 import { getDashboardSummary } from "@/services/dashboard-service";
+import { findAllTags } from "@/services/tag-service";
+import type { TagResponse } from "@/types/tag";
 import type {
   DashboardPeriod,
   DashboardSummaryResponse,
@@ -35,6 +37,8 @@ function formatPeriod(period: DashboardPeriod): string {
 export default function DashboardPage() {
   const router = useRouter();
   const [period, setPeriod] = useState<DashboardPeriod | null>(null);
+  const [tagId, setTagId] = useState<number | "">("");
+  const [tags, setTags] = useState<TagResponse[]>([]);
   const [dashboard, setDashboard] = useState<DashboardData | null>(null);
   const [revision, setRevision] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -43,10 +47,19 @@ export default function DashboardPage() {
 
   useEffect(() => {
     let cancelled = false;
+    findAllTags().then(loaded => { if (!cancelled) setTags(loaded); }).catch(() => { if (!cancelled) setTags([]); });
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
 
     async function loadDashboard() {
       const now = new Date();
-      const selectedPeriod = period ?? monthPeriod(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`);
+      const selectedPeriod = {
+        ...(period ?? monthPeriod(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`)),
+        ...(tagId === "" ? {} : { tagId }),
+      };
       try {
         const summary = await getDashboardSummary(selectedPeriod);
         if (cancelled) return;
@@ -67,7 +80,7 @@ export default function DashboardPage() {
 
     loadDashboard();
     return () => { cancelled = true; };
-  }, [period, revision, router]);
+  }, [period, tagId, revision, router]);
 
   function applyPeriod(nextPeriod: DashboardPeriod | null) {
     if (loading) return;
@@ -106,7 +119,7 @@ export default function DashboardPage() {
       <h1>Dashboard</h1>
       <section className={`card ${styles.filters}`}>
         <h2>Período</h2>
-        <p>O mês atual é exibido inicialmente. Informe as duas datas (até 10 anos; por dia, até 366 dias). Trocar o agrupamento preserva o período.</p>
+        <p>O mês atual é exibido inicialmente. Informe as duas datas (até 10 anos; por dia, até 366 dias). A etiqueta vale para os cartões, a comparação mensal e o gráfico. Todas as etiquetas é o padrão.</p>
         <form key={`${dashboard?.period.startDate}-${dashboard?.period.endDate}`} className="transaction-form" onSubmit={handleSubmit} onReset={() => { const now = new Date(); applyPeriod(monthPeriod(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`)); }}>
           <div>
             <label htmlFor="dashboard-start">Data inicial</label>
@@ -115,6 +128,18 @@ export default function DashboardPage() {
           <div>
             <label htmlFor="dashboard-end">Data final</label>
             <DateInput id="dashboard-end" name="endDate" defaultValue={dashboard?.period.endDate ? formatDate(dashboard.period.endDate) : ""} required disabled={loading} />
+          </div>
+          <div>
+            <label htmlFor="dashboard-tag">Etiqueta</label>
+            <select id="dashboard-tag" value={tagId} disabled={loading} onChange={event => {
+              setValidationMessage("");
+              setErrorMessage("");
+              setLoading(true);
+              setTagId(event.target.value === "" ? "" : Number(event.target.value));
+            }}>
+              <option value="">Todas as etiquetas</option>
+              {tags.map(tag => <option key={tag.id} value={tag.id}>{tag.name}</option>)}
+            </select>
           </div>
           <button type="submit" disabled={loading}>Aplicar período</button>
           <button className="button--secondary" type="reset" disabled={loading}>Mês atual</button>
@@ -133,7 +158,7 @@ export default function DashboardPage() {
           <>
             <section className="card">
               <h2>Resumo financeiro</h2>
-              <p>Período exibido: {formatPeriod(dashboard.period)}</p>
+              <p>Período exibido: {formatPeriod(dashboard.period)}{tagId === "" ? "" : ` · Etiqueta: ${tags.find(tag => tag.id === tagId)?.name ?? ""}`}</p>
               <div className="summary-grid">
                 <div>
                   <strong>Receitas</strong>
@@ -152,8 +177,8 @@ export default function DashboardPage() {
           </>
         )}
       </div>
-      {dashboard && <FinancialChartPanel startDate={(period ?? dashboard.period).startDate!} endDate={(period ?? dashboard.period).endDate!} />}
-      <MonthlySummary />
+      {dashboard && <FinancialChartPanel startDate={(period ?? dashboard.period).startDate!} endDate={(period ?? dashboard.period).endDate!} tagId={tagId === "" ? undefined : tagId} />}
+      <MonthlySummary tagId={tagId === "" ? undefined : tagId} />
     </main>
   );
 }
