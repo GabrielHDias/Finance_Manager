@@ -60,7 +60,8 @@ public class TransactionController {
             request.type(),
             request.accountId(),
             request.categoryId(),
-            request.destinationAccountId()
+            request.destinationAccountId(),
+            request.tagIds()
         );
 
         return ResponseEntity
@@ -85,7 +86,10 @@ public class TransactionController {
         Long accountId,
 
         @RequestParam(required = false)
-        Long categoryId
+        Long categoryId,
+
+        @RequestParam(required = false)
+        Long tagId
     ) {
         Long userId = authenticatedUser.getId();
 
@@ -97,7 +101,8 @@ public class TransactionController {
                     endDate,
                     type,
                     accountId,
-                    categoryId
+                    categoryId,
+                    tagId
                 )
                 .stream()
                 .map(TransactionMapper::toResponse)
@@ -113,11 +118,12 @@ public class TransactionController {
         @RequestParam(required = false) TransactionType type,
         @RequestParam(required = false) Long accountId,
         @RequestParam(required = false) Long categoryId,
+        @RequestParam(required = false) Long tagId,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size
     ) {
         var result = transactionService.pageByUser(
-            authenticatedUser.getId(), startDate, endDate, type, accountId, categoryId, page, size
+            authenticatedUser.getId(), startDate, endDate, type, accountId, categoryId, tagId, page, size
         );
         return ResponseEntity.ok(new TransactionPageResponse(
             result.getContent().stream().map(TransactionMapper::toResponse).toList(),
@@ -157,7 +163,8 @@ public class TransactionController {
             request.type(),
             request.accountId(),
             request.categoryId(),
-            request.destinationAccountId()
+            request.destinationAccountId(),
+            request.tagIds()
         );
 
         return ResponseEntity.ok(

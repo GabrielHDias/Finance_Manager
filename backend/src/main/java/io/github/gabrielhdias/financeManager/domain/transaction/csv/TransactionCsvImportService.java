@@ -4,6 +4,8 @@ import io.github.gabrielhdias.financeManager.domain.account.Account;
 import io.github.gabrielhdias.financeManager.domain.account.AccountRepository;
 import io.github.gabrielhdias.financeManager.domain.category.Category;
 import io.github.gabrielhdias.financeManager.domain.category.CategoryRepository;
+import io.github.gabrielhdias.financeManager.domain.tag.Tag;
+import io.github.gabrielhdias.financeManager.domain.tag.TagRepository;
 import io.github.gabrielhdias.financeManager.domain.exception.BusinessRuleException;
 import io.github.gabrielhdias.financeManager.domain.exception.ResourceNotFoundException;
 import io.github.gabrielhdias.financeManager.domain.transaction.Transaction;
@@ -29,13 +31,15 @@ public class TransactionCsvImportService {
     private final AccountRepository accounts;
     private final CategoryRepository categories;
     private final TransactionRepository transactions;
+    private final TagRepository tags;
 
     public TransactionCsvImportService(TransactionCsvParser parser, AccountRepository accounts,
-        CategoryRepository categories, TransactionRepository transactions) {
+        CategoryRepository categories, TransactionRepository transactions, TagRepository tags) {
         this.parser = parser;
         this.accounts = accounts;
         this.categories = categories;
         this.transactions = transactions;
+        this.tags = tags;
     }
 
     @Transactional(readOnly = true)
@@ -61,8 +65,12 @@ public class TransactionCsvImportService {
         }
         List<Transaction> pending = preview.rows().stream()
             .filter(row -> row.status() == CsvImportRow.Status.READY)
-            .map(row -> new Transaction(row.description(), new BigDecimal(row.amount()), LocalDate.parse(row.date()),
-                TransactionType.valueOf(row.type()), account, category)).toList();
+            .map(row -> {
+                Transaction transaction = new Transaction(row.description(), new BigDecimal(row.amount()), LocalDate.parse(row.date()),
+                    TransactionType.valueOf(row.type()), account, category);
+                row.tagNames().forEach(name -> transaction.getTags().add(tags.findByUserIdAndName(userId, name).orElseThrow()));
+                return transaction;
+            }).toList();
         transactions.saveAll(pending);
         transactions.flush();
         return new CsvImportResult(pending.size(), preview.duplicates());
@@ -80,7 +88,7 @@ public class TransactionCsvImportService {
         if (!valid.isEmpty()) {
             LocalDate start = valid.stream().map(row -> LocalDate.parse(row.date())).min(LocalDate::compareTo).orElseThrow();
             LocalDate end = valid.stream().map(row -> LocalDate.parse(row.date())).max(LocalDate::compareTo).orElseThrow();
-            for (Transaction transaction : transactions.findAllByFilters(userId, start, end, null, account.getId(), category.getId())) {
+            for (Transaction transaction : transactions.findAllByFilters(userId, start, end, null, account.getId(), category.getId(), null)) {
                 existing.add(new Key(transaction.getDate(), transaction.getDescription().trim(),
                     transaction.getAmount().setScale(2).toPlainString(), transaction.getType().name()));
             }
@@ -100,6 +108,9 @@ public class TransactionCsvImportService {
                 } else if (existing.contains(key)) {
                     rows.add(row.duplicate("Já existe uma transação idêntica nesta conta e categoria."));
                     duplicates++;
+                } else if (row.tagNames().stream().anyMatch(name -> tags.findByUserIdAndName(userId, name).isEmpty())) {
+                    rows.add(row.invalid("Cadastre a etiqueta antes de importar."));
+                    invalid++;
                 } else if (!inFile.add(key)) {
                     rows.add(row.duplicate("Registro repetido no arquivo."));
                     duplicates++;

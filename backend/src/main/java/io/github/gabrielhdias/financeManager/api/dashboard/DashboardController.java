@@ -60,7 +60,10 @@ public class DashboardController {
 
         @RequestParam(required = false)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-        LocalDate endDate
+        LocalDate endDate,
+
+        @RequestParam(required = false)
+        Long tagId
     ) {
         Long userId = authenticatedUser.getId();
 
@@ -68,7 +71,8 @@ public class DashboardController {
             dashboardService.getSummary(
                 userId,
                 startDate,
-                endDate
+                endDate,
+                tagId
             );
 
         return ResponseEntity.ok(

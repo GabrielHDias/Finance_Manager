@@ -6,6 +6,9 @@ import io.github.gabrielhdias.financeManager.domain.category.Category;
 import io.github.gabrielhdias.financeManager.domain.category.CategoryRepository;
 import io.github.gabrielhdias.financeManager.domain.exception.BusinessRuleException;
 import io.github.gabrielhdias.financeManager.domain.exception.ResourceNotFoundException;
+import io.github.gabrielhdias.financeManager.domain.tag.Tag;
+import io.github.gabrielhdias.financeManager.domain.tag.TagRepository;
+import io.github.gabrielhdias.financeManager.domain.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,15 +24,18 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
     private final CategoryRepository categoryRepository;
+    private final TagRepository tagRepository;
 
     public TransactionService(
         TransactionRepository transactionRepository,
         AccountRepository accountRepository,
-        CategoryRepository categoryRepository
+        CategoryRepository categoryRepository,
+        TagRepository tagRepository
     ) {
         this.transactionRepository = transactionRepository;
         this.accountRepository = accountRepository;
         this.categoryRepository = categoryRepository;
+        this.tagRepository = tagRepository;
     }
 
     @Transactional
@@ -42,7 +48,7 @@ public class TransactionService {
         Long accountId,
         Long categoryId
     ) {
-        return create(userId, description, amount, date, type, accountId, categoryId, null);
+        return create(userId, description, amount, date, type, accountId, categoryId, null, null);
     }
 
     @Transactional
@@ -54,23 +60,23 @@ public class TransactionService {
         TransactionType type,
         Long accountId,
         Long categoryId,
-        Long destinationAccountId
+        Long destinationAccountId,
+        java.util.List<Long> tagIds
     ) {
         Account account = findAccountByIdAndUserId(accountId, userId);
+        Transaction transaction;
         if (type == TransactionType.TRANSFER) {
-            return transactionRepository.save(new Transaction(
-                description, amount, date, account, requireDestination(userId, account, destinationAccountId, categoryId)
-            ));
+            transaction = new Transaction(description, amount, date, account, requireDestination(userId, account, destinationAccountId, categoryId));
+        } else {
+            transaction = new Transaction(description, amount, date, type, account, requireMatchingCategory(userId, type, categoryId));
         }
-        Category category = requireMatchingCategory(userId, type, categoryId);
-        return transactionRepository.save(new Transaction(description, amount, date, type, account, category));
+        replaceTags(transaction, userId, tagIds);
+        return touch(transactionRepository.save(transaction));
     }
 
     @Transactional(readOnly = true)
     public List<Transaction> listByUser(Long userId) {
-        return transactionRepository.findAllByAccountUserId(
-            userId
-        );
+        return touch(transactionRepository.findAllByAccountUserId(userId));
     }
 
     @Transactional(readOnly = true)
@@ -80,7 +86,8 @@ public class TransactionService {
         LocalDate endDate,
         TransactionType type,
         Long accountId,
-        Long categoryId
+        Long categoryId,
+        Long tagId
     ) {
         validatePeriod(
             startDate,
@@ -88,10 +95,30 @@ public class TransactionService {
         );
 
         List<Transaction> result = transactionRepository.findLimitedByFilters(
-            userId, startDate, endDate, type, accountId, categoryId, PageRequest.of(0, 10001));
+            userId, startDate, endDate, type, accountId, categoryId, tagId, PageRequest.of(0, 10001));
         if (result.size() > 10000) throw new BusinessRuleException(
             "Exportação limitada a 10000 transações. Reduza o período ou aplique filtros.");
-        return result;
+        return touch(result);
+    }
+
+    public List<Transaction> filterByUser(
+        Long userId, LocalDate startDate, LocalDate endDate, TransactionType type, Long accountId, Long categoryId
+    ) {
+        return filterByUser(userId, startDate, endDate, type, accountId, categoryId, null);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Transaction> pageByUser(
+        Long userId, LocalDate startDate, LocalDate endDate,
+        TransactionType type, Long accountId, Long categoryId, Long tagId, int page, int size
+    ) {
+        validatePeriod(startDate, endDate);
+        if (page < 0 || size < 1 || size > 100) {
+            throw new IllegalArgumentException("A página deve ser maior ou igual a zero e o tamanho deve estar entre 1 e 100.");
+        }
+        return touch(transactionRepository.findPageByFilters(
+            userId, startDate, endDate, type, accountId, categoryId, tagId, PageRequest.of(page, size)
+        ));
     }
 
     @Transactional(readOnly = true)
@@ -99,13 +126,7 @@ public class TransactionService {
         Long userId, LocalDate startDate, LocalDate endDate,
         TransactionType type, Long accountId, Long categoryId, int page, int size
     ) {
-        validatePeriod(startDate, endDate);
-        if (page < 0 || size < 1 || size > 100) {
-            throw new IllegalArgumentException("A página deve ser maior ou igual a zero e o tamanho deve estar entre 1 e 100.");
-        }
-        return transactionRepository.findPageByFilters(
-            userId, startDate, endDate, type, accountId, categoryId, PageRequest.of(page, size)
-        );
+        return pageByUser(userId, startDate, endDate, type, accountId, categoryId, null, page, size);
     }
 
     @Transactional(readOnly = true)
@@ -113,10 +134,10 @@ public class TransactionService {
         Long userId,
         Long transactionId
     ) {
-        return findTransactionByIdAndUserId(
+        return touch(findTransactionByIdAndUserId(
             transactionId,
             userId
-        );
+        ));
     }
 
     @Transactional
@@ -130,7 +151,7 @@ public class TransactionService {
         Long accountId,
         Long categoryId
     ) {
-        return update(userId, transactionId, description, amount, date, type, accountId, categoryId, null);
+        return update(userId, transactionId, description, amount, date, type, accountId, categoryId, null, null);
     }
 
     @Transactional
@@ -143,7 +164,8 @@ public class TransactionService {
         TransactionType type,
         Long accountId,
         Long categoryId,
-        Long destinationAccountId
+        Long destinationAccountId,
+        java.util.List<Long> tagIds
     ) {
         Transaction transaction = findTransactionByIdAndUserId(transactionId, userId);
         Account account = findAccountByIdAndUserId(accountId, userId);
@@ -153,11 +175,12 @@ public class TransactionService {
         if (type == TransactionType.TRANSFER) {
             transaction.updateAccount(account);
             transaction.becomeTransfer(requireDestination(userId, account, destinationAccountId, categoryId));
-            return transaction;
+        } else {
+            transaction.becomeMovement(type, requireMatchingCategory(userId, type, categoryId));
+            transaction.updateAccount(account);
         }
-        transaction.becomeMovement(type, requireMatchingCategory(userId, type, categoryId));
-        transaction.updateAccount(account);
-        return transaction;
+        replaceTags(transaction, userId, tagIds);
+        return touch(transaction);
     }
 
     @Transactional
@@ -201,6 +224,37 @@ public class TransactionService {
                     "Transação não encontrada"
                 )
             );
+    }
+
+    private Transaction touch(Transaction transaction) {
+        transaction.getTags().size();
+        return transaction;
+    }
+
+    private List<Transaction> touch(List<Transaction> transactions) {
+        transactions.forEach(transaction -> transaction.getTags().size());
+        return transactions;
+    }
+
+    private Page<Transaction> touch(Page<Transaction> page) {
+        page.getContent().forEach(transaction -> transaction.getTags().size());
+        return page;
+    }
+
+    private void replaceTags(Transaction transaction, Long userId, java.util.List<Long> tagIds) {
+        transaction.getTags().clear();
+        if (tagIds == null || tagIds.isEmpty()) {
+            return;
+        }
+        java.util.LinkedHashSet<Long> unique = new java.util.LinkedHashSet<>(tagIds);
+        if (unique.size() != tagIds.size() || unique.size() > 10) {
+            throw new IllegalArgumentException("Use no máximo 10 etiquetas diferentes");
+        }
+        java.util.List<Tag> found = tagRepository.findByUserIdAndIdIn(userId, unique);
+        if (found.size() != unique.size()) {
+            throw new ResourceNotFoundException("Etiqueta não encontrada");
+        }
+        transaction.getTags().addAll(found);
     }
 
     private Category requireMatchingCategory(Long userId, TransactionType type, Long categoryId) {

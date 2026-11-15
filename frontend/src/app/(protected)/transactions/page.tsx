@@ -11,6 +11,8 @@ import { matchesTransactionFilters, sortTransactions } from "@/lib/transaction-l
 import { downloadTransactionCsv } from "@/lib/transaction-csv";
 import { findAllAccounts } from "@/services/account-service";
 import { findAllCategories } from "@/services/category-service";
+import { findAllTags } from "@/services/tag-service";
+import type { TagResponse } from "@/types/tag";
 import { createTransaction, deleteTransaction, findAllTransactions, findTransactionPage, updateTransaction } from "@/services/transaction-service";
 import type { AccountResponse } from "@/types/account";
 import type { CategoryResponse } from "@/types/category";
@@ -22,6 +24,8 @@ export default function TransactionsPage() {
   const [pagination, setPagination] = useState({ page: 0, size: 10, totalElements: 0, totalPages: 0 });
   const [accounts, setAccounts] = useState<AccountResponse[]>([]);
   const [categories, setCategories] = useState<CategoryResponse[]>([]);
+  const [tags, setTags] = useState<TagResponse[]>([]);
+  const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState("");
@@ -45,14 +49,15 @@ export default function TransactionsPage() {
     let cancelled = false;
     async function loadPageData() {
       try {
-        const [items, accountsResponse, categoriesResponse] = await Promise.all([
-          findTransactionPage(), findAllAccounts(), findAllCategories(),
+        const [items, accountsResponse, categoriesResponse, tagsResponse] = await Promise.all([
+          findTransactionPage(), findAllAccounts(), findAllCategories(), findAllTags(),
         ]);
         if (cancelled) return;
         setTransactions(items.content);
         setPagination({ page: items.page, size: items.size, totalElements: items.totalElements, totalPages: items.totalPages });
         setAccounts(accountsResponse);
         setCategories(categoriesResponse);
+        setTags(tagsResponse);
       } catch (error) {
         if (cancelled) return;
         setListFailed(true);
@@ -86,6 +91,7 @@ export default function TransactionsPage() {
     setAccountId("");
     setCategoryId("");
     setDestinationAccountId("");
+    setSelectedTagIds([]);
   }
 
   function startEditing(transaction: TransactionResponse) {
@@ -97,6 +103,7 @@ export default function TransactionsPage() {
     setAccountId(String(transaction.accountId));
     setCategoryId(transaction.categoryId ? String(transaction.categoryId) : "");
     setDestinationAccountId(transaction.destinationAccountId ? String(transaction.destinationAccountId) : "");
+    setSelectedTagIds(transaction.tags.map(tag => tag.id));
     setPendingDelete(null);
     setErrorMessage("");
     setSuccessMessage("");
@@ -129,7 +136,8 @@ export default function TransactionsPage() {
         accountId: Number(accountId),
         ...(type === "TRANSFER"
           ? { destinationAccountId: Number(destinationAccountId) }
-          : { categoryId: Number(categoryId) }) };
+          : { categoryId: Number(categoryId) }),
+        tagIds: selectedTagIds };
       const saved = editingId === null
         ? await createTransaction(request)
         : await updateTransaction(editingId, request);
@@ -233,6 +241,7 @@ export default function TransactionsPage() {
       type: (data.get("type") || undefined) as TransactionType | undefined,
       accountId: data.get("accountId") ? Number(data.get("accountId")) : undefined,
       categoryId: data.get("categoryId") ? Number(data.get("categoryId")) : undefined,
+      tagId: data.get("tagId") ? Number(data.get("tagId")) : undefined,
     });
   }
 
@@ -364,6 +373,13 @@ export default function TransactionsPage() {
             </select>
           </div>
         )}
+        <div>
+          <label htmlFor="transaction-tags">Etiquetas</label>
+          <select id="transaction-tags" multiple value={selectedTagIds.map(String)} disabled={busy || tags.length === 0}
+            onChange={event => setSelectedTagIds(Array.from(event.target.selectedOptions, option => Number(option.value)))}>
+            {tags.map(tag => <option key={tag.id} value={tag.id}>{tag.name}</option>)}
+          </select>
+        </div>
 
         <button type="submit" disabled={busy || accounts.length < (type === "TRANSFER" ? 2 : 1) || (type !== "TRANSFER" && categories.filter((category) => category.type === type).length === 0)}>
           {submitting ? "Salvando..." : editingId === null ? "Criar transação" : "Salvar alterações"}
@@ -397,6 +413,13 @@ export default function TransactionsPage() {
             <select id="filter-category" name="categoryId" disabled={busy}>
               <option value="">Todas as categorias</option>
               {categories.map((category) => <option key={category.id} value={category.id}>{category.name} ({category.type === "INCOME" ? "receita" : "despesa"})</option>)}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="filter-tag">Etiqueta</label>
+            <select id="filter-tag" name="tagId" disabled={busy}>
+              <option value="">Todas as etiquetas</option>
+              {tags.map(tag => <option key={tag.id} value={tag.id}>{tag.name}</option>)}
             </select>
           </div>
           <button type="submit" disabled={busy}>Aplicar filtros</button>
@@ -446,6 +469,7 @@ export default function TransactionsPage() {
                   <span>{transaction.type === "INCOME" ? "Receita" : transaction.type === "EXPENSE" ? "Despesa" : "Transferência"}</span>
                   <span>{transaction.type === "TRANSFER" ? `De ${transaction.accountName} para ${transaction.destinationAccountName}` : `Conta: ${transaction.accountName}`}</span>
                   {transaction.type !== "TRANSFER" && <span>Categoria: {transaction.categoryName}</span>}
+                  {transaction.tags.length > 0 && <span>Etiquetas: {transaction.tags.map(tag => tag.name).join(", ")}</span>}
                 </div>
                 <div className="transaction-actions">
                   {pendingDelete === transaction.id ? (

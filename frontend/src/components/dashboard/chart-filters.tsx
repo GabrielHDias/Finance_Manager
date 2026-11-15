@@ -19,12 +19,12 @@ export default function ChartFilters({ type, groupBy, chart, pieDisabled, onType
       </select></div>
     <div><label htmlFor="chart-group">Agrupamento</label>
       <select id="chart-group" value={groupBy} onChange={event => onGroup(event.target.value as ChartGrouping)}>
-        <option value="CATEGORY">Por categoria</option><option value="DAY">Por dia</option><option value="MONTH">Por mês</option>
+        <option value="CATEGORY">Por categoria</option><option value="TAG">Por etiqueta</option><option value="DAY">Por dia</option><option value="MONTH">Por mês</option>
       </select></div>
     <div><label htmlFor="chart-visual">Tipo de gráfico</label>
       <select id="chart-visual" value={chart} aria-describedby="chart-compatibility" onChange={event => onChart(event.target.value as ChartType)}>
         <option value="PIE" disabled={pieDisabled}>Pizza (rosca)</option>
-        <option value="LINE" disabled={groupBy === "CATEGORY"}>Linha</option><option value="BAR">Coluna</option>
+        <option value="LINE" disabled={groupBy === "CATEGORY" || groupBy === "TAG"}>Linha</option><option value="BAR">Coluna</option>
       </select></div>
   </div>;
 }

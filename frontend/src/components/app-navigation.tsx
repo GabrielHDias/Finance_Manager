@@ -52,6 +52,9 @@ export default function AppNavigation() {
         <Link href="/transactions/import" className={pathname === "/transactions/import" ? "active" : ""} aria-current={pathname === "/transactions/import" ? "page" : undefined}>
           Importar CSV
         </Link>
+        <Link href="/tags" className={pathname === "/tags" ? "active" : ""} aria-current={pathname === "/tags" ? "page" : undefined}>
+          Etiquetas
+        </Link>
       </div>
 
       <div className="navigation-actions"><ThemeToggle />

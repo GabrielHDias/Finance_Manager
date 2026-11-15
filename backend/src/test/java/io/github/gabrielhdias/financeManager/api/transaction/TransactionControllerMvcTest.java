@@ -98,6 +98,7 @@ class TransactionControllerMvcTest {
             TransactionType.EXPENSE,
             10L,
             20L,
+            null,
             null
         )).thenReturn(transaction);
 

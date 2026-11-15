@@ -1,5 +1,6 @@
 package io.github.gabrielhdias.financeManager.api.transaction;
 
+import io.github.gabrielhdias.financeManager.api.tag.dto.TagResponse;
 import io.github.gabrielhdias.financeManager.api.transaction.dto.TransactionResponse;
 import io.github.gabrielhdias.financeManager.domain.transaction.Transaction;
 
@@ -22,7 +23,9 @@ public final class TransactionMapper {
             transaction.getCategory() == null ? null : transaction.getCategory().getId(),
             transaction.getCategory() == null ? null : transaction.getCategory().getName(),
             transaction.getDestinationAccount() == null ? null : transaction.getDestinationAccount().getId(),
-            transaction.getDestinationAccount() == null ? null : transaction.getDestinationAccount().getName()
+            transaction.getDestinationAccount() == null ? null : transaction.getDestinationAccount().getName(),
+            transaction.getTags() == null ? java.util.List.of() : transaction.getTags().stream()
+                .map(tag -> new TagResponse(tag.getId(), tag.getName())).toList()
         );
     }
 }

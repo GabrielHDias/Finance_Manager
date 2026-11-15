@@ -86,6 +86,7 @@ public interface TransactionRepository
               AND t.type = COALESCE(:type, t.type)
               AND (:accountId IS NULL OR t.account.id = :accountId OR t.destinationAccount.id = :accountId)
               AND (:categoryId IS NULL OR t.category.id = :categoryId)
+              AND (:tagId IS NULL OR :tagId IN (SELECT tg.id FROM t.tags tg))
             ORDER BY t.date DESC, t.id DESC
             """)
     List<Transaction> findAllByFilters(
@@ -94,8 +95,15 @@ public interface TransactionRepository
         @Param("endDate") LocalDate endDate,
         @Param("type") TransactionType type,
         @Param("accountId") Long accountId,
-        @Param("categoryId") Long categoryId
+        @Param("categoryId") Long categoryId,
+        @Param("tagId") Long tagId
     );
+
+    default List<Transaction> findAllByFilters(
+        Long userId, LocalDate startDate, LocalDate endDate, TransactionType type, Long accountId, Long categoryId
+    ) {
+        return findAllByFilters(userId, startDate, endDate, type, accountId, categoryId, null);
+    }
 
     @Query("""
             SELECT t
@@ -109,6 +117,7 @@ public interface TransactionRepository
               AND t.type = COALESCE(:type, t.type)
               AND (:accountId IS NULL OR t.account.id = :accountId OR t.destinationAccount.id = :accountId)
               AND (:categoryId IS NULL OR t.category.id = :categoryId)
+              AND (:tagId IS NULL OR :tagId IN (SELECT tg.id FROM t.tags tg))
             ORDER BY t.date DESC, t.id DESC
             """)
     List<Transaction> findLimitedByFilters(
@@ -117,8 +126,16 @@ public interface TransactionRepository
         @Param("endDate") LocalDate endDate,
         @Param("type") TransactionType type,
         @Param("accountId") Long accountId,
-        @Param("categoryId") Long categoryId, Pageable pageable
+        @Param("categoryId") Long categoryId,
+        @Param("tagId") Long tagId, Pageable pageable
     );
+
+    default List<Transaction> findLimitedByFilters(
+        Long userId, LocalDate startDate, LocalDate endDate, TransactionType type,
+        Long accountId, Long categoryId, Pageable pageable
+    ) {
+        return findLimitedByFilters(userId, startDate, endDate, type, accountId, categoryId, null, pageable);
+    }
 
     @Query(value = """
             SELECT t FROM Transaction t
@@ -131,6 +148,7 @@ public interface TransactionRepository
               AND t.type = COALESCE(:type, t.type)
               AND (:accountId IS NULL OR t.account.id = :accountId OR t.destinationAccount.id = :accountId)
               AND (:categoryId IS NULL OR t.category.id = :categoryId)
+              AND (:tagId IS NULL OR :tagId IN (SELECT tg.id FROM t.tags tg))
             ORDER BY t.date DESC, t.id DESC
             """, countQuery = """
             SELECT COUNT(t) FROM Transaction t
@@ -140,6 +158,7 @@ public interface TransactionRepository
               AND t.type = COALESCE(:type, t.type)
               AND (:accountId IS NULL OR t.account.id = :accountId OR t.destinationAccount.id = :accountId)
               AND (:categoryId IS NULL OR t.category.id = :categoryId)
+              AND (:tagId IS NULL OR :tagId IN (SELECT tg.id FROM t.tags tg))
             """)
     Page<Transaction> findPageByFilters(
         @Param("userId") Long userId,
@@ -148,8 +167,16 @@ public interface TransactionRepository
         @Param("type") TransactionType type,
         @Param("accountId") Long accountId,
         @Param("categoryId") Long categoryId,
+        @Param("tagId") Long tagId,
         Pageable pageable
     );
+
+    default Page<Transaction> findPageByFilters(
+        Long userId, LocalDate startDate, LocalDate endDate, TransactionType type,
+        Long accountId, Long categoryId, Pageable pageable
+    ) {
+        return findPageByFilters(userId, startDate, endDate, type, accountId, categoryId, null, pageable);
+    }
 
     @Query("""
             SELECT COALESCE(SUM(t.amount), 0)
@@ -220,4 +247,35 @@ public interface TransactionRepository
         """)
     List<io.github.gabrielhdias.financeManager.api.account.dto.AccountBalanceResponse> balancesByUser(
         @Param("userId") Long userId, @Param("incomeType") TransactionType incomeType);
+
+    @Query("""
+        SELECT new io.github.gabrielhdias.financeManager.domain.dashboard.CategoryExpenseSummary(tag.id, tag.name, SUM(t.amount))
+        FROM Transaction t JOIN t.tags tag
+        WHERE t.account.user.id = :userId AND t.type = :type
+          AND t.date >= COALESCE(:startDate, t.date) AND t.date <= COALESCE(:endDate, t.date)
+        GROUP BY tag.id, tag.name
+        ORDER BY SUM(t.amount) DESC
+        """)
+    List<io.github.gabrielhdias.financeManager.domain.dashboard.CategoryExpenseSummary> sumByTag(
+        @Param("userId") Long userId, @Param("type") TransactionType type,
+        @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+
+    @Query("""
+        SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t
+        WHERE t.account.user.id = :userId AND t.type = :type
+          AND t.date >= COALESCE(:startDate, t.date) AND t.date <= COALESCE(:endDate, t.date)
+          AND t.tags IS EMPTY
+        """)
+    java.math.BigDecimal sumWithoutTags(
+        @Param("userId") Long userId, @Param("type") TransactionType type,
+        @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+
+    @Query("""
+        SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t JOIN t.tags tag
+        WHERE t.account.user.id = :userId AND t.type = :type AND tag.id = :tagId
+          AND t.date >= COALESCE(:startDate, t.date) AND t.date <= COALESCE(:endDate, t.date)
+        """)
+    java.math.BigDecimal sumAmountForTag(
+        @Param("userId") Long userId, @Param("type") TransactionType type, @Param("tagId") Long tagId,
+        @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 }
