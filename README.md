@@ -175,6 +175,10 @@ Cada resposta inclui `id`, `categoryId`, `categoryName`, `periodStart`, `limitAm
 
 Em **Contas financeiras**, o campo **Saldo inicial** entra na criação e na edição. Ele compõe o saldo da conta junto com as transações e não gera um lançamento. Zero e valores negativos são válidos (por exemplo, um cartão ou um limite já usado). Se a API receber a conta sem esse campo, o saldo inicial fica `0.00` e uma edição que omita o campo preserva o valor atual. O saldo exibido é saldo inicial + receitas − despesas.
 
+## Conta do usuário
+
+Em **Minha conta**, o e-mail muda mediante a senha atual. A sessão JWT continua válida porque o identificador do usuário não muda; o e-mail gravado no token só é renovado no próximo login. Excluir a conta pede a senha atual, apaga contas, categorias, transações, transferências, orçamentos, etiquetas e recorrências, e a interface remove o token local. Um token antigo deixa de encontrar o usuário.
+
 ## Recorrências e orçamento que se repete
 
 Em **Recorrências**, uma receita ou despesa mensal ou semanal gera lançamentos reais quando você abre transações, orçamentos ou o dashboard. A data de “hoje” usa o fuso America/Sao_Paulo. Gerar de novo não duplica. Apagar um lançamento gerado não o recria. Interromper a regra preserva o que já foi lançado e não cria os próximos.

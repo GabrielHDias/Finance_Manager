@@ -25,6 +25,9 @@ class UserServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private jakarta.persistence.EntityManager entityManager;
+
     @InjectMocks
     private UserService userService;
 
@@ -236,7 +239,7 @@ class UserServiceTest {
     @Test
     void shouldAcceptPasswordsAtBcryptByteLimitWithoutTruncation() {
         BCryptPasswordEncoder realEncoder = new BCryptPasswordEncoder();
-        UserService service = new UserService(userRepository, realEncoder);
+        UserService service = new UserService(userRepository, realEncoder, entityManager);
         when(userRepository.save(any(User.class)))
             .thenAnswer(invocation -> invocation.getArgument(0));
         for (String password : new String[] {"a".repeat(72), "é".repeat(36), "🔒".repeat(18)}) {

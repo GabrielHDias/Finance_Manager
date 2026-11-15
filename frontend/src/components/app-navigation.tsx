@@ -58,6 +58,9 @@ export default function AppNavigation() {
         <Link href="/recurring" className={pathname === "/recurring" ? "active" : ""} aria-current={pathname === "/recurring" ? "page" : undefined}>
           Recorrências
         </Link>
+        <Link href="/account" className={pathname === "/account" ? "active" : ""} aria-current={pathname === "/account" ? "page" : undefined}>
+          Minha conta
+        </Link>
       </div>
 
       <div className="navigation-actions"><ThemeToggle />
