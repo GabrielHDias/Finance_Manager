@@ -19,8 +19,10 @@ public final class TransactionMapper {
             transaction.getType(),
             transaction.getAccount().getId(),
             transaction.getAccount().getName(),
-            transaction.getCategory().getId(),
-            transaction.getCategory().getName()
+            transaction.getCategory() == null ? null : transaction.getCategory().getId(),
+            transaction.getCategory() == null ? null : transaction.getCategory().getName(),
+            transaction.getDestinationAccount() == null ? null : transaction.getDestinationAccount().getId(),
+            transaction.getDestinationAccount() == null ? null : transaction.getDestinationAccount().getName()
         );
     }
 }

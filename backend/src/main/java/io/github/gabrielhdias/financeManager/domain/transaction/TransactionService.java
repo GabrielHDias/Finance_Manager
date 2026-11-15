@@ -42,31 +42,28 @@ public class TransactionService {
         Long accountId,
         Long categoryId
     ) {
-        Account account = findAccountByIdAndUserId(
-            accountId,
-            userId
-        );
+        return create(userId, description, amount, date, type, accountId, categoryId, null);
+    }
 
-        Category category = findCategoryByIdAndUserId(
-            categoryId,
-            userId
-        );
-        if (!category.getType().name().equals(type.name())) {
-            throw new BusinessRuleException(
-                "A categoria precisa ser do mesmo tipo da transação"
-            );
+    @Transactional
+    public Transaction create(
+        Long userId,
+        String description,
+        BigDecimal amount,
+        LocalDate date,
+        TransactionType type,
+        Long accountId,
+        Long categoryId,
+        Long destinationAccountId
+    ) {
+        Account account = findAccountByIdAndUserId(accountId, userId);
+        if (type == TransactionType.TRANSFER) {
+            return transactionRepository.save(new Transaction(
+                description, amount, date, account, requireDestination(userId, account, destinationAccountId, categoryId)
+            ));
         }
-
-        Transaction transaction = new Transaction(
-            description,
-            amount,
-            date,
-            type,
-            account,
-            category
-        );
-
-        return transactionRepository.save(transaction);
+        Category category = requireMatchingCategory(userId, type, categoryId);
+        return transactionRepository.save(new Transaction(description, amount, date, type, account, category));
     }
 
     @Transactional(readOnly = true)
@@ -133,34 +130,33 @@ public class TransactionService {
         Long accountId,
         Long categoryId
     ) {
-        Transaction transaction =
-            findTransactionByIdAndUserId(
-                transactionId,
-                userId
-            );
+        return update(userId, transactionId, description, amount, date, type, accountId, categoryId, null);
+    }
 
-        Account account = findAccountByIdAndUserId(
-            accountId,
-            userId
-        );
-
-        Category category = findCategoryByIdAndUserId(
-            categoryId,
-            userId
-        );
-        if (!category.getType().name().equals(type.name())) {
-            throw new BusinessRuleException(
-                "A categoria precisa ser do mesmo tipo da transação"
-            );
-        }
-
+    @Transactional
+    public Transaction update(
+        Long userId,
+        Long transactionId,
+        String description,
+        BigDecimal amount,
+        LocalDate date,
+        TransactionType type,
+        Long accountId,
+        Long categoryId,
+        Long destinationAccountId
+    ) {
+        Transaction transaction = findTransactionByIdAndUserId(transactionId, userId);
+        Account account = findAccountByIdAndUserId(accountId, userId);
         transaction.updateDescription(description);
         transaction.updateAmount(amount);
         transaction.updateDate(date);
-        transaction.updateType(type);
+        if (type == TransactionType.TRANSFER) {
+            transaction.updateAccount(account);
+            transaction.becomeTransfer(requireDestination(userId, account, destinationAccountId, categoryId));
+            return transaction;
+        }
+        transaction.becomeMovement(type, requireMatchingCategory(userId, type, categoryId));
         transaction.updateAccount(account);
-        transaction.updateCategory(category);
-
         return transaction;
     }
 
@@ -205,6 +201,31 @@ public class TransactionService {
                     "Transação não encontrada"
                 )
             );
+    }
+
+    private Category requireMatchingCategory(Long userId, TransactionType type, Long categoryId) {
+        if (categoryId == null) {
+            throw new IllegalArgumentException("Informe a categoria");
+        }
+        Category category = findCategoryByIdAndUserId(categoryId, userId);
+        if (!category.getType().name().equals(type.name())) {
+            throw new BusinessRuleException("A categoria precisa ser do mesmo tipo da transação");
+        }
+        return category;
+    }
+
+    private Account requireDestination(Long userId, Account source, Long destinationAccountId, Long categoryId) {
+        if (categoryId != null) {
+            throw new IllegalArgumentException("Transferência não usa categoria");
+        }
+        if (destinationAccountId == null) {
+            throw new IllegalArgumentException("Informe a conta de destino");
+        }
+        Account destination = findAccountByIdAndUserId(destinationAccountId, userId);
+        if (source.getId().equals(destination.getId())) {
+            throw new BusinessRuleException("A conta de origem e a de destino precisam ser diferentes");
+        }
+        return destination;
     }
 
     private Account findAccountByIdAndUserId(

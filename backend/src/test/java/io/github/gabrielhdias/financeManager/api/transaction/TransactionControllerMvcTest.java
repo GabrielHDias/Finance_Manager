@@ -97,7 +97,8 @@ class TransactionControllerMvcTest {
             LocalDate.of(2026, 10, 1),
             TransactionType.EXPENSE,
             10L,
-            20L
+            20L,
+            null
         )).thenReturn(transaction);
 
         mockMvc.perform(

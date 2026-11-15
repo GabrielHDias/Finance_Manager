@@ -45,7 +45,8 @@ public interface TransactionRepository
             SELECT t
             FROM Transaction t
             JOIN FETCH t.account
-            JOIN FETCH t.category
+            LEFT JOIN FETCH t.category
+            LEFT JOIN FETCH t.destinationAccount
             WHERE t.account.user.id = :userId
             ORDER BY t.date DESC, t.id DESC
             """)
@@ -57,7 +58,8 @@ public interface TransactionRepository
             SELECT t
             FROM Transaction t
             JOIN FETCH t.account
-            JOIN FETCH t.category
+            LEFT JOIN FETCH t.category
+            LEFT JOIN FETCH t.destinationAccount
             WHERE t.id = :id
               AND t.account.user.id = :userId
             """)
@@ -68,19 +70,22 @@ public interface TransactionRepository
 
     boolean existsByAccountId(Long accountId);
 
+    boolean existsByDestinationAccountId(Long destinationAccountId);
+
     boolean existsByCategoryId(Long categoryId);
 
     @Query("""
             SELECT t
             FROM Transaction t
             JOIN FETCH t.account
-            JOIN FETCH t.category
+            LEFT JOIN FETCH t.category
+            LEFT JOIN FETCH t.destinationAccount
             WHERE t.account.user.id = :userId
               AND t.date >= COALESCE(:startDate, t.date)
               AND t.date <= COALESCE(:endDate, t.date)
               AND t.type = COALESCE(:type, t.type)
-              AND t.account.id = COALESCE(:accountId, t.account.id)
-              AND t.category.id = COALESCE(:categoryId, t.category.id)
+              AND (:accountId IS NULL OR t.account.id = :accountId OR t.destinationAccount.id = :accountId)
+              AND (:categoryId IS NULL OR t.category.id = :categoryId)
             ORDER BY t.date DESC, t.id DESC
             """)
     List<Transaction> findAllByFilters(
@@ -96,13 +101,14 @@ public interface TransactionRepository
             SELECT t
             FROM Transaction t
             JOIN FETCH t.account
-            JOIN FETCH t.category
+            LEFT JOIN FETCH t.category
+            LEFT JOIN FETCH t.destinationAccount
             WHERE t.account.user.id = :userId
               AND t.date >= COALESCE(:startDate, t.date)
               AND t.date <= COALESCE(:endDate, t.date)
               AND t.type = COALESCE(:type, t.type)
-              AND t.account.id = COALESCE(:accountId, t.account.id)
-              AND t.category.id = COALESCE(:categoryId, t.category.id)
+              AND (:accountId IS NULL OR t.account.id = :accountId OR t.destinationAccount.id = :accountId)
+              AND (:categoryId IS NULL OR t.category.id = :categoryId)
             ORDER BY t.date DESC, t.id DESC
             """)
     List<Transaction> findLimitedByFilters(
@@ -117,13 +123,14 @@ public interface TransactionRepository
     @Query(value = """
             SELECT t FROM Transaction t
             JOIN FETCH t.account
-            JOIN FETCH t.category
+            LEFT JOIN FETCH t.category
+            LEFT JOIN FETCH t.destinationAccount
             WHERE t.account.user.id = :userId
               AND t.date >= COALESCE(:startDate, t.date)
               AND t.date <= COALESCE(:endDate, t.date)
               AND t.type = COALESCE(:type, t.type)
-              AND t.account.id = COALESCE(:accountId, t.account.id)
-              AND t.category.id = COALESCE(:categoryId, t.category.id)
+              AND (:accountId IS NULL OR t.account.id = :accountId OR t.destinationAccount.id = :accountId)
+              AND (:categoryId IS NULL OR t.category.id = :categoryId)
             ORDER BY t.date DESC, t.id DESC
             """, countQuery = """
             SELECT COUNT(t) FROM Transaction t
@@ -131,8 +138,8 @@ public interface TransactionRepository
               AND t.date >= COALESCE(:startDate, t.date)
               AND t.date <= COALESCE(:endDate, t.date)
               AND t.type = COALESCE(:type, t.type)
-              AND t.account.id = COALESCE(:accountId, t.account.id)
-              AND t.category.id = COALESCE(:categoryId, t.category.id)
+              AND (:accountId IS NULL OR t.account.id = :accountId OR t.destinationAccount.id = :accountId)
+              AND (:categoryId IS NULL OR t.category.id = :categoryId)
             """)
     Page<Transaction> findPageByFilters(
         @Param("userId") Long userId,
@@ -184,15 +191,17 @@ public interface TransactionRepository
             SELECT COALESCE(
                 SUM(
                     CASE
-                        WHEN t.type = :incomeType
-                            THEN t.amount
-                        ELSE -t.amount
+                        WHEN t.account.id = :accountId AND t.type = :incomeType THEN t.amount
+                        WHEN t.account.id = :accountId AND t.type = io.github.gabrielhdias.financeManager.domain.transaction.TransactionType.EXPENSE THEN -t.amount
+                        WHEN t.account.id = :accountId AND t.type = io.github.gabrielhdias.financeManager.domain.transaction.TransactionType.TRANSFER THEN -t.amount
+                        WHEN t.destinationAccount.id = :accountId AND t.type = io.github.gabrielhdias.financeManager.domain.transaction.TransactionType.TRANSFER THEN t.amount
+                        ELSE 0
                     END
                 ),
                 0
             )
             FROM Transaction t
-            WHERE t.account.id = :accountId
+            WHERE t.account.id = :accountId OR t.destinationAccount.id = :accountId
             """)
     BigDecimal calculateBalanceByAccountId(
         @Param("accountId") Long accountId,
@@ -200,8 +209,13 @@ public interface TransactionRepository
     );
     @Query("""
         SELECT new io.github.gabrielhdias.financeManager.api.account.dto.AccountBalanceResponse(
-            a.id, a.openingBalance + COALESCE(SUM(CASE WHEN t.type = :incomeType THEN t.amount ELSE -t.amount END), 0))
-        FROM Account a LEFT JOIN Transaction t ON t.account = a
+            a.id, a.openingBalance + COALESCE(SUM(CASE
+                WHEN t.type = :incomeType AND t.account = a THEN t.amount
+                WHEN t.type = io.github.gabrielhdias.financeManager.domain.transaction.TransactionType.EXPENSE AND t.account = a THEN -t.amount
+                WHEN t.type = io.github.gabrielhdias.financeManager.domain.transaction.TransactionType.TRANSFER AND t.account = a THEN -t.amount
+                WHEN t.type = io.github.gabrielhdias.financeManager.domain.transaction.TransactionType.TRANSFER AND t.destinationAccount = a THEN t.amount
+                ELSE 0 END), 0))
+        FROM Account a LEFT JOIN Transaction t ON t.account = a OR t.destinationAccount = a
         WHERE a.user.id = :userId GROUP BY a.id, a.openingBalance ORDER BY a.id
         """)
     List<io.github.gabrielhdias.financeManager.api.account.dto.AccountBalanceResponse> balancesByUser(

@@ -13,9 +13,9 @@ export function serializeTransactionCsv(transactions: readonly TransactionRespon
     formatDate(transaction.date),
     transaction.description,
     decimal(cents(transaction.amount)).replace(".", ","),
-    transaction.type === "INCOME" ? "RECEITA" : "DESPESA",
-    transaction.accountName,
-    transaction.categoryName,
+    transaction.type === "INCOME" ? "RECEITA" : transaction.type === "EXPENSE" ? "DESPESA" : "TRANSFERENCIA",
+    transaction.type === "TRANSFER" ? `${transaction.accountName} → ${transaction.destinationAccountName ?? ""}` : transaction.accountName,
+    transaction.categoryName ?? "",
   ].map(csvCell).join(";"));
 
   return `\uFEFFdata;descricao;valor;tipo;conta;categoria\r\n${rows.join("\r\n")}${rows.length ? "\r\n" : ""}`;

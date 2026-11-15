@@ -18,6 +18,8 @@ public record TransactionResponse(
     Long accountId,
     String accountName,
     Long categoryId,
-    String categoryName
+    String categoryName,
+    Long destinationAccountId,
+    String destinationAccountName
 ) {
 }

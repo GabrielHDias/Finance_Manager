@@ -42,8 +42,20 @@ public record TransactionRequest(
     @Positive(message = "O identificador da conta deve ser maior que zero")
     Long accountId,
 
-    @NotNull(message = "A categoria é obrigatória")
     @Positive(message = "O identificador da categoria deve ser maior que zero")
-    Long categoryId
+    Long categoryId,
+
+    @Positive(message = "O identificador da conta de destino deve ser maior que zero")
+    Long destinationAccountId
 ) {
+    public TransactionRequest(
+        String description,
+        BigDecimal amount,
+        LocalDate date,
+        TransactionType type,
+        Long accountId,
+        Long categoryId
+    ) {
+        this(description, amount, date, type, accountId, categoryId, null);
+    }
 }

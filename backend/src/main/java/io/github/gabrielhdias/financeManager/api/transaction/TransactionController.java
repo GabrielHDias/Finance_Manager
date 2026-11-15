@@ -59,7 +59,8 @@ public class TransactionController {
             request.date(),
             request.type(),
             request.accountId(),
-            request.categoryId()
+            request.categoryId(),
+            request.destinationAccountId()
         );
 
         return ResponseEntity
@@ -155,7 +156,8 @@ public class TransactionController {
             request.date(),
             request.type(),
             request.accountId(),
-            request.categoryId()
+            request.categoryId(),
+            request.destinationAccountId()
         );
 
         return ResponseEntity.ok(

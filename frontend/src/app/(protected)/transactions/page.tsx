@@ -28,6 +28,7 @@ export default function TransactionsPage() {
   const [type, setType] = useState<TransactionType>("EXPENSE");
   const [accountId, setAccountId] = useState("");
   const [categoryId, setCategoryId] = useState("");
+  const [destinationAccountId, setDestinationAccountId] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
   const [pendingDelete, setPendingDelete] = useState<number | null>(null);
   const [filters, setFilters] = useState<TransactionFilters>({});
@@ -84,6 +85,7 @@ export default function TransactionsPage() {
     setType("EXPENSE");
     setAccountId("");
     setCategoryId("");
+    setDestinationAccountId("");
   }
 
   function startEditing(transaction: TransactionResponse) {
@@ -93,7 +95,8 @@ export default function TransactionsPage() {
     setDate(formatDate(transaction.date));
     setType(transaction.type);
     setAccountId(String(transaction.accountId));
-    setCategoryId(String(transaction.categoryId));
+    setCategoryId(transaction.categoryId ? String(transaction.categoryId) : "");
+    setDestinationAccountId(transaction.destinationAccountId ? String(transaction.destinationAccountId) : "");
     setPendingDelete(null);
     setErrorMessage("");
     setSuccessMessage("");
@@ -108,8 +111,11 @@ export default function TransactionsPage() {
     if (!validInput(numericAmount)) {
       setErrorMessage("Informe um valor válido."); return;
     }
-    if (!date || !accountId || !categoryId) {
-      setErrorMessage("Informe a data, a conta e a categoria."); return;
+    if (!date || !accountId || (type !== "TRANSFER" && !categoryId) || (type === "TRANSFER" && !destinationAccountId)) {
+      setErrorMessage(type === "TRANSFER" ? "Informe a data, a conta de origem e a conta de destino." : "Informe a data, a conta e a categoria."); return;
+    }
+    if (type === "TRANSFER" && accountId === destinationAccountId) {
+      setErrorMessage("A conta de origem e a de destino precisam ser diferentes."); return;
     }
     const apiDate = parseDisplayDate(date);
     if (!apiDate) {
@@ -120,7 +126,10 @@ export default function TransactionsPage() {
     setSuccessMessage("");
     try {
       const request = { description: description.trim(), amount: numericAmount, date: apiDate, type,
-        accountId: Number(accountId), categoryId: Number(categoryId) };
+        accountId: Number(accountId),
+        ...(type === "TRANSFER"
+          ? { destinationAccountId: Number(destinationAccountId) }
+          : { categoryId: Number(categoryId) }) };
       const saved = editingId === null
         ? await createTransaction(request)
         : await updateTransaction(editingId, request);
@@ -299,6 +308,7 @@ export default function TransactionsPage() {
           >
             <option value="EXPENSE">Despesa</option>
             <option value="INCOME">Receita</option>
+            <option value="TRANSFER">Transferência</option>
           </select>
         </div>
 
@@ -331,8 +341,8 @@ export default function TransactionsPage() {
             name="categoryId"
             value={categoryId}
             onChange={(event) => setCategoryId(event.target.value)}
-            required
-            disabled={busy}
+            required={type !== "TRANSFER"}
+            disabled={busy || type === "TRANSFER"}
           >
             <option value="">Selecione uma categoria</option>
 
@@ -343,8 +353,19 @@ export default function TransactionsPage() {
             ))}
           </select>
         </div>
+        {type === "TRANSFER" && (
+          <div>
+            <label htmlFor="destination-account">Conta de destino</label>
+            <select id="destination-account" value={destinationAccountId} onChange={(event) => setDestinationAccountId(event.target.value)} required disabled={busy}>
+              <option value="">Selecione a conta de destino</option>
+              {accounts.filter((account) => String(account.id) !== accountId).map((account) => (
+                <option key={account.id} value={account.id}>{account.name}</option>
+              ))}
+            </select>
+          </div>
+        )}
 
-        <button type="submit" disabled={busy || accounts.length === 0 || categories.length === 0}>
+        <button type="submit" disabled={busy || accounts.length < (type === "TRANSFER" ? 2 : 1) || (type !== "TRANSFER" && categories.filter((category) => category.type === type).length === 0)}>
           {submitting ? "Salvando..." : editingId === null ? "Criar transação" : "Salvar alterações"}
         </button>
         {editingId !== null && (
@@ -361,7 +382,7 @@ export default function TransactionsPage() {
           <div>
             <label htmlFor="filter-type">Tipo de transação</label>
             <select id="filter-type" name="type" disabled={busy}>
-              <option value="">Todos os tipos</option><option value="INCOME">Receita</option><option value="EXPENSE">Despesa</option>
+              <option value="">Todos os tipos</option><option value="INCOME">Receita</option><option value="EXPENSE">Despesa</option><option value="TRANSFER">Transferência</option>
             </select>
           </div>
           <div>
@@ -416,15 +437,15 @@ export default function TransactionsPage() {
               <li key={transaction.id} className="transaction-item">
                 <div className="transaction-item__header">
                   <strong>{transaction.description}</strong>
-                  <strong className={`transaction-amount transaction-amount--${transaction.type === "INCOME" ? "income" : "expense"}`}>
+                  <strong className={`transaction-amount transaction-amount--${transaction.type === "INCOME" ? "income" : transaction.type === "EXPENSE" ? "expense" : ""}`}>
                     {formatCurrency(transaction.amount)}
                   </strong>
                 </div>
                 <div className="transaction-item__details">
                   <span>{formatDate(transaction.date)}</span>
-                  <span>{transaction.type === "INCOME" ? "Receita" : "Despesa"}</span>
-                  <span>Conta: {transaction.accountName}</span>
-                  <span>Categoria: {transaction.categoryName}</span>
+                  <span>{transaction.type === "INCOME" ? "Receita" : transaction.type === "EXPENSE" ? "Despesa" : "Transferência"}</span>
+                  <span>{transaction.type === "TRANSFER" ? `De ${transaction.accountName} para ${transaction.destinationAccountName}` : `Conta: ${transaction.accountName}`}</span>
+                  {transaction.type !== "TRANSFER" && <span>Categoria: {transaction.categoryName}</span>}
                 </div>
                 <div className="transaction-actions">
                   {pendingDelete === transaction.id ? (

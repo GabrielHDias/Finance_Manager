@@ -14,7 +14,7 @@ export function matchesTransactionFilters(
     (!filters.startDate || transaction.date >= filters.startDate) &&
     (!filters.endDate || transaction.date <= filters.endDate) &&
     (!filters.type || transaction.type === filters.type) &&
-    (filters.accountId === undefined || transaction.accountId === filters.accountId) &&
+    (filters.accountId === undefined || transaction.accountId === filters.accountId || transaction.destinationAccountId === filters.accountId) &&
     (filters.categoryId === undefined || transaction.categoryId === filters.categoryId)
   );
 }

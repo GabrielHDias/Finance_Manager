@@ -1,4 +1,4 @@
-export type TransactionType = "INCOME" | "EXPENSE";
+export type TransactionType = "INCOME" | "EXPENSE" | "TRANSFER";
 
 export interface CreateTransactionRequest {
   description: string;
@@ -6,7 +6,8 @@ export interface CreateTransactionRequest {
   date: string;
   type: TransactionType;
   accountId: number;
-  categoryId: number;
+  categoryId?: number;
+  destinationAccountId?: number;
 }
 
 export interface TransactionResponse {
@@ -17,8 +18,10 @@ export interface TransactionResponse {
   type: TransactionType;
   accountId: number;
   accountName: string;
-  categoryId: number;
-  categoryName: string;
+  categoryId: number | null;
+  categoryName: string | null;
+  destinationAccountId: number | null;
+  destinationAccountName: string | null;
 }
 
 export interface TransactionFilters {
