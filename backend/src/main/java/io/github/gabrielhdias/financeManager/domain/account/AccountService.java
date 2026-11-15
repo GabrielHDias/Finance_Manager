@@ -157,7 +157,8 @@ public class AccountService {
             userId
         );
 
-        if (transactionRepository.existsByAccountId(accountId)) {
+        if (transactionRepository.existsByAccountId(accountId)
+            || transactionRepository.existsByDestinationAccountId(accountId)) {
             throw new BusinessRuleException(
                 "Não é possível excluir uma conta que possui transações"
             );

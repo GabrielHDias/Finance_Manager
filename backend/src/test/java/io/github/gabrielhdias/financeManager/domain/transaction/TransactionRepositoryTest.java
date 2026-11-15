@@ -27,7 +27,7 @@ class TransactionRepositoryTest
     private EntityManager entityManager;
 
     @org.junit.jupiter.params.ParameterizedTest
-    @org.junit.jupiter.params.provider.EnumSource(TransactionType.class)
+    @org.junit.jupiter.params.provider.EnumSource(value = TransactionType.class, names = "TRANSFER", mode = org.junit.jupiter.params.provider.EnumSource.Mode.EXCLUDE)
     void chartAggregationsRespectOwnerTypeInclusiveDatesAndPrecision(TransactionType type) {
         TestData owner = createTestData("chart-owner@example.test");
         TestData other = createTestData("chart-other@example.test");

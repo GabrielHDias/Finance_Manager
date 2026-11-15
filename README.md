@@ -175,6 +175,10 @@ Cada resposta inclui `id`, `categoryId`, `categoryName`, `periodStart`, `limitAm
 
 Em **Contas financeiras**, o campo **Saldo inicial** entra na criação e na edição. Ele compõe o saldo da conta junto com as transações e não gera um lançamento. Zero e valores negativos são válidos (por exemplo, um cartão ou um limite já usado). Se a API receber a conta sem esse campo, o saldo inicial fica `0.00` e uma edição que omita o campo preserva o valor atual. O saldo exibido é saldo inicial + receitas − despesas.
 
+## Transferências entre contas
+
+Em **Transações**, o tipo **Transferência** move um valor de uma conta sua para outra. A transferência entra no saldo das duas contas e aparece na lista como “De … para …”. Ela não entra em receitas, despesas, gráficos, orçamentos nem no consumo do limite. Editar ou excluir mexe nas duas pontas de uma vez, porque existe um único registro. As duas contas precisam ser do mesmo usuário e diferentes. A exportação CSV usa o tipo `TRANSFERENCIA` e junta origem e destino na coluna da conta.
+
 ## Tipo da categoria
 
 Cada categoria é de **receita** ou **despesa**. Uma transação só pode usar uma categoria do mesmo tipo. Orçamento mensal só existe em categoria de despesa. Categorias antigas sem movimentação, ou com despesa ou orçamento, permanecem como despesa. Categorias usadas só como receita passam a ser receita. Se a mesma categoria tinha os dois tipos, as receitas migram para uma categoria nova chamada `{nome} (receita)`. Omitir o tipo na criação assume despesa, para não quebrar clientes anteriores. Mudar o tipo é recusado enquanto houver transações; virar receita também exige remover os orçamentos.

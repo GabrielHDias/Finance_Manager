@@ -60,7 +60,8 @@ class TransactionControllerTest {
             request.date(),
             request.type(),
             request.accountId(),
-            request.categoryId()
+            request.categoryId(),
+            request.destinationAccountId()
         )).thenReturn(transaction);
 
         ResponseEntity<TransactionResponse> response =
@@ -85,7 +86,8 @@ class TransactionControllerTest {
             request.date(),
             request.type(),
             request.accountId(),
-            request.categoryId()
+            request.categoryId(),
+            request.destinationAccountId()
         );
     }
 
@@ -252,7 +254,8 @@ class TransactionControllerTest {
             request.date(),
             request.type(),
             request.accountId(),
-            request.categoryId()
+            request.categoryId(),
+            request.destinationAccountId()
         )).thenReturn(transaction);
 
         ResponseEntity<TransactionResponse> response =
@@ -277,7 +280,8 @@ class TransactionControllerTest {
                 request.date(),
                 request.type(),
                 request.accountId(),
-                request.categoryId()
+                request.categoryId(),
+                request.destinationAccountId()
             );
     }
 

@@ -33,9 +33,13 @@ public class Transaction {
     @JoinColumn(name = "account_id", nullable = false)
     private Account account;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "category_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
     private Category category;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "destination_account_id")
+    private Account destinationAccount;
 
     protected Transaction() {
     }
@@ -58,6 +62,9 @@ public class Transaction {
             type,
             "O tipo da transação não pode ser nulo"
         );
+        if (type == TransactionType.TRANSFER) {
+            throw new IllegalArgumentException("Transferência não usa categoria");
+        }
         this.account = Objects.requireNonNull(
             account,
             "A conta da transação não pode ser nula"
@@ -66,6 +73,22 @@ public class Transaction {
             category,
             "A categoria da transação não pode ser nula"
         );
+    }
+
+    public Transaction(
+        String description,
+        BigDecimal amount,
+        LocalDate date,
+        Account source,
+        Account destination
+    ) {
+        this.description = validateDescription(description);
+        this.amount = validateAmount(amount);
+        this.date = Objects.requireNonNull(date, "A data da transação não pode ser nula");
+        this.type = TransactionType.TRANSFER;
+        this.account = Objects.requireNonNull(source, "A conta de origem não pode ser nula");
+        this.destinationAccount = requireDifferentAccount(destination);
+        this.category = null;
     }
 
     public Long getId() {
@@ -94,6 +117,10 @@ public class Transaction {
 
     public Category getCategory() {
         return category;
+    }
+
+    public Account getDestinationAccount() {
+        return destinationAccount;
     }
 
     public void updateDescription(String description) {
@@ -130,6 +157,29 @@ public class Transaction {
             category,
             "A categoria da transação não pode ser nula"
         );
+    }
+
+    public void becomeMovement(TransactionType type, Category category) {
+        if (type == null || type == TransactionType.TRANSFER) {
+            throw new IllegalArgumentException("Informe receita ou despesa");
+        }
+        this.type = type;
+        this.category = Objects.requireNonNull(category, "A categoria da transação não pode ser nula");
+        this.destinationAccount = null;
+    }
+
+    public void becomeTransfer(Account destination) {
+        this.type = TransactionType.TRANSFER;
+        this.category = null;
+        this.destinationAccount = requireDifferentAccount(destination);
+    }
+
+    private Account requireDifferentAccount(Account destination) {
+        Account target = Objects.requireNonNull(destination, "A conta de destino não pode ser nula");
+        if (account.getId() != null && account.getId().equals(target.getId())) {
+            throw new IllegalArgumentException("A conta de origem e a de destino precisam ser diferentes");
+        }
+        return target;
     }
 
     private String validateDescription(String description) {
