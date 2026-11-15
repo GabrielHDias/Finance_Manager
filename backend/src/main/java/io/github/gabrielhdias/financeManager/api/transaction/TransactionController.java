@@ -4,6 +4,7 @@ import io.github.gabrielhdias.financeManager.api.transaction.dto.TransactionRequ
 import io.github.gabrielhdias.financeManager.api.transaction.dto.TransactionResponse;
 import io.github.gabrielhdias.financeManager.api.transaction.dto.TransactionPageResponse;
 import io.github.gabrielhdias.financeManager.domain.transaction.Transaction;
+import io.github.gabrielhdias.financeManager.domain.recurring.RecurringGenerationService;
 import io.github.gabrielhdias.financeManager.domain.transaction.TransactionService;
 import io.github.gabrielhdias.financeManager.domain.transaction.TransactionType;
 import io.github.gabrielhdias.financeManager.security.AuthenticatedUser;
@@ -37,13 +38,16 @@ public class TransactionController {
 
     private final TransactionService transactionService;
     private final AuthenticatedUser authenticatedUser;
+    private final RecurringGenerationService recurringGenerationService;
 
     public TransactionController(
         TransactionService transactionService,
-        AuthenticatedUser authenticatedUser
+        AuthenticatedUser authenticatedUser,
+        RecurringGenerationService recurringGenerationService
     ) {
         this.transactionService = transactionService;
         this.authenticatedUser = authenticatedUser;
+        this.recurringGenerationService = recurringGenerationService;
     }
 
     @PostMapping
@@ -92,6 +96,7 @@ public class TransactionController {
         Long tagId
     ) {
         Long userId = authenticatedUser.getId();
+        recurringGenerationService.generate(userId);
 
         List<TransactionResponse> response =
             transactionService
@@ -122,6 +127,7 @@ public class TransactionController {
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size
     ) {
+        recurringGenerationService.generate(authenticatedUser.getId());
         var result = transactionService.pageByUser(
             authenticatedUser.getId(), startDate, endDate, type, accountId, categoryId, tagId, page, size
         );

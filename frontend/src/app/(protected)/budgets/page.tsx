@@ -23,6 +23,7 @@ export default function BudgetsPage() {
   const [year, setYear] = useState<string | null>(null);
   const [categoryId, setCategoryId] = useState("");
   const [limit, setLimit] = useState("");
+  const [repeatsMonthly, setRepeatsMonthly] = useState(false);
   const [pendingDelete, setPendingDelete] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [working, setWorking] = useState(false);
@@ -80,7 +81,7 @@ export default function BudgetsPage() {
     }
     setWorking(true); setError(""); setSuccess("");
     try {
-      const saved = await saveBudget({ ...data.period, categoryId: Number(categoryId), limitAmount: amount });
+      const saved = await saveBudget({ ...data.period, categoryId: Number(categoryId), limitAmount: amount, repeatsMonthly });
       setData(current => current && ({ ...current, budgets: [...current.budgets.filter(row => row.id !== saved.id), saved].sort((a, b) => a.categoryName.localeCompare(b.categoryName, "pt-BR")) }));
       setSuccess("Limite mensal salvo."); setCategoryId(""); setLimit(""); setPendingDelete(null);
     } catch (failure) { handleError(failure); }
@@ -141,6 +142,7 @@ export default function BudgetsPage() {
                 <input id="budget-limit" className="amount-input" type="number" min="0.01" step="0.01" value={limit} onChange={event => setLimit(event.target.value)} required disabled={busy} />
               </div>
               <button type="submit" disabled={busy || data.categories.filter(category => category.type === "EXPENSE").length === 0}>{working ? "Salvando..." : "Salvar limite"}</button>
+              <label><input type="checkbox" checked={repeatsMonthly} onChange={event => setRepeatsMonthly(event.target.checked)} disabled={busy} /> Repetir nos meses seguintes</label>
             </form>
           </section>
           <section className="card">

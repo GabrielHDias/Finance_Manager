@@ -55,6 +55,9 @@ export default function AppNavigation() {
         <Link href="/tags" className={pathname === "/tags" ? "active" : ""} aria-current={pathname === "/tags" ? "page" : undefined}>
           Etiquetas
         </Link>
+        <Link href="/recurring" className={pathname === "/recurring" ? "active" : ""} aria-current={pathname === "/recurring" ? "page" : undefined}>
+          Recorrências
+        </Link>
       </div>
 
       <div className="navigation-actions"><ThemeToggle />

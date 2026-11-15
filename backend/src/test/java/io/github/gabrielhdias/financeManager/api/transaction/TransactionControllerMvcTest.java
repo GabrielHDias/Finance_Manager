@@ -44,6 +44,9 @@ class TransactionControllerMvcTest {
     private AuthenticatedUser authenticatedUser;
 
     @MockitoBean
+    private io.github.gabrielhdias.financeManager.domain.recurring.RecurringGenerationService recurringGenerationService;
+
+    @MockitoBean
     private JwtDecoder jwtDecoder;
 
     @Test

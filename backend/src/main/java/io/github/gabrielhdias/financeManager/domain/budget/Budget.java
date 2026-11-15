@@ -17,10 +17,13 @@ public class Budget {
     private LocalDate periodStart;
     @Column(name = "limit_amount", nullable = false, precision = 19, scale = 2)
     private BigDecimal limitAmount;
+    @Column(name = "repeats_monthly", nullable = false)
+    private boolean repeatsMonthly;
 
     protected Budget() {}
     public Long getId() { return id; }
     public Category getCategory() { return category; }
     public LocalDate getPeriodStart() { return periodStart; }
     public BigDecimal getLimitAmount() { return limitAmount; }
+    public boolean isRepeatsMonthly() { return repeatsMonthly; }
 }
