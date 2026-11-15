@@ -60,6 +60,11 @@ class TransactionChartSummaryTest {
     @ParameterizedTest
     @EnumSource(ChartGrouping.class)
     void emptyPeriodsHaveZeroTotals(ChartGrouping group) {
+        if (group == ChartGrouping.TAG) {
+            when(repository.sumByTag(7L, TransactionType.INCOME, start, end)).thenReturn(List.of());
+            when(repository.sumWithoutTags(7L, TransactionType.INCOME, start, end)).thenReturn(BigDecimal.ZERO);
+            when(repository.sumAmountByUserAndTypeAndPeriod(7L, TransactionType.INCOME, start, end)).thenReturn(BigDecimal.ZERO);
+        }
         var result = service.getTransactionsSummary(7L, TransactionType.INCOME, group, start, end);
         assertEquals(0, result.total().signum());
         assertTrue(result.items().stream().allMatch(item -> item.total().signum() == 0));

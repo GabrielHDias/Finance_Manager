@@ -147,6 +147,7 @@ class TransactionControllerMvcTest {
             null,
             null,
             null,
+            null,
             null
         )).thenReturn(
             List.of(transaction)
@@ -182,7 +183,8 @@ class TransactionControllerMvcTest {
             LocalDate.of(2026, 10, 31),
             TransactionType.EXPENSE,
             10L,
-            20L
+            20L,
+            null
         )).thenReturn(
             List.of(transaction)
         );
@@ -231,6 +233,7 @@ class TransactionControllerMvcTest {
             userId,
             LocalDate.of(2026, 10, 31),
             LocalDate.of(2026, 10, 1),
+            null,
             null,
             null,
             null
@@ -304,7 +307,7 @@ class TransactionControllerMvcTest {
         when(authenticatedUser.getId()).thenReturn(1L);
         when(transactionService.pageByUser(
             1L, LocalDate.of(2026, 10, 1), LocalDate.of(2026, 10, 31),
-            TransactionType.EXPENSE, 10L, 20L, 1, 1
+            TransactionType.EXPENSE, 10L, 20L, null, 1, 1
         )).thenReturn(new org.springframework.data.domain.PageImpl<>(
             List.of(transaction), org.springframework.data.domain.PageRequest.of(1, 1), 2
         ));
@@ -328,7 +331,7 @@ class TransactionControllerMvcTest {
     @Test
     void shouldReturnBadRequestForInvalidPageSize() throws Exception {
         when(authenticatedUser.getId()).thenReturn(1L);
-        when(transactionService.pageByUser(1L, null, null, null, null, null, 0, 101))
+        when(transactionService.pageByUser(1L, null, null, null, null, null, null, 0, 101))
             .thenThrow(new IllegalArgumentException("Tamanho inválido"));
         mockMvc.perform(get("/transactions/page").with(jwt()).param("size", "101"))
             .andExpect(status().isBadRequest());

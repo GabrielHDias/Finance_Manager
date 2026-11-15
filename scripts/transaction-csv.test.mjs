@@ -50,5 +50,5 @@ test('preserves ordinary text, row order and input data', () => {
 });
 
 test('empty result has only the header and no phantom transaction', () => {
-  assert.equal(serializeTransactionCsv([]), '\uFEFFdata;descricao;valor;tipo;conta;categoria\r\n');
+  assert.equal(serializeTransactionCsv([]), '\uFEFFdata;descricao;valor;tipo;conta;categoria;etiquetas\r\n');
 });
