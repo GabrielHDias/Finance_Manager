@@ -148,11 +148,13 @@ test("API real: receitas, despesas, dias zerados, meses e categorias", async ({ 
   const { accessToken } = await login.json();
   const headers = { Authorization: `Bearer ${accessToken}` };
   const account = await request.post(`${apiURL}/accounts`, { headers, data: { name: "Conta gráficos" } });
-  const category = await request.post(`${apiURL}/categories`, { headers, data: { name: "Categoria gráficos" } });
-  expect(account.ok()).toBe(true); expect(category.ok()).toBe(true);
+  const expenseCategory = await request.post(`${apiURL}/categories`, { headers, data: { name: "Despesas gráficos", type: "EXPENSE" } });
+  const incomeCategory = await request.post(`${apiURL}/categories`, { headers, data: { name: "Categoria gráficos", type: "INCOME" } });
+  expect(account.ok()).toBe(true); expect(expenseCategory.ok()).toBe(true); expect(incomeCategory.ok()).toBe(true);
   const accountId = (await account.json()).id;
-  const categoryId = (await category.json()).id;
-  for (const [amount, type, date] of [["0.10", "EXPENSE", "2026-10-01"], ["0.20", "EXPENSE", "2026-10-03"], ["100.00", "INCOME", "2026-10-01"]]) {
+  const expenseCategoryId = (await expenseCategory.json()).id;
+  const incomeCategoryId = (await incomeCategory.json()).id;
+  for (const [amount, type, date, categoryId] of [["0.10", "EXPENSE", "2026-10-01", expenseCategoryId], ["0.20", "EXPENSE", "2026-10-03", expenseCategoryId], ["100.00", "INCOME", "2026-10-01", incomeCategoryId]]) {
     const response = await request.post(`${apiURL}/transactions`, { headers, data: { description: "Dados de validação", amount, type, date, accountId, categoryId } });
     expect(response.ok()).toBe(true);
   }
